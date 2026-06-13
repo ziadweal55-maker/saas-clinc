@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+dist-electron/
+build/
+
+# Environment files (KEEP SECRETS OUT OF GIT)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Electron
+*.exe
+*.dmg
+*.AppImage
+
+# Uploads (user data, not code)
+clinic-api/uploads/
+
+# IDE
+.vscode/
+.idea/

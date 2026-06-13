@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 162 47% 14%; /* Deep Pine Green #0B2F24 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 162 47% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 162 47% 14%;
+
+    --primary: 160 84% 39%; /* Emerald Green #059669 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 70% 90%; /* Light Mint Green */
+    --secondary-foreground: 162 47% 14%;
+
+    --muted: 160 20% 95%; /* Muted Green-Gray */
+    --muted-foreground: 162 30% 45%;
+
+    --accent: 142 76% 36%; /* Forest/Grass Green */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 160 25% 88%;
+    --input: 160 25% 88%;
+    --ring: 160 84% 39%;
+
+    --radius: 1.5rem;
+  }
+
+  .dark {
+    --background: 162 47% 6%; /* Deep Pine Dark Mode */
+    --foreground: 160 50% 96%;
+
+    --card: 162 47% 9%;
+    --card-foreground: 160 50% 96%;
+
+    --popover: 162 47% 9%;
+    --popover-foreground: 160 50% 96%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 162 30% 15%;
+    --secondary-foreground: 160 50% 96%;
+
+    --muted: 162 30% 12%;
+    --muted-foreground: 160 30% 65%;
+
+    --accent: 142 76% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 162 30% 16%;
+    --input: 162 30% 16%;
+    --ring: 160 84% 39%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+  }
+}

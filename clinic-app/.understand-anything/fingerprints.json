@@ -1,0 +1,5067 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "55817b075dbc141faaffb749db7cdb48ab5d2725",
+  "generatedAt": "2026-06-05T21:33:13.749Z",
+  "files": {
+    ".agents/skills/supabase-postgres-best-practices/references/_contributing.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/_contributing.md",
+      "contentHash": "191e039e7d94764e6073410b513b559f9a594e0fdf0252a30c2a2986df2ab3bc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 171,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/_sections.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/_sections.md",
+      "contentHash": "c9e992612b422c7122de0b7542ebc2450db283edaab08cfe86c6d657fcccccd5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/_template.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/_template.md",
+      "contentHash": "6299954250f212caabe339d752c3e5313a8e07d1a182a4e4b425baee91df1bd2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md",
+      "contentHash": "40c2606bbb4c4dce31308f201b24cc7f58c7df05b1d9c6856fe2b888d3b7cf28",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md",
+      "contentHash": "24cacf6a8bc35901dd566d24502ce8e57f810a5c196b897e61d52726e521d106",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 50,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md",
+      "contentHash": "630588902c00fcec59a5988cc5d042f76dcf2c923a535abfd8c47dca205eaed5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/conn-limits.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/conn-limits.md",
+      "contentHash": "11b2a67a7c7679cbbc5d807bbb17e69c98484a581d0c8b929c03408f412b81b2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/conn-pooling.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/conn-pooling.md",
+      "contentHash": "88cf086bf98ba865d2e9d0579974e1366b14157619d6a93e7da77be91084e4a5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 42,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md",
+      "contentHash": "174e9332fe3dda5c99b2b00159fb1915ae36c00bab3a7882c14e73e4344e946e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md",
+      "contentHash": "531933b82d6a622d0fae29e0ea80be6fe5d78655adf2804c271ea84a1930de37",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md",
+      "contentHash": "21a44905e5b16a42741892ec34bb1bfef124d049b140a76934a9acd0f46f5fc2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/data-pagination.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/data-pagination.md",
+      "contentHash": "73c9fa10a3d439bedea0e11b640bd25bf30dd50f0d9006cf85baf7c3151543fa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/data-upsert.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/data-upsert.md",
+      "contentHash": "2612af83b20a2701dde30ef1f8d7efd26b7e9eef84717226b8f038a2d2150ff7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/lock-advisory.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/lock-advisory.md",
+      "contentHash": "c88d259dbf81c3771438f59a165f7eab8acd09999dd370bdf807521c73f35aab",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 57,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md",
+      "contentHash": "09aee46f51d7178c8e55fe056cd5a94a64ba2c122fe418e6900cd99f297b2347",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 69,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md",
+      "contentHash": "5aa7f61095916986d39644b446cdbcd2bacca7ef698a3bb50b3f82dd60207602",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md",
+      "contentHash": "6c45077f430f29cd9cd8f448c94d578e827e7bd023fcdaf717a756acb116fa4b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md",
+      "contentHash": "4cb67ffbf8e57f2e5b380b0beb4242528b513723ce314a2c2ffcf083bd4203d7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md",
+      "contentHash": "89dca99d4e894fcbdcac136be7ad9fbc03d1342904f065c1b198dc9cf495f098",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md",
+      "contentHash": "2892272011710eb49b3f185ec12f15ce9ce4c365792c672f6e2a9c90da426a1a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md",
+      "contentHash": "73e42424e671f0266e74fdb220db3196790f69fb43e2b19c7b9483eb4971b554",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md",
+      "contentHash": "daf2a7f0477fb7357b62b5fb5b185b1995a77a186347e45cb780e25e7a7589b6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 41,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/query-index-types.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/query-index-types.md",
+      "contentHash": "472a74f22c2df203bd0154999b3a5a0187cca2ab3d9a3978e305bb7c32f1a282",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 49,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md",
+      "contentHash": "91ad8b0ff4365704b4830a7f077c6f140f7140fd5d3ce5cd0b92b160cf9e25f1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 44,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md",
+      "contentHash": "6448982bc8558c6555284958edc331b29239c6a0130e6b4501dd6d4da607a6dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-constraints.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-constraints.md",
+      "contentHash": "90e8efda3e9e81095e642911ad4aae2809d160f29414338fa997253238f510f8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-data-types.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-data-types.md",
+      "contentHash": "e01b58c14c7f3f65d8ead580b9a4fcf70b83baaab0f9a5f83c569c9fd113e8c8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md",
+      "contentHash": "7587713d12a65a212365459b3d39e4717d8a79e4073b10bd62f1054d8192c0dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md",
+      "contentHash": "4bc80f70865f2390872591f326c8a6be6456a0aeb5a7e5a2475d7cd9d43059ab",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md",
+      "contentHash": "541e13fbeaf4bb1485c9059d4c9417dbdb766cf16f4237cd63a04ada7ec45b90",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 56,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md",
+      "contentHash": "3c8beabef82066f9a0838b926da0885117fd2d9a263aaf84cb5ca9e5f0d400e9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 62,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/security-privileges.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/security-privileges.md",
+      "contentHash": "095909274a4fb43df785d7144cf674eeb40284d2d45628f14af4108737b93663",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md",
+      "contentHash": "e04dd1a3a382aafdaaa73fe9f7976352acdde6e90c2a2470d281b94d4f44b096",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md",
+      "contentHash": "ee62c6e34468df8673d625291c1fcd7fb87041f122325eba224fc492cfe01bb3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 58,
+      "hasStructuralAnalysis": true
+    },
+    ".agents/skills/supabase-postgres-best-practices/SKILL.md": {
+      "filePath": ".agents/skills/supabase-postgres-best-practices/SKILL.md",
+      "contentHash": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 65,
+      "hasStructuralAnalysis": true
+    },
+    ".env": {
+      "filePath": ".env",
+      "contentHash": "45c61ad09b077c5f6a0ca238863255daf2fb55db8b9cb256138ce8374e3446bc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    ".gemini/settings.json": {
+      "filePath": ".gemini/settings.json",
+      "contentHash": "48676c805172829c3eb854d2b4d4af1024ca86313c22b3faf7e2542c27592a42",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    ".gemini/skills/ui-ux-pro-max/data/charts.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/charts.csv",
+      "contentHash": "b754c0efffcf54cb889114a9314be1d5af6ceebe65c4c436d713b52018e752c9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/colors.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/colors.csv",
+      "contentHash": "4cc0df2785f340b8bd0ace50bd4068dc13a7c4c6fa4d9d2723271244ce904614",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 98,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/icons.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/icons.csv",
+      "contentHash": "351fe61ba45b8146c66de6ea7d67297654639d79a94f537b4d0bad570058c28f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/landing.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/landing.csv",
+      "contentHash": "010e1e46db271b94e0af6f18973bea86ddba62feeccd62aeeaa6ed40e2ae2db1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/products.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/products.csv",
+      "contentHash": "5359e3037dcb84e99c792ea13dd44f5b78ab6a53557afb309cf19140512aaf5b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 97,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/react-performance.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/react-performance.csv",
+      "contentHash": "904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 46,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/astro.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "contentHash": "ad18dae3ab6d148d37d144592df80dc1825b6c9e86d9d2d68fdda77434206a37",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/flutter.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "contentHash": "e470e6bc2bcd8562667cc764d1e1afb0be0a30ca4dc9ec12fa18b19d46f156bd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "contentHash": "1f004891dd189f6bc2a7717401e3100244326e7e2f3963a79bf7b2349d85e091",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 57,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "contentHash": "6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nextjs.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "contentHash": "06a8e8c13bd44696c6ebb4cb6c4d8dea440e3de8cce77616512529ed29258f0c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 54,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "contentHash": "05d6e74501b2b6a636faed32450622759f49a5bcafad971f5f4e7eba0eb7be71",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 52,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "contentHash": "f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/react-native.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "contentHash": "a08ca77fcf6b6d9531982dce465366296013bfcf12d2938ac72ad57cf0c4f085",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 53,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/react.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "contentHash": "b6e3eb0e4c9c01bd00ffb951d5ca224a19d488b4544c75436f48cf92ff12bf45",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/shadcn.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "contentHash": "395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 62,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/svelte.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "contentHash": "bc8d158994a8bdf412830a9dd5e5a5534edd2f367a6e50e0ebd4d76f592dfa3f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 55,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/swiftui.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "contentHash": "e87cb9eee208bb753bdab96d4a261c7f830c4317ee90ec098316b248fc32be85",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 52,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/stacks/vue.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "contentHash": "9b793c3f4eec85f77a758c09322f2b62f3b3ca549bb713ccf0849ef885934395",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/styles.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/styles.csv",
+      "contentHash": "ad3c3236134d833bda01a2faf31ddeaaa1dbd5005fa430dec571fa91b26e5fea",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 69,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/typography.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/typography.csv",
+      "contentHash": "64695e05ac335ba534aff396c4ba9241c642f80ea53b424251d2669b71c4772b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 58,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/ui-reasoning.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "contentHash": "58fc52fff69f62709f8c7dd460de6f6693699ea820f24287f3301a427c2b554e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 102,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/ux-guidelines.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "contentHash": "1870ee048f2a2bdd60709f8f7adf7f3b6dcad560bc005c8b2915a8ac8639820d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 100,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/data/web-interface.csv": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/data/web-interface.csv",
+      "contentHash": "10bfc24e09a6a15db8309e6ef9b6881e1d4af97dffb7c99418aefb8e30df7d54",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": false
+    },
+    ".gemini/skills/ui-ux-pro-max/scripts/core.py": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/scripts/core.py",
+      "contentHash": "5459d1f04eea03dfb913742d0c03edc5065ac67f6227e4807fa87699662588cb",
+      "functions": [
+        {
+          "name": "_load_csv",
+          "params": [
+            "filepath"
+          ],
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "_search_csv",
+          "params": [
+            "filepath",
+            "search_cols",
+            "output_cols",
+            "query",
+            "max_results"
+          ],
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "detect_domain",
+          "params": [
+            "query"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "search",
+          "params": [
+            "query",
+            "domain",
+            "max_results"
+          ],
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "search_stack",
+          "params": [
+            "query",
+            "stack",
+            "max_results"
+          ],
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "classes": [
+        {
+          "name": "BM25",
+          "methods": [
+            "__init__",
+            "tokenize",
+            "fit",
+            "score"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 60
+        }
+      ],
+      "imports": [
+        {
+          "source": "csv",
+          "specifiers": [
+            "csv"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "math",
+          "specifiers": [
+            "log"
+          ]
+        },
+        {
+          "source": "collections",
+          "specifiers": [
+            "defaultdict"
+          ]
+        }
+      ],
+      "exports": [
+        "BM25",
+        "_load_csv",
+        "_search_csv",
+        "detect_domain",
+        "search",
+        "search_stack"
+      ],
+      "totalLines": 254,
+      "hasStructuralAnalysis": true
+    },
+    ".gemini/skills/ui-ux-pro-max/scripts/design_system.py": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/scripts/design_system.py",
+      "contentHash": "4da1d341f3c7749df51b51db4a543a48a427c3c746eb0e9882a1ab86acf3bb54",
+      "functions": [
+        {
+          "name": "format_ascii_box",
+          "params": [
+            "design_system"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 123
+        },
+        {
+          "name": "format_markdown",
+          "params": [
+            "design_system"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 92
+        },
+        {
+          "name": "generate_design_system",
+          "params": [
+            "query",
+            "project_name",
+            "output_format",
+            "persist",
+            "page",
+            "output_dir"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "persist_design_system",
+          "params": [
+            "design_system",
+            "page",
+            "output_dir",
+            "page_query"
+          ],
+          "returnType": "dict",
+          "exported": true,
+          "lineCount": 49
+        },
+        {
+          "name": "format_master_md",
+          "params": [
+            "design_system"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 261
+        },
+        {
+          "name": "format_page_override_md",
+          "params": [
+            "design_system",
+            "page_name",
+            "page_query"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 107
+        },
+        {
+          "name": "_generate_intelligent_overrides",
+          "params": [
+            "page_name",
+            "page_query",
+            "design_system"
+          ],
+          "returnType": "dict",
+          "exported": true,
+          "lineCount": 104
+        },
+        {
+          "name": "_detect_page_type",
+          "params": [
+            "context",
+            "style_results"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 33
+        }
+      ],
+      "classes": [
+        {
+          "name": "DesignSystemGenerator",
+          "methods": [
+            "__init__",
+            "_load_reasoning",
+            "_multi_domain_search",
+            "_find_reasoning_rule",
+            "_apply_reasoning",
+            "_select_best_match",
+            "_extract_results",
+            "generate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 200
+        }
+      ],
+      "imports": [
+        {
+          "source": "csv",
+          "specifiers": [
+            "csv"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "datetime",
+          "specifiers": [
+            "datetime"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "core",
+          "specifiers": [
+            "search",
+            "DATA_DIR"
+          ]
+        }
+      ],
+      "exports": [
+        "DesignSystemGenerator",
+        "format_ascii_box",
+        "format_markdown",
+        "generate_design_system",
+        "persist_design_system",
+        "format_master_md",
+        "format_page_override_md",
+        "_generate_intelligent_overrides",
+        "_detect_page_type"
+      ],
+      "totalLines": 1068,
+      "hasStructuralAnalysis": true
+    },
+    ".gemini/skills/ui-ux-pro-max/scripts/search.py": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/scripts/search.py",
+      "contentHash": "a449e57060ef5134e98e62fd11f6e240153afd68c27dab89cbb72a3ce55f1498",
+      "functions": [
+        {
+          "name": "format_output",
+          "params": [
+            "result"
+          ],
+          "exported": true,
+          "lineCount": 24
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "argparse",
+          "specifiers": [
+            "argparse"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "io",
+          "specifiers": [
+            "io"
+          ]
+        },
+        {
+          "source": "core",
+          "specifiers": [
+            "CSV_CONFIG",
+            "AVAILABLE_STACKS",
+            "MAX_RESULTS",
+            "search",
+            "search_stack"
+          ]
+        },
+        {
+          "source": "design_system",
+          "specifiers": [
+            "generate_design_system",
+            "persist_design_system"
+          ]
+        }
+      ],
+      "exports": [
+        "format_output"
+      ],
+      "totalLines": 115,
+      "hasStructuralAnalysis": true
+    },
+    ".gemini/skills/ui-ux-pro-max/SKILL.md": {
+      "filePath": ".gemini/skills/ui-ux-pro-max/SKILL.md",
+      "contentHash": "b4f16d368d4c22972e2523c9f5bf7e24f1d6230224899b18ff7d6001b10c6bf4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 293,
+      "hasStructuralAnalysis": true
+    },
+    ".superpowers/brainstorm/25889-1776980462/content/ui-ux-mockup.html": {
+      "filePath": ".superpowers/brainstorm/25889-1776980462/content/ui-ux-mockup.html",
+      "contentHash": "a7bafcedcb7f057dd680ff290082e7ee8c7a19df0b8163e27d41144b704a0fe8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 94,
+      "hasStructuralAnalysis": false
+    },
+    ".superpowers/brainstorm/25889-1776980462/state/server-info": {
+      "filePath": ".superpowers/brainstorm/25889-1776980462/state/server-info",
+      "contentHash": "83bf09ec4b05f732f9219672739fb7cd3c83e0a4d5ddfebfa32a2c2ca3f17aee",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "b80ce1d8f21bc2c549a317c6b0348673e8c334d089746955ae8f5ab3b6fc76dc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 38,
+      "hasStructuralAnalysis": false
+    },
+    ".understand-anything/config.json": {
+      "filePath": ".understand-anything/config.json",
+      "contentHash": "c3d4ed53a5453d102e321f7c8943707b29c34bad4a7038d624d2c2fe82919b2b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 5,
+      "hasStructuralAnalysis": true
+    },
+    "design-system/evolve-suite/MASTER.md": {
+      "filePath": "design-system/evolve-suite/MASTER.md",
+      "contentHash": "fa3f22e34828af797099d415042c2453690525d1d306abe1ef548581156ce677",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 204,
+      "hasStructuralAnalysis": true
+    },
+    "dist-electron/builder-debug.yml": {
+      "filePath": "dist-electron/builder-debug.yml",
+      "contentHash": "eed1aa37b11a95dca83a591c4f39c68c60483e4b961db32bdc1c342c0eed25bc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "dist-electron/builder-effective-config.yaml": {
+      "filePath": "dist-electron/builder-effective-config.yaml",
+      "contentHash": "d1e63fe077c40b27a72ffac68820ed39e5117a8fad6753e4905d1c19797e90d9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "dist-electron/win-unpacked/chrome_100_percent.pak": {
+      "filePath": "dist-electron/win-unpacked/chrome_100_percent.pak",
+      "contentHash": "464c2613d58639c2d2ba6030231335844c6b8d32c248c510b56ba665e682182a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 946,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/chrome_200_percent.pak": {
+      "filePath": "dist-electron/win-unpacked/chrome_200_percent.pak",
+      "contentHash": "b2ebd72684dac966650131e893bcc5ff16eb67d05fc364dfcee83e4e1b399428",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1276,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/d3dcompiler_47.dll": {
+      "filePath": "dist-electron/win-unpacked/d3dcompiler_47.dll",
+      "contentHash": "1aaef22526f38e7da53738c78dc6bb203bd2d73d89148deb5957fc1b7df7a7a6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11196,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/ffmpeg.dll": {
+      "filePath": "dist-electron/win-unpacked/ffmpeg.dll",
+      "contentHash": "4270c7b2a047ad3be58a77bd3d297f8a719e24da237d1c1603891921c945490b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 7706,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/icudtl.dat": {
+      "filePath": "dist-electron/win-unpacked/icudtl.dat",
+      "contentHash": "e2ccbd179436259f45af07602bd95de98c17810b4525e158eeade3da005fdac9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51078,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/libEGL.dll": {
+      "filePath": "dist-electron/win-unpacked/libEGL.dll",
+      "contentHash": "8cf279308440a92e1750fb2281defc069d788061e3ee2c2d2c98caac09ebc8d0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1395,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/libGLESv2.dll": {
+      "filePath": "dist-electron/win-unpacked/libGLESv2.dll",
+      "contentHash": "da47c35ad479db5642699411781f2b30be137afec55acf3195cac84288d4ecbd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19653,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/LICENSE.electron.txt": {
+      "filePath": "dist-electron/win-unpacked/LICENSE.electron.txt",
+      "contentHash": "5154e165bd6c2cc0cfbcd8916498c7abab0497923bafcd5cb07673fe8480087d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/LICENSES.chromium.html": {
+      "filePath": "dist-electron/win-unpacked/LICENSES.chromium.html",
+      "contentHash": "40f314c778851106918aae749d75b2d913984327602a1bfb7ef0cc6443ff2a37",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 169694,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/af.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/af.pak",
+      "contentHash": "134eda8327d844c83bd698832528c1e1004d0f71a8b8679e7a2bbd2129673b7a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 381,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/am.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/am.pak",
+      "contentHash": "96508a8244243260a5001fe9bfbc549e9afc7066b657c3dfcfcd2f531aebc745",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1318,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ar.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ar.pak",
+      "contentHash": "cff5b2b56ff8387683d21ef6d252929647c955be091a91e76bb98d564c29b1ef",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1138,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/bg.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/bg.pak",
+      "contentHash": "4d45f42437d2933def41ed638ef9f5987824b1c1dadbb0de9608eaee12e9f1dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1089,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/bn.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/bn.pak",
+      "contentHash": "ccb4a04a29800925b02707ace00f06d977a82113f3af76137a509aca1a3ac235",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1103,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ca.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ca.pak",
+      "contentHash": "f1684829a0d6dabd0ed40e57df0f04bc719ed9946f7bb6e0be3e6ef13fd679b8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 360,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/cs.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/cs.pak",
+      "contentHash": "752da5e9a26f05c8fd680bd6f0cea72fa5424ee9249b67be2d0d608c093b69c7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 361,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/da.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/da.pak",
+      "contentHash": "77303795eca57d797d7340af86fc7cdadff2d5c29154e8cd1044327fac75c9ab",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 391,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/de.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/de.pak",
+      "contentHash": "58233a62e9f56acc269babeac8e4dc47a99f63ad879baaa9106444d0cdceb0fc",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 357,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/el.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/el.pak",
+      "contentHash": "aff6312adca8e45aeb53f361d0088390229c757cc792495dabb31173b97da3c9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1035,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/en-GB.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/en-GB.pak",
+      "contentHash": "abc2effadd899a455659aa43d44734957491e98afb28748be604c0f0c9bc6744",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 405,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/en-US.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/en-US.pak",
+      "contentHash": "54360748d46933acb18c7d0ab32b060457120e5a22fde50b1c4aadf3592640a3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 952,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/es-419.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/es-419.pak",
+      "contentHash": "d4f934827ba45d6f7aedb2e69c124d548d686b48736761ad0c0df5654aee187d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 392,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/es.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/es.pak",
+      "contentHash": "70451b24921cb6abe51181273b4659a14a7418cab24a35db3d30a8cb14b4bff3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 379,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/et.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/et.pak",
+      "contentHash": "d3bfbdc6ab8ff82012f85d715ea43b5fd4d951c0a7be30a941fa47822518572f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 368,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/fa.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/fa.pak",
+      "contentHash": "667b54eff16e6a97bb06739eb59c9c4c9f89103b6029a14e53eddef1823be649",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1169,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/fi.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/fi.pak",
+      "contentHash": "79dbcc8dcd6c0c94c16544d715c332c9ea22e2c87f08de173b23ecb97ff732e8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 368,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/fil.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/fil.pak",
+      "contentHash": "51153e0cd48179bc488be432297b33efe908863463c002fb3f9867eab211b0cb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 419,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/fr.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/fr.pak",
+      "contentHash": "2434120469e09ff3a3cee39cf1d17c9bfa2b32298ed77118a5faa1b5301c3354",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 371,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/gu.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/gu.pak",
+      "contentHash": "f71b52e9b3515f9bf1e2d31a9479dd986b5a286db29b572a8ba9662e51bf7120",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1032,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/he.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/he.pak",
+      "contentHash": "76be5d744fcd0ebd9c0f344ca6a96939859e490dc35df9a6455db99a2b5cae89",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1494,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/hi.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/hi.pak",
+      "contentHash": "f02f6137cc73e4ba9d1aff608b9b3cb9e6b1df5db8392287940aa4b552bdfc2e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1070,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/hr.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/hr.pak",
+      "contentHash": "325244aec94e5c95488e288b57334f613c7824ac3fc9f3e1e665f6bbffadd669",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 415,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/hu.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/hu.pak",
+      "contentHash": "b7d0cc5a429f8126943c404f018b13d903e304bb9019e179f933832f4081da4c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 363,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/id.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/id.pak",
+      "contentHash": "cc3ae68f66b4994dba36db9b11efcd2ab4d1f6fc6d20cf3f3a544779974a544c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 380,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/it.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/it.pak",
+      "contentHash": "947caedb7e501c68b67051a476b6d158afcedcc3ab8205b4f4bdf0f49a673cbb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 346,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ja.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ja.pak",
+      "contentHash": "16214f91454dcf3a7984f4fc69ff5759f6236faaa52baaa466df6063a129a0eb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1088,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/kn.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/kn.pak",
+      "contentHash": "aa952d972c21718ccf4538cce7e684e73161ab64ef3efef5b7d37d99d4e8df24",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1017,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ko.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ko.pak",
+      "contentHash": "c3570b9dc2fdd3d296421d72dab20f15b0d82979e42e374a530ef399c5206bde",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 354,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/lt.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/lt.pak",
+      "contentHash": "11d32ec61a0f21cfefc02223e09e8d7bdca7ccbd96d56d8befa3e5948e51f54f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 432,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/lv.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/lv.pak",
+      "contentHash": "97415d01f31b8e99f7588d22c7a7a987f3c2f179f09dd0364b3c0f1f6637452b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 352,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ml.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ml.pak",
+      "contentHash": "b8e95fdf9cea24fa53ff68de5440fdd1b80e2b26c2a41beea6e924d0ad694ad7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 952,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/mr.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/mr.pak",
+      "contentHash": "cbd16cb346d03655b968cec03765e72d0ec3554c26b5f9d7ce23bab3f697a2c2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 977,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ms.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ms.pak",
+      "contentHash": "558ecc275bd1502b7ae86b73fb9b1642d54aaede7bd28c3d6c50b18760ff1875",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 379,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/nb.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/nb.pak",
+      "contentHash": "9961a281f49fc2dc6098dcc71a99d931e86b3cbeeae9a63cbb71128f7beab08c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 341,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/nl.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/nl.pak",
+      "contentHash": "95646b8e27232d23e1e33308856c31f31d35098d3cf68750c0333ca41e8ea70f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 378,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/pl.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/pl.pak",
+      "contentHash": "39cd7d8d4903be5aff407c6f38ec7fe3369e4feb4f7d9da7e36a413157e7781c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 381,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/pt-BR.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/pt-BR.pak",
+      "contentHash": "ca4baeec42000add71d1c0c834f0ee8925a0416ebb4e771ec8229da4cd9b3c13",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 368,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/pt-PT.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/pt-PT.pak",
+      "contentHash": "34e8c1007b7b788f09972b36f2fc82ffd1f26435ebc44bb5b1f56829263ab4ec",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 357,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ro.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ro.pak",
+      "contentHash": "3944722ad877fddac55f74c287b045394c4de1c2979e137f36590161eb9bda28",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 330,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ru.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ru.pak",
+      "contentHash": "28f4c8195e9a57da87c6d9d853744e789f84b69ad459b642ccb8acfdd0a53351",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 967,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/sk.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/sk.pak",
+      "contentHash": "afad4ba1a7d16d5bd01ede0adc5d9aa4888ac09d5c59a3356477845beb60fe4b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 360,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/sl.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/sl.pak",
+      "contentHash": "eab9be47f4a079257405a01df226fbd25badeb189c35ce0f97c208c81cd04c2d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 364,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/sr.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/sr.pak",
+      "contentHash": "10a67f53f1627cb2b226aa392b08d395e1aa8f8a47c41284ad691a1259759c2d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1106,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/sv.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/sv.pak",
+      "contentHash": "72da4e68927d1dfde0516ca3db17fac127745e2895b2dee167dd5dcee7b86d28",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 411,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/sw.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/sw.pak",
+      "contentHash": "70769df0bce4013be148664f012dec8b71d4c3fb1603a86d1f87c9b44441be5e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 351,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ta.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ta.pak",
+      "contentHash": "c0d02c82bbe9e45ddf5247547825d1ce84da16a73531878253c5ab76a0a36a07",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 971,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/te.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/te.pak",
+      "contentHash": "e92a7762a9b3a236a9b2e5f1ed41d5e4a2c9d66d5f02d02e2f6ef49e5a59f9d6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 989,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/th.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/th.pak",
+      "contentHash": "f68de8b685ccdf0ca13b0fc6b778f497250f6f7f8e0c4db358367ad373cd44da",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1069,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/tr.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/tr.pak",
+      "contentHash": "05d7696bd1745ca75489a1014a6a3957b8cf367cd5e52ec6998083a10cd852a3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 360,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/uk.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/uk.pak",
+      "contentHash": "f2d7621bec0cfd5fcb30f21df936d4844a63739ddbf9a380d0cc587a17fe2ed9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1011,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/ur.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/ur.pak",
+      "contentHash": "8f00c5c5c8f5f751560855f30c86c6f281272b78e684b31483735623abeb329f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1159,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/vi.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/vi.pak",
+      "contentHash": "732038fc97b15bfbd46b97b5259a94ee535f0e96486a4ced3a51a4cf1f6f7342",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 877,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/zh-CN.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/zh-CN.pak",
+      "contentHash": "1d1d363b4772c26b0dc4fa5de7938ee019c7d18ccd0c3072badb6e6e1d4429ad",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 337,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/locales/zh-TW.pak": {
+      "filePath": "dist-electron/win-unpacked/locales/zh-TW.pak",
+      "contentHash": "c34cd979efbdd63a5a23643850ed59585dac7ee11f82c37261100e9ab70954ae",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 349,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/resources.pak": {
+      "filePath": "dist-electron/win-unpacked/resources.pak",
+      "contentHash": "75ac3cc417df96b758c3d22ca3dda86e64991e9d74d6f34331ce7da72c14754d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 22013,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/resources/app.asar": {
+      "filePath": "dist-electron/win-unpacked/resources/app.asar",
+      "contentHash": "8925fcdfcd4771170cba02b0fc3aab8441f7fade52abc2151e3728b8f4648116",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 897872,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/Revive Clinic.exe": {
+      "filePath": "dist-electron/win-unpacked/Revive Clinic.exe",
+      "contentHash": "b2d508ef59aaa4c70e78ad71332ae7d1b9a32b6416e9730c2ca45ddb7ca19b3f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 915653,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/snapshot_blob.bin": {
+      "filePath": "dist-electron/win-unpacked/snapshot_blob.bin",
+      "contentHash": "420f9c8eadc3ff9a6e90d000504fbcf499c5eadfa5c4ccd65aaffd2189d6d9c4",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1048,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/v8_context_snapshot.bin": {
+      "filePath": "dist-electron/win-unpacked/v8_context_snapshot.bin",
+      "contentHash": "61b19dc1f959f7b97da96973937a64e2bfb9d7d74578032e0e395b9b809635d7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2953,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/vk_swiftshader_icd.json": {
+      "filePath": "dist-electron/win-unpacked/vk_swiftshader_icd.json",
+      "contentHash": "32d83ff113fef532a9f97e0d2831f8656628ab1c99e9060f0332b1532839afd9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 1,
+      "hasStructuralAnalysis": true
+    },
+    "dist-electron/win-unpacked/vk_swiftshader.dll": {
+      "filePath": "dist-electron/win-unpacked/vk_swiftshader.dll",
+      "contentHash": "f2547d0e6f4dcf128151170c265236d832f11a3e62d987acab8587f37b226dd2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12331,
+      "hasStructuralAnalysis": false
+    },
+    "dist-electron/win-unpacked/vulkan-1.dll": {
+      "filePath": "dist-electron/win-unpacked/vulkan-1.dll",
+      "contentHash": "cad7754874dd9cc11a2246c0acca5d539fbc80d44ad35f7ed07e768c990320e9",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2480,
+      "hasStructuralAnalysis": false
+    },
+    "docs/supabase/migration.sql": {
+      "filePath": "docs/supabase/migration.sql",
+      "contentHash": "8b8086ad17ad9fe5ef748c51eb581eecaeeec6874111119a5198c236263fd54c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 290,
+      "hasStructuralAnalysis": true
+    },
+    "docs/supabase/schema.sql": {
+      "filePath": "docs/supabase/schema.sql",
+      "contentHash": "a773bbcd3336b87838aa4e04df0f0c9856936b9bd9c288eb86aab59da1e19233",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 208,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/plans/2025-05-14-patient-portal-auth.md": {
+      "filePath": "docs/superpowers/plans/2025-05-14-patient-portal-auth.md",
+      "contentHash": "89d63a79c4b14788a184d64c5ffa229c997c39662398bd6b843acee86d24e08d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 231,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/plans/2026-04-23-home-exercise-portal.md": {
+      "filePath": "docs/superpowers/plans/2026-04-23-home-exercise-portal.md",
+      "contentHash": "b7d6b57a98bab442c8e6e8ecf3c5a71f0e357d265014099d00b941f92a6bfa13",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 164,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/specs/2026-04-23-patient-portal-sync-design.md": {
+      "filePath": "docs/superpowers/specs/2026-04-23-patient-portal-sync-design.md",
+      "contentHash": "4758e0a6dedf26d045dbe2f0aa348160bab692c34900647a30cd176bde01521e",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 48,
+      "hasStructuralAnalysis": true
+    },
+    "docs/superpowers/specs/2026-04-24-patient-portal-vercel-deployment-design.md": {
+      "filePath": "docs/superpowers/specs/2026-04-24-patient-portal-vercel-deployment-design.md",
+      "contentHash": "21f4c9c3c4639a8ec41e4a41e805c05ea979a08917ee2c1d57af2911c5b474c7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "electron/database.js": {
+      "filePath": "electron/database.js",
+      "contentHash": "299abf9659b19eff1dbf41dccb8243623fac91e72c2c73f310e701100ef9f7f3",
+      "functions": [
+        {
+          "name": "getDatabase",
+          "params": [],
+          "exported": false,
+          "lineCount": 161
+        },
+        {
+          "name": "initSchema",
+          "params": [
+            "rawDb",
+            "db"
+          ],
+          "exported": false,
+          "lineCount": 565
+        },
+        {
+          "name": "reloadDatabase",
+          "params": [],
+          "exported": false,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 746,
+      "hasStructuralAnalysis": true
+    },
+    "electron/logger.js": {
+      "filePath": "electron/logger.js",
+      "contentHash": "dbbc4421e8867c7602a7be0c779674ce8f264ee5fe8dabc57f7420bc25ea6465",
+      "functions": [
+        {
+          "name": "getLogFilePath",
+          "params": [],
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "rotateLogsIfNeeded",
+          "params": [],
+          "exported": false,
+          "lineCount": 23
+        },
+        {
+          "name": "writeLog",
+          "params": [
+            "level",
+            "moduleName",
+            "message"
+          ],
+          "exported": false,
+          "lineCount": 18
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 76,
+      "hasStructuralAnalysis": true
+    },
+    "electron/main.js": {
+      "filePath": "electron/main.js",
+      "contentHash": "f95294ad76d1dc5b9ad0780d20408c38d2392bf1c9f77783f33d5ae86ef57e94",
+      "functions": [
+        {
+          "name": "getLocalIp",
+          "params": [],
+          "exported": false,
+          "lineCount": 28
+        },
+        {
+          "name": "getTailscaleIp",
+          "params": [],
+          "exported": false,
+          "lineCount": 21
+        },
+        {
+          "name": "startLocalServer",
+          "params": [],
+          "exported": false,
+          "lineCount": 317
+        },
+        {
+          "name": "hashPassword",
+          "params": [
+            "password"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "verifyPassword",
+          "params": [
+            "password",
+            "hash"
+          ],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "createWindow",
+          "params": [],
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "runAutoArchiveJob",
+          "params": [],
+          "exported": false,
+          "lineCount": 32
+        },
+        {
+          "name": "logAudit",
+          "params": [
+            "clientId",
+            "field",
+            "oldValue",
+            "newValue",
+            "adminUsername"
+          ],
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "syncPackageSessions",
+          "params": [
+            "clientId"
+          ],
+          "exported": false,
+          "lineCount": 26
+        },
+        {
+          "name": "runBackgroundSyncJob",
+          "params": [],
+          "exported": false,
+          "lineCount": 215
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3179,
+      "hasStructuralAnalysis": true
+    },
+    "electron/preload.js": {
+      "filePath": "electron/preload.js",
+      "contentHash": "11682e4ac3f82d35952c388e36798fccc11cbbc90ed71933472b1be7e26bd0f2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 173,
+      "hasStructuralAnalysis": true
+    },
+    "electron/sync.js": {
+      "filePath": "electron/sync.js",
+      "contentHash": "988b56b159d4e09bd0465b7c77ed092478a3bd042e9c4ade7b64697545890b92",
+      "functions": [
+        {
+          "name": "syncToCloud",
+          "params": [
+            "tableName",
+            "localRecords"
+          ],
+          "exported": false,
+          "lineCount": 13
+        },
+        {
+          "name": "syncPatientPlan",
+          "params": [
+            "payload"
+          ],
+          "exported": false,
+          "lineCount": 555
+        },
+        {
+          "name": "syncAppointments",
+          "params": [
+            "db"
+          ],
+          "exported": false,
+          "lineCount": 67
+        },
+        {
+          "name": "syncUsers",
+          "params": [
+            "db"
+          ],
+          "exported": false,
+          "lineCount": 54
+        },
+        {
+          "name": "processSyncQueue",
+          "params": [
+            "db"
+          ],
+          "exported": false,
+          "lineCount": 40
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 755,
+      "hasStructuralAnalysis": true
+    },
+    "eslint.config.mjs": {
+      "filePath": "eslint.config.mjs",
+      "contentHash": "dc00c7db700d03834d04a172ea709593ae5ef1bc750eb55dfc521a60d9e1baa0",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "js"
+          ]
+        },
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-hooks",
+          "specifiers": [
+            "reactHooks"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-refresh",
+          "specifiers": [
+            "reactRefresh"
+          ]
+        },
+        {
+          "source": "typescript-eslint",
+          "specifiers": [
+            "tseslint"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 29,
+      "hasStructuralAnalysis": true
+    },
+    "index.html": {
+      "filePath": "index.html",
+      "contentHash": "599f442738826d56ded7a21fefb9cc296133a0cd0fc3904b47309f6991829ba3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "management-dashboard/.env": {
+      "filePath": "management-dashboard/.env",
+      "contentHash": "5e0a6034c50065b8c8b9136b2e5970974155e8971eefc3d5e462e4f5bd4cb076",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/eslint.config.js": {
+      "filePath": "management-dashboard/eslint.config.js",
+      "contentHash": "cf80a7510234dcd5ae594b30b44682b8b45ba13c0fcb5bf8928bea143802aa1c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "js"
+          ]
+        },
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-hooks",
+          "specifiers": [
+            "reactHooks"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-refresh",
+          "specifiers": [
+            "reactRefresh"
+          ]
+        },
+        {
+          "source": "typescript-eslint",
+          "specifiers": [
+            "tseslint"
+          ]
+        },
+        {
+          "source": "eslint/config",
+          "specifiers": [
+            "defineConfig",
+            "globalIgnores"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/index.html": {
+      "filePath": "management-dashboard/index.html",
+      "contentHash": "0dbeef9292619a095c96acffba2c3f0976eff5bbad50d639fa2a413c4895bc0f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "management-dashboard/package.json": {
+      "filePath": "management-dashboard/package.json",
+      "contentHash": "e44ea89050061a90d21d051ae2f50739c2a4b092c413c828099d362b9cebebf2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 39,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/README.md": {
+      "filePath": "management-dashboard/README.md",
+      "contentHash": "8dc9e0ee2281acb3324624fbe6eb7e1377cc626f616ea4dc90e3a90ae094374d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/src/App.tsx": {
+      "filePath": "management-dashboard/src/App.tsx",
+      "contentHash": "78073881ee35dd38df3ffbd4243a4f30d42abe83bce0c6b499df94ce9bd79fbe",
+      "functions": [
+        {
+          "name": "App",
+          "params": [],
+          "exported": true,
+          "lineCount": 324
+        },
+        {
+          "name": "StatCard",
+          "params": [
+            "{ title, value, icon: Icon, trend, color }"
+          ],
+          "exported": false,
+          "lineCount": 19
+        },
+        {
+          "name": "RevenueTable",
+          "params": [
+            "{ data, query }"
+          ],
+          "exported": false,
+          "lineCount": 98
+        },
+        {
+          "name": "PatientsTable",
+          "params": [
+            "{ data, query, onSelect }"
+          ],
+          "exported": false,
+          "lineCount": 101
+        },
+        {
+          "name": "PatientDetailView",
+          "params": [
+            "{ patient, onClose }"
+          ],
+          "exported": false,
+          "lineCount": 1186
+        },
+        {
+          "name": "DoctorsTable",
+          "params": [
+            "{ data, query }"
+          ],
+          "exported": false,
+          "lineCount": 70
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React",
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useRef"
+          ]
+        },
+        {
+          "source": "./lib/supabase",
+          "specifiers": [
+            "supabase"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users",
+            "TrendingUp",
+            "Calendar",
+            "UserCircle",
+            "Search",
+            "Filter",
+            "DollarSign",
+            "Activity",
+            "X",
+            "Phone",
+            "History",
+            "Clipboard",
+            "Dumbbell",
+            "CreditCard",
+            "RefreshCw",
+            "AlertTriangle",
+            "Zap",
+            "Hand",
+            "Wrench",
+            "Apple",
+            "Scale",
+            "FileText",
+            "Trash2"
+          ]
+        }
+      ],
+      "exports": [
+        "App"
+      ],
+      "totalLines": 1851,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/src/index.css": {
+      "filePath": "management-dashboard/src/index.css",
+      "contentHash": "7a731209b5bd18c9454ffd88516847e65bf9e29854b0a90db5cbf163c9672e6c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": false
+    },
+    "management-dashboard/src/lib/supabase.ts": {
+      "filePath": "management-dashboard/src/lib/supabase.ts",
+      "contentHash": "46182237673b0e5d11b4a1a809bd51a1ed11b416638d9e57a17f214db2420d42",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@supabase/supabase-js",
+          "specifiers": [
+            "createClient"
+          ]
+        }
+      ],
+      "exports": [
+        "supabase"
+      ],
+      "totalLines": 7,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/src/main.tsx": {
+      "filePath": "management-dashboard/src/main.tsx",
+      "contentHash": "abe0edc1f91f5d414bbfb8f335f8871b4bf4edf07a861ab225e368a8319cdb6b",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "React"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "ReactDOM"
+          ]
+        },
+        {
+          "source": "./App.tsx",
+          "specifiers": [
+            "App"
+          ]
+        },
+        {
+          "source": "./index.css",
+          "specifiers": []
+        }
+      ],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/tsconfig.app.json": {
+      "filePath": "management-dashboard/tsconfig.app.json",
+      "contentHash": "b1eac9ba6cd1c01d59ebca159805e052c798d9d4ab904680b79ce3e306ea0bbd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/tsconfig.json": {
+      "filePath": "management-dashboard/tsconfig.json",
+      "contentHash": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/tsconfig.node.json": {
+      "filePath": "management-dashboard/tsconfig.node.json",
+      "contentHash": "90a22c920cbc14624fb4658b58f15c875abf3234224f3933f211849c3ada3242",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "management-dashboard/vite.config.ts": {
+      "filePath": "management-dashboard/vite.config.ts",
+      "contentHash": "59d2746d56a57a5627f0c06b58075550c4ef025fdcf55174b89f80a50e06f64d",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "@tailwindcss/vite",
+          "specifiers": [
+            "tailwindcss"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 17,
+      "hasStructuralAnalysis": true
+    },
+    "package.json": {
+      "filePath": "package.json",
+      "contentHash": "0fe5cc4f11c363b491d1265098059977402af1ff609b79ce157ca1aa7a2e34ff",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 72,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/.env": {
+      "filePath": "patient-portal/.env",
+      "contentHash": "5e0a6034c50065b8c8b9136b2e5970974155e8971eefc3d5e462e4f5bd4cb076",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/eslint.config.js": {
+      "filePath": "patient-portal/eslint.config.js",
+      "contentHash": "cf80a7510234dcd5ae594b30b44682b8b45ba13c0fcb5bf8928bea143802aa1c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@eslint/js",
+          "specifiers": [
+            "js"
+          ]
+        },
+        {
+          "source": "globals",
+          "specifiers": [
+            "globals"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-hooks",
+          "specifiers": [
+            "reactHooks"
+          ]
+        },
+        {
+          "source": "eslint-plugin-react-refresh",
+          "specifiers": [
+            "reactRefresh"
+          ]
+        },
+        {
+          "source": "typescript-eslint",
+          "specifiers": [
+            "tseslint"
+          ]
+        },
+        {
+          "source": "eslint/config",
+          "specifiers": [
+            "defineConfig",
+            "globalIgnores"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/index.html": {
+      "filePath": "patient-portal/index.html",
+      "contentHash": "b1fbe02263ee4d34475af1dfce3293827fd9f7f6fd9e9e684830ab2084f9eba7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "patient-portal/package.json": {
+      "filePath": "patient-portal/package.json",
+      "contentHash": "89e7ce26d1569d5e9ee76877ece2eaf0dbfd8c6d07d54ee14b1d4a9dcd43da02",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/README.md": {
+      "filePath": "patient-portal/README.md",
+      "contentHash": "8dc9e0ee2281acb3324624fbe6eb7e1377cc626f616ea4dc90e3a90ae094374d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/App.css": {
+      "filePath": "patient-portal/src/App.css",
+      "contentHash": "6e25a776d3e8102da5bacb3cb99f4a5fc662a2e01e6143140671a556d28c3d5c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 185,
+      "hasStructuralAnalysis": false
+    },
+    "patient-portal/src/App.tsx": {
+      "filePath": "patient-portal/src/App.tsx",
+      "contentHash": "069305ce94cbfd84a34c6921cb33dbe1365dab3e389515ba742a01f79f2cc356",
+      "functions": [
+        {
+          "name": "App",
+          "params": [],
+          "exported": false,
+          "lineCount": 101
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "./components/PinEntry",
+          "specifiers": [
+            "PinEntry"
+          ]
+        },
+        {
+          "source": "./components/ExerciseList",
+          "specifiers": [
+            "ExerciseList"
+          ]
+        },
+        {
+          "source": "./components/DailyCheckIn",
+          "specifiers": [
+            "DailyCheckIn"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "LogOut",
+            "Dumbbell",
+            "Sparkles",
+            "CheckCircle"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 110,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/components/DailyCheckIn.tsx": {
+      "filePath": "patient-portal/src/components/DailyCheckIn.tsx",
+      "contentHash": "f56b55759b33ee65c672f16fd89786f075e9ccadb89e2158c2c77bb202f37f96",
+      "functions": [
+        {
+          "name": "DailyCheckIn",
+          "params": [
+            "{ patientId, onClose, onSuccess }"
+          ],
+          "exported": true,
+          "lineCount": 131
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "../lib/supabase",
+          "specifiers": [
+            "supabase"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Thermometer",
+            "CheckCircle",
+            "Loader2",
+            "AlertCircle",
+            "X",
+            "MessageSquare"
+          ]
+        }
+      ],
+      "exports": [
+        "DailyCheckIn"
+      ],
+      "totalLines": 142,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/components/ExerciseList.tsx": {
+      "filePath": "patient-portal/src/components/ExerciseList.tsx",
+      "contentHash": "75fb2d953d77959377f6552a555b3809fda4272d41955fc0684b34e74caa2170",
+      "functions": [
+        {
+          "name": "ExerciseList",
+          "params": [
+            "{ patientId, onFinishSession }"
+          ],
+          "exported": true,
+          "lineCount": 171
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "../lib/supabase",
+          "specifiers": [
+            "supabase"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Dumbbell",
+            "CheckCircle2",
+            "Circle",
+            "PlayCircle",
+            "Loader2",
+            "AlertCircle",
+            "Activity"
+          ]
+        }
+      ],
+      "exports": [
+        "ExerciseList"
+      ],
+      "totalLines": 192,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/components/PinEntry.tsx": {
+      "filePath": "patient-portal/src/components/PinEntry.tsx",
+      "contentHash": "7565d1144a475c05af1b84420e31a0d77d8400a860c52b8da6638c6581df2136",
+      "functions": [
+        {
+          "name": "PinEntry",
+          "params": [
+            "{ onSuccess }"
+          ],
+          "exported": true,
+          "lineCount": 104
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "../lib/supabase",
+          "specifiers": [
+            "supabase"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "KeyRound",
+            "Loader2",
+            "AlertCircle"
+          ]
+        }
+      ],
+      "exports": [
+        "PinEntry"
+      ],
+      "totalLines": 113,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/index.css": {
+      "filePath": "patient-portal/src/index.css",
+      "contentHash": "3e4566f0e3c86eeaae0dadc7bb7824c6484bb663d80f47dfb9fe1e4df5df6896",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 116,
+      "hasStructuralAnalysis": false
+    },
+    "patient-portal/src/lib/supabase.ts": {
+      "filePath": "patient-portal/src/lib/supabase.ts",
+      "contentHash": "a65c1f1a9426699ccd8e8694e1ebec6a6b8271fb8e02ab9bfb894e5dcb0b8d39",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@supabase/supabase-js",
+          "specifiers": [
+            "createClient"
+          ]
+        }
+      ],
+      "exports": [
+        "supabase"
+      ],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/src/main.tsx": {
+      "filePath": "patient-portal/src/main.tsx",
+      "contentHash": "6e9e5807fcbd48b75a96db5cbef36c996262196be42e6d4760dc86babbe61ad2",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "StrictMode"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "createRoot"
+          ]
+        },
+        {
+          "source": "./index.css",
+          "specifiers": []
+        },
+        {
+          "source": "./App.tsx",
+          "specifiers": [
+            "App"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/tsconfig.app.json": {
+      "filePath": "patient-portal/tsconfig.app.json",
+      "contentHash": "3909fc3fa5fb1f564a3716bf7ba1a88a8805b2782ba9ad83d12054896b8e9ae2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/tsconfig.json": {
+      "filePath": "patient-portal/tsconfig.json",
+      "contentHash": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/tsconfig.node.json": {
+      "filePath": "patient-portal/tsconfig.node.json",
+      "contentHash": "f12468b633d0565e4024d43d205abbbe812adbe4328dbef9f529acbacac4ad2f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "patient-portal/vite.config.ts": {
+      "filePath": "patient-portal/vite.config.ts",
+      "contentHash": "2d349dd531ebc438776f51e3bcf28064538b7e19339285aaaaf6d429724aca70",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "@tailwindcss/vite",
+          "specifiers": [
+            "tailwindcss"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "f83e8201f2934fb634577123959d9f332edfc9cb45438c764c9f6fc7ac6d71c3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 51,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/.env": {
+      "filePath": "schedule-portal/.env",
+      "contentHash": "5e0a6034c50065b8c8b9136b2e5970974155e8971eefc3d5e462e4f5bd4cb076",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 3,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/index.html": {
+      "filePath": "schedule-portal/index.html",
+      "contentHash": "b17b0cc6aa77c16ff31bfbb5381cd442661a7411201195128bba266c958e6e3f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": false
+    },
+    "schedule-portal/package.json": {
+      "filePath": "schedule-portal/package.json",
+      "contentHash": "2083e331e6f4ff26e2165264029b2e6bbaba7d4d8074ad0883c38b528060a0ef",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 35,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/src/App.tsx": {
+      "filePath": "schedule-portal/src/App.tsx",
+      "contentHash": "a71895228a88a4f4ef3e930f6fde335a6f4c31cde13e68e3f3205f85e1d4be8a",
+      "functions": [
+        {
+          "name": "sha256",
+          "params": [
+            "ascii"
+          ],
+          "returnType": "string",
+          "exported": false,
+          "lineCount": 86
+        },
+        {
+          "name": "App",
+          "params": [],
+          "exported": false,
+          "lineCount": 569
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "./lib/supabase",
+          "specifiers": [
+            "supabase"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Lock",
+            "User",
+            "ShieldCheck",
+            "AlertCircle",
+            "Calendar",
+            "Search",
+            "ChevronLeft",
+            "ChevronRight",
+            "LogOut",
+            "Clock",
+            "Phone",
+            "Activity",
+            "UserCheck",
+            "Sparkles",
+            "RefreshCw"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 702,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/src/index.css": {
+      "filePath": "schedule-portal/src/index.css",
+      "contentHash": "3e4566f0e3c86eeaae0dadc7bb7824c6484bb663d80f47dfb9fe1e4df5df6896",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 116,
+      "hasStructuralAnalysis": false
+    },
+    "schedule-portal/src/lib/supabase.ts": {
+      "filePath": "schedule-portal/src/lib/supabase.ts",
+      "contentHash": "a65c1f1a9426699ccd8e8694e1ebec6a6b8271fb8e02ab9bfb894e5dcb0b8d39",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "@supabase/supabase-js",
+          "specifiers": [
+            "createClient"
+          ]
+        }
+      ],
+      "exports": [
+        "supabase"
+      ],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/src/main.tsx": {
+      "filePath": "schedule-portal/src/main.tsx",
+      "contentHash": "6e9e5807fcbd48b75a96db5cbef36c996262196be42e6d4760dc86babbe61ad2",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "StrictMode"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "createRoot"
+          ]
+        },
+        {
+          "source": "./index.css",
+          "specifiers": []
+        },
+        {
+          "source": "./App.tsx",
+          "specifiers": [
+            "App"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/tsconfig.app.json": {
+      "filePath": "schedule-portal/tsconfig.app.json",
+      "contentHash": "3909fc3fa5fb1f564a3716bf7ba1a88a8805b2782ba9ad83d12054896b8e9ae2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/tsconfig.json": {
+      "filePath": "schedule-portal/tsconfig.json",
+      "contentHash": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/tsconfig.node.json": {
+      "filePath": "schedule-portal/tsconfig.node.json",
+      "contentHash": "f12468b633d0565e4024d43d205abbbe812adbe4328dbef9f529acbacac4ad2f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "schedule-portal/vite.config.ts": {
+      "filePath": "schedule-portal/vite.config.ts",
+      "contentHash": "2d349dd531ebc438776f51e3bcf28064538b7e19339285aaaaf6d429724aca70",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "vite",
+          "specifiers": [
+            "defineConfig"
+          ]
+        },
+        {
+          "source": "@vitejs/plugin-react",
+          "specifiers": [
+            "react"
+          ]
+        },
+        {
+          "source": "@tailwindcss/vite",
+          "specifiers": [
+            "tailwindcss"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/test_gemini.js": {
+      "filePath": "scratch/test_gemini.js",
+      "contentHash": "428a01533d249fb033adff2ca0a8139439b0c99066544efe49f55243c63a0f81",
+      "functions": [
+        {
+          "name": "testKey",
+          "params": [],
+          "exported": false,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 20,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/zip_app.py": {
+      "filePath": "scratch/zip_app.py",
+      "contentHash": "cb06f96df90e822da5bb499172831eccbb8d228d10efca3d6901d3e2f65989c7",
+      "functions": [
+        {
+          "name": "zip_directory",
+          "params": [
+            "dir_path",
+            "zip_path"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "zipfile",
+          "specifiers": [
+            "zipfile"
+          ]
+        }
+      ],
+      "exports": [
+        "zip_directory"
+      ],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/zip_build.py": {
+      "filePath": "scratch/zip_build.py",
+      "contentHash": "f04dcbf1023af10d06e839a0d7dd906fa99dfccd1805ead0b2b4e14670771bd3",
+      "functions": [
+        {
+          "name": "zipdir",
+          "params": [
+            "path",
+            "ziph"
+          ],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zipfile",
+          "specifiers": [
+            "zipfile"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "zipdir"
+      ],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/zip_network_test.py": {
+      "filePath": "scratch/zip_network_test.py",
+      "contentHash": "64a76747756a367843dcefe1784320da24d05a5b4da021cdfe4e9f64bbbb528d",
+      "functions": [
+        {
+          "name": "zipdir",
+          "params": [
+            "path",
+            "ziph"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "zipfile",
+          "specifiers": [
+            "zipfile"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        }
+      ],
+      "exports": [
+        "zipdir"
+      ],
+      "totalLines": 24,
+      "hasStructuralAnalysis": true
+    },
+    "scratch/zip_ui_update.py": {
+      "filePath": "scratch/zip_ui_update.py",
+      "contentHash": "b4ed617ab988907d273d27ecfed8f2af80f8162088b90c08fdf23ccadad81614",
+      "functions": [
+        {
+          "name": "zip_directory",
+          "params": [
+            "dir_path",
+            "zip_path"
+          ],
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "zipfile",
+          "specifiers": [
+            "zipfile"
+          ]
+        }
+      ],
+      "exports": [
+        "zip_directory"
+      ],
+      "totalLines": 22,
+      "hasStructuralAnalysis": true
+    },
+    "skills-lock.json": {
+      "filePath": "skills-lock.json",
+      "contentHash": "ec34e2d0540ceef20bd4a5c0b88d89b91a63f404ae54cccdec6a89b714101b91",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "src/App.css": {
+      "filePath": "src/App.css",
+      "contentHash": "86c4330d97152096def8386319463fdf1faaf25cfd4a01a34c36a68c8ddc7488",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 34,
+      "hasStructuralAnalysis": false
+    },
+    "src/App.tsx": {
+      "filePath": "src/App.tsx",
+      "contentHash": "94d03c66e7d3972a0e83ca8a76c59478f572b74b11aaa0d170d27d605bcb1f3a",
+      "functions": [
+        {
+          "name": "App",
+          "params": [],
+          "exported": true,
+          "lineCount": 448
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Home",
+            "Users",
+            "Calendar",
+            "Settings",
+            "FileText",
+            "Bot",
+            "Activity",
+            "RefreshCw",
+            "X",
+            "Stethoscope",
+            "ClipboardList",
+            "Dumbbell",
+            "DollarSign",
+            "Menu",
+            "Clock",
+            "FlaskConical",
+            "CheckCircle",
+            "AlertCircle",
+            "Info",
+            "Building2"
+          ]
+        },
+        {
+          "source": "./types",
+          "specifiers": [
+            "Client",
+            "UserType"
+          ]
+        },
+        {
+          "source": "./views/LoginView",
+          "specifiers": [
+            "LoginView"
+          ]
+        },
+        {
+          "source": "./views/SetupView",
+          "specifiers": [
+            "SetupView"
+          ]
+        },
+        {
+          "source": "./views/BranchSelectorView",
+          "specifiers": [
+            "BranchSelectorView"
+          ]
+        },
+        {
+          "source": "./views/DashboardView",
+          "specifiers": [
+            "DashboardView"
+          ]
+        },
+        {
+          "source": "./views/CalendarView",
+          "specifiers": [
+            "CalendarView"
+          ]
+        },
+        {
+          "source": "./views/ClientsView",
+          "specifiers": [
+            "ClientsView"
+          ]
+        },
+        {
+          "source": "./views/ClientProfileView",
+          "specifiers": [
+            "ClientProfileView"
+          ]
+        },
+        {
+          "source": "./views/ReportsView",
+          "specifiers": [
+            "ReportsView"
+          ]
+        },
+        {
+          "source": "./views/SettingsView",
+          "specifiers": [
+            "SettingsView"
+          ]
+        },
+        {
+          "source": "./views/AIView",
+          "specifiers": [
+            "AIView"
+          ]
+        },
+        {
+          "source": "./views/DoctorsView",
+          "specifiers": [
+            "DoctorsView"
+          ]
+        },
+        {
+          "source": "./views/AssessmentView",
+          "specifiers": [
+            "AssessmentView"
+          ]
+        },
+        {
+          "source": "./views/ExercisesView",
+          "specifiers": [
+            "ExercisesView"
+          ]
+        },
+        {
+          "source": "./views/FinanceManagementView",
+          "specifiers": [
+            "FinanceManagementView"
+          ]
+        },
+        {
+          "source": "./views/AttendanceView",
+          "specifiers": [
+            "AttendanceView"
+          ]
+        },
+        {
+          "source": "./components/InvestigationAdmin",
+          "specifiers": [
+            "InvestigationAdmin"
+          ]
+        }
+      ],
+      "exports": [
+        "App"
+      ],
+      "totalLines": 473,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Assessment.tsx": {
+      "filePath": "src/components/Assessment.tsx",
+      "contentHash": "c169c91616ace8cd77533e5f8e27b6b74d94c308b09fa8eb4da626a3629cc7fb",
+      "functions": [
+        {
+          "name": "AssessmentTab",
+          "params": [
+            "{ clientId, readOnly, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 399
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "CheckCircle",
+            "Clock",
+            "Stethoscope",
+            "FileText",
+            "X",
+            "Edit",
+            "Trash2"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "AssessmentTab"
+      ],
+      "totalLines": 423,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/BioMetrics.tsx": {
+      "filePath": "src/components/BioMetrics.tsx",
+      "contentHash": "2c929d896a24c2005e256602ac928e82d560ec0aa2512005e8881a93e94eef0f",
+      "functions": [
+        {
+          "name": "AssessmentTab",
+          "params": [
+            "{ clientId, readOnly, currentUser: _currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 170
+        },
+        {
+          "name": "AssessmentAdmin",
+          "params": [],
+          "exported": true,
+          "lineCount": 135
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "Trash2",
+            "Activity",
+            "FileText",
+            "ClipboardList"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "AssessmentTab",
+        "AssessmentAdmin"
+      ],
+      "totalLines": 318,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/BranchManagement.tsx": {
+      "filePath": "src/components/BranchManagement.tsx",
+      "contentHash": "f7943fdcbfcbf91197414e549beb263e831b832ef58db9538ad69783b0aae915",
+      "functions": [
+        {
+          "name": "BranchManagement",
+          "params": [],
+          "exported": true,
+          "lineCount": 270
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Building2",
+            "Plus",
+            "Pencil",
+            "Power",
+            "Check",
+            "X",
+            "AlertCircle",
+            "RefreshCw"
+          ]
+        }
+      ],
+      "exports": [
+        "BranchManagement"
+      ],
+      "totalLines": 280,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/CommandPalette.tsx": {
+      "filePath": "src/components/CommandPalette.tsx",
+      "contentHash": "4baa83574fca566af3b80d1391fd0a483f3e5515c1bc71fe8c06e27993115bb5",
+      "functions": [
+        {
+          "name": "CommandPalette",
+          "params": [
+            "{ clients, onClose, onNavigate, onSelectClient }"
+          ],
+          "exported": true,
+          "lineCount": 112
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Search",
+            "Home",
+            "Users",
+            "Bot",
+            "Command",
+            "ChevronRight",
+            "Sparkles"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Client"
+          ]
+        }
+      ],
+      "exports": [
+        "CommandPalette"
+      ],
+      "totalLines": 124,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Exercises.tsx": {
+      "filePath": "src/components/Exercises.tsx",
+      "contentHash": "ca5c03a6e73dda0eb6cccde3189a243e7c1f306968130cb5d70a380502938452",
+      "functions": [
+        {
+          "name": "ExercisesTab",
+          "params": [
+            "{ clientId, readOnly, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 319
+        },
+        {
+          "name": "ExerciseAdmin",
+          "params": [],
+          "exported": true,
+          "lineCount": 144
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Printer",
+            "Plus",
+            "X",
+            "Search",
+            "Dumbbell",
+            "Activity",
+            "Check",
+            "Trash2"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "ExercisesTab",
+        "ExerciseAdmin"
+      ],
+      "totalLines": 475,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/HomeExercises.tsx": {
+      "filePath": "src/components/HomeExercises.tsx",
+      "contentHash": "d6ba6ad4d0290bf8a7a9a4191e6794383ffc58771189b715116bff70efbd16b3",
+      "functions": [
+        {
+          "name": "HomeExercises",
+          "params": [
+            "{ clientId, readOnly, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 465
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "X",
+            "Search",
+            "Dumbbell",
+            "Trash2",
+            "CheckCircle",
+            "AlertTriangle",
+            "ExternalLink",
+            "Edit3",
+            "Save"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "HomeExercises"
+      ],
+      "totalLines": 476,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/InvestigationAdmin.tsx": {
+      "filePath": "src/components/InvestigationAdmin.tsx",
+      "contentHash": "4ad1db6d9ef3ccd9fb249c5ce30050402fceab6b0b68c998cf8099f55666c253",
+      "functions": [
+        {
+          "name": "InvestigationAdmin",
+          "params": [],
+          "exported": true,
+          "lineCount": 179
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "Search",
+            "Trash2",
+            "Loader2",
+            "FlaskConical",
+            "CheckCircle2",
+            "AlertCircle"
+          ]
+        }
+      ],
+      "exports": [
+        "InvestigationAdmin"
+      ],
+      "totalLines": 188,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/LymphaticProfile.tsx": {
+      "filePath": "src/components/LymphaticProfile.tsx",
+      "contentHash": "94eec067ad15d7989835ec39933d483c1187050674526b89b00a0140ddef3113",
+      "functions": [
+        {
+          "name": "todayStr",
+          "params": [],
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "getTrend",
+          "params": [
+            "history"
+          ],
+          "returnType": "'up' | 'down' | 'flat'",
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "TrendIcon",
+          "params": [
+            "{ trend }"
+          ],
+          "exported": false,
+          "lineCount": 5
+        },
+        {
+          "name": "Sparkline",
+          "params": [
+            "{ history }"
+          ],
+          "exported": false,
+          "lineCount": 40
+        },
+        {
+          "name": "FeedbackBanner",
+          "params": [
+            "{ message, type }"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "MeasurementRow",
+          "params": [
+            "{\n  name, defaultUnit, history, readOnly, onSave, onDelete, saving\n}"
+          ],
+          "exported": false,
+          "lineCount": 127
+        },
+        {
+          "name": "LymphaticProfile",
+          "params": [
+            "{ profileId, currentUser, readOnly = false }"
+          ],
+          "exported": true,
+          "lineCount": 251
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "Trash2",
+            "Save",
+            "Loader2",
+            "CheckCircle2",
+            "AlertCircle",
+            "Ruler",
+            "Activity",
+            "TrendingUp",
+            "TrendingDown",
+            "Minus",
+            "BarChart2"
+          ]
+        }
+      ],
+      "exports": [
+        "LymphaticProfile"
+      ],
+      "totalLines": 520,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/NutritionProfile.tsx": {
+      "filePath": "src/components/NutritionProfile.tsx",
+      "contentHash": "0bd7a123a06cecac8ec8e035e30b314486fff8c11126cde5b1b1afd4068ba1fe",
+      "functions": [
+        {
+          "name": "resolveInbodyImageUrl",
+          "params": [
+            "localPath"
+          ],
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "FeedbackBanner",
+          "params": [
+            "{ message, type }"
+          ],
+          "exported": false,
+          "lineCount": 14
+        },
+        {
+          "name": "HeightBanner",
+          "params": [
+            "{ profileId, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 91
+        },
+        {
+          "name": "BasicDataTab",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 322
+        },
+        {
+          "name": "AddResultForm",
+          "params": [
+            "{\n  existingEntries,\n  doctors,\n  currentUser,\n  onSave\n}"
+          ],
+          "exported": false,
+          "lineCount": 109
+        },
+        {
+          "name": "InvestigationsTab",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 284
+        },
+        {
+          "name": "InBodyTab",
+          "params": [
+            "{ profileId, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 212
+        },
+        {
+          "name": "NutritionProfile",
+          "params": [
+            "{ profileId, currentUser, readOnly = false }"
+          ],
+          "exported": true,
+          "lineCount": 47
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "Trash2",
+            "Edit3",
+            "Save",
+            "X",
+            "Upload",
+            "FlaskConical",
+            "FileText",
+            "Camera",
+            "Loader2",
+            "CheckCircle2",
+            "AlertCircle",
+            "BookOpen",
+            "Microscope",
+            "ImageIcon",
+            "Ruler"
+          ]
+        }
+      ],
+      "exports": [
+        "NutritionProfile"
+      ],
+      "totalLines": 1170,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/PhysicalTherapyProfile.tsx": {
+      "filePath": "src/components/PhysicalTherapyProfile.tsx",
+      "contentHash": "755b440f447fc313a50bd93da699e1c737ac74e982968b5b6f8a37e306222490",
+      "functions": [
+        {
+          "name": "formatPTDate",
+          "params": [
+            "dateStr",
+            "includeTime"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "useFeedback",
+          "params": [],
+          "exported": false,
+          "lineCount": 8
+        },
+        {
+          "name": "Spinner",
+          "params": [],
+          "exported": false,
+          "lineCount": 10
+        },
+        {
+          "name": "FeedbackBanner",
+          "params": [
+            "{ feedback }"
+          ],
+          "exported": false,
+          "lineCount": 11
+        },
+        {
+          "name": "SaveBtn",
+          "params": [
+            "{ onClick, loading }"
+          ],
+          "exported": false,
+          "lineCount": 12
+        },
+        {
+          "name": "SectionLabel",
+          "params": [
+            "{ label }"
+          ],
+          "exported": false,
+          "lineCount": 9
+        },
+        {
+          "name": "RedFlagsTab",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 157
+        },
+        {
+          "name": "SubjectiveSection",
+          "params": [
+            "{ profileId, assessmentId, currentUser, readOnly, onAssessmentSaved }"
+          ],
+          "exported": false,
+          "lineCount": 204
+        },
+        {
+          "name": "nextTempId",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "ObjectiveSection",
+          "params": [
+            "{ profileId, assessmentId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 240
+        },
+        {
+          "name": "PhysicalAssessmentTab",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 240
+        },
+        {
+          "name": "SpecialTestsTab",
+          "params": [
+            "{ profileId, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 152
+        },
+        {
+          "name": "buildDefaultSection",
+          "params": [
+            "items"
+          ],
+          "returnType": "SectionData",
+          "exported": false,
+          "lineCount": 3
+        },
+        {
+          "name": "parseSectionData",
+          "params": [
+            "jsonStr",
+            "items"
+          ],
+          "returnType": "SectionData",
+          "exported": false,
+          "lineCount": 18
+        },
+        {
+          "name": "SessionPlanTab",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": false,
+          "lineCount": 386
+        },
+        {
+          "name": "PhysicalTherapyProfile",
+          "params": [
+            "{ profileId, currentUser, readOnly }"
+          ],
+          "exported": true,
+          "lineCount": 43
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "AlertTriangle",
+            "Activity",
+            "Clipboard",
+            "Target",
+            "ChevronDown",
+            "ChevronRight",
+            "Plus",
+            "Trash2",
+            "Save",
+            "CheckCircle",
+            "XCircle",
+            "Zap",
+            "Hand",
+            "Wrench"
+          ]
+        }
+      ],
+      "exports": [
+        "PhysicalTherapyProfile"
+      ],
+      "totalLines": 1644,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/Progress.tsx": {
+      "filePath": "src/components/Progress.tsx",
+      "contentHash": "9287398aeb619d41440017ba5808fcbc96fd2bfd98c7c703f1bbc0e9b98aa74d",
+      "functions": [
+        {
+          "name": "ProgressTab",
+          "params": [
+            "{ clientId }"
+          ],
+          "exported": true,
+          "lineCount": 185
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Activity"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "PackageStatus"
+          ]
+        }
+      ],
+      "exports": [
+        "ProgressTab"
+      ],
+      "totalLines": 194,
+      "hasStructuralAnalysis": true
+    },
+    "src/components/UserManagement.tsx": {
+      "filePath": "src/components/UserManagement.tsx",
+      "contentHash": "d4b8ba5f0c86a25187db235c28e13ba6adfa3aef4b7495bb434c242ad9c26a91",
+      "functions": [
+        {
+          "name": "UserManagement",
+          "params": [],
+          "exported": true,
+          "lineCount": 367
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Users",
+            "Key",
+            "Trash2",
+            "UserPlus",
+            "ShieldCheck",
+            "X",
+            "AlertCircle",
+            "Shield",
+            "Stethoscope",
+            "Snowflake",
+            "Flame",
+            "Building2"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Doctor"
+          ]
+        }
+      ],
+      "exports": [
+        "UserManagement"
+      ],
+      "totalLines": 372,
+      "hasStructuralAnalysis": true
+    },
+    "src/index.css": {
+      "filePath": "src/index.css",
+      "contentHash": "180bd3af72bd55ff6b15cfdc3123fa4628a92739dd7d01f5b6215715da4db6c1",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 152,
+      "hasStructuralAnalysis": false
+    },
+    "src/main.tsx": {
+      "filePath": "src/main.tsx",
+      "contentHash": "0a76fab0ca3a59d1838d8af4846e9665b9ae77a823a7ffcf22d6f8da2bdf1143",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "StrictMode"
+          ]
+        },
+        {
+          "source": "react-dom/client",
+          "specifiers": [
+            "createRoot"
+          ]
+        },
+        {
+          "source": "./index.css",
+          "specifiers": []
+        },
+        {
+          "source": "./App.tsx",
+          "specifiers": [
+            "App"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 18,
+      "hasStructuralAnalysis": true
+    },
+    "src/types/index.ts": {
+      "filePath": "src/types/index.ts",
+      "contentHash": "a8d567275c9f93b7250e1777c728b5300b861ac5eb45b132a6435c8952157d3d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 83,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/AIView.tsx": {
+      "filePath": "src/views/AIView.tsx",
+      "contentHash": "11db845df29ca5a32f90bb5780a82c1bfdb297b3a69fa16bb450abefc95908e5",
+      "functions": [
+        {
+          "name": "AIView",
+          "params": [
+            "{ clients }"
+          ],
+          "exported": true,
+          "lineCount": 146
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Bot",
+            "AlertCircle",
+            "Sparkles",
+            "Send",
+            "User",
+            "MessageSquare"
+          ]
+        },
+        {
+          "source": "react-markdown",
+          "specifiers": [
+            "ReactMarkdown"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Client"
+          ]
+        }
+      ],
+      "exports": [
+        "AIView"
+      ],
+      "totalLines": 156,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/AssessmentView.tsx": {
+      "filePath": "src/views/AssessmentView.tsx",
+      "contentHash": "b079120aeeb37f69bd6a7b3f4b92389bc3cf27ef940086ce8d2d579a15d0c300",
+      "functions": [
+        {
+          "name": "AssessmentView",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../components/BioMetrics",
+          "specifiers": [
+            "AssessmentAdmin"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "ClipboardList"
+          ]
+        }
+      ],
+      "exports": [
+        "AssessmentView"
+      ],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/AttendanceView.tsx": {
+      "filePath": "src/views/AttendanceView.tsx",
+      "contentHash": "c25977ad3ce7853a3f88faea59cf4d8a15568e799234cf1f97a2e4af4cc1816b",
+      "functions": [
+        {
+          "name": "getLocalTodayStr",
+          "params": [],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "getLocalTimeStr",
+          "params": [],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "formatTimeAmPm",
+          "params": [
+            "timeStr"
+          ],
+          "exported": false,
+          "lineCount": 15
+        },
+        {
+          "name": "AttendanceView",
+          "params": [
+            "{ currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 335
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Clock",
+            "CheckCircle2",
+            "LogIn",
+            "LogOut",
+            "Calendar",
+            "Loader2",
+            "Users",
+            "Clipboard"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "AttendanceView"
+      ],
+      "totalLines": 385,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/BranchSelectorView.tsx": {
+      "filePath": "src/views/BranchSelectorView.tsx",
+      "contentHash": "ea423bbef2cf67ff797923d99c84581645d73c7023b80c3e236019f61950a6a1",
+      "functions": [
+        {
+          "name": "BranchSelectorView",
+          "params": [
+            "{ onBranchSelected, userDisplayName }"
+          ],
+          "exported": true,
+          "lineCount": 133
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Building2",
+            "ArrowRight",
+            "RefreshCw",
+            "ShieldCheck"
+          ]
+        }
+      ],
+      "exports": [
+        "BranchSelectorView"
+      ],
+      "totalLines": 148,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/CalendarView.tsx": {
+      "filePath": "src/views/CalendarView.tsx",
+      "contentHash": "241b6fead72cf5178d43abca936d4ec72cc0f081897bed82e4db24c8f3c09713",
+      "functions": [
+        {
+          "name": "CalendarView",
+          "params": [
+            "{ clients, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 469
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Trash2",
+            "Clock",
+            "Plus",
+            "X",
+            "ChevronLeft",
+            "ChevronRight",
+            "CheckCircle",
+            "AlertCircle",
+            "Stethoscope",
+            "UserIcon",
+            "CalendarDays"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Client",
+            "User",
+            "Doctor"
+          ]
+        }
+      ],
+      "exports": [
+        "CalendarView"
+      ],
+      "totalLines": 492,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/ClientProfileView.tsx": {
+      "filePath": "src/views/ClientProfileView.tsx",
+      "contentHash": "25eeee73613e1d4cc538707438ee6f1b3a25b5a3f6fc806023f65942a724ae00",
+      "functions": [
+        {
+          "name": "formatPTDate",
+          "params": [
+            "dateStr",
+            "includeTime"
+          ],
+          "exported": false,
+          "lineCount": 7
+        },
+        {
+          "name": "ClientProfileView",
+          "params": [
+            "{ client, onBack, onNavigate, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 1173
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Bot",
+            "FileText",
+            "RefreshCw",
+            "ExternalLink",
+            "Folder",
+            "ChevronLeft",
+            "User",
+            "Phone",
+            "Clipboard",
+            "ShieldAlert",
+            "CreditCard",
+            "Thermometer",
+            "Dumbbell",
+            "Activity",
+            "Plus",
+            "X",
+            "Sparkles",
+            "CheckCircle",
+            "ShieldCheck",
+            "QrCode",
+            "Edit",
+            "Trash2",
+            "Layers",
+            "MapPin"
+          ]
+        },
+        {
+          "source": "react-qr-code",
+          "specifiers": [
+            "QRCode"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Client",
+            "UserType"
+          ]
+        },
+        {
+          "source": "../components/Exercises",
+          "specifiers": [
+            "ExercisesTab"
+          ]
+        },
+        {
+          "source": "../components/Progress",
+          "specifiers": [
+            "ProgressTab"
+          ]
+        },
+        {
+          "source": "../components/PhysicalTherapyProfile",
+          "specifiers": [
+            "PhysicalTherapyProfile"
+          ]
+        },
+        {
+          "source": "../components/NutritionProfile",
+          "specifiers": [
+            "NutritionProfile"
+          ]
+        },
+        {
+          "source": "../components/LymphaticProfile",
+          "specifiers": [
+            "LymphaticProfile"
+          ]
+        },
+        {
+          "source": "../components/HomeExercises",
+          "specifiers": [
+            "HomeExercises"
+          ]
+        }
+      ],
+      "exports": [
+        "ClientProfileView"
+      ],
+      "totalLines": 1200,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/ClientsView.tsx": {
+      "filePath": "src/views/ClientsView.tsx",
+      "contentHash": "3edc90857ff3b5e411c07c7f43d4b5572aa19fa1869854c6eb54cc7531b6d00d",
+      "functions": [
+        {
+          "name": "ClientsView",
+          "params": [
+            "{ clients, onSelectClient, onClientAdded, currentUser: _currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 349
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Search",
+            "Users",
+            "UserPlus",
+            "X",
+            "Plus"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Client",
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "ClientsView"
+      ],
+      "totalLines": 361,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/DashboardView.tsx": {
+      "filePath": "src/views/DashboardView.tsx",
+      "contentHash": "2cbbb1c244f92cfb449cf6c7ed11a8b232ce1fe68f20f4cd971764cab9fdf0db",
+      "functions": [
+        {
+          "name": "DashboardView",
+          "params": [
+            "{ onNavigate, currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 628
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useMemo",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Clock",
+            "Users",
+            "Activity",
+            "Sparkles",
+            "ChevronRight",
+            "Calendar",
+            "Database",
+            "Layout",
+            "CheckCircle",
+            "ClipboardList",
+            "Info",
+            "Search",
+            "Filter",
+            "QrCode",
+            "Monitor",
+            "Shield",
+            "Stethoscope"
+          ]
+        },
+        {
+          "source": "react-qr-code",
+          "specifiers": [
+            "QRCode"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "DashboardView"
+      ],
+      "totalLines": 639,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/DoctorsView.tsx": {
+      "filePath": "src/views/DoctorsView.tsx",
+      "contentHash": "90b9db585cc68a2c090a901148f9bcb56d2a55671205c122ab04f7c3416764f4",
+      "functions": [
+        {
+          "name": "DoctorsView",
+          "params": [],
+          "exported": true,
+          "lineCount": 222
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Search",
+            "Edit2",
+            "CheckCircle",
+            "XCircle",
+            "UserPlus",
+            "Stethoscope",
+            "RefreshCw"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Doctor"
+          ]
+        }
+      ],
+      "exports": [
+        "DoctorsView"
+      ],
+      "totalLines": 227,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/ExercisesView.tsx": {
+      "filePath": "src/views/ExercisesView.tsx",
+      "contentHash": "d619207e96bc10ed628211d467fa009ac6b4ba890fd2e5e62a8e4a2ab3defb14",
+      "functions": [
+        {
+          "name": "ExercisesView",
+          "params": [],
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "../components/Exercises",
+          "specifiers": [
+            "ExerciseAdmin"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Dumbbell"
+          ]
+        }
+      ],
+      "exports": [
+        "ExercisesView"
+      ],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/FinanceManagementView.tsx": {
+      "filePath": "src/views/FinanceManagementView.tsx",
+      "contentHash": "c4c10e6d9c595ed21b02d23117b5fdc584316eadcdacb4833a0d722c13637ef3",
+      "functions": [
+        {
+          "name": "api",
+          "params": [],
+          "exported": false,
+          "lineCount": 1
+        },
+        {
+          "name": "FinanceManagementView",
+          "params": [
+            "{ currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 1359
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect",
+            "useCallback"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "DollarSign",
+            "Users",
+            "TrendingUp",
+            "ChevronRight",
+            "Calculator",
+            "Save",
+            "Calendar",
+            "Search",
+            "AlertCircle",
+            "CreditCard",
+            "Trash2",
+            "PlusCircle",
+            "RotateCcw",
+            "Package",
+            "X",
+            "CheckCircle",
+            "TrendingDown",
+            "Minus",
+            "ChevronLeft",
+            "ClipboardList"
+          ]
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "FinanceManagementView"
+      ],
+      "totalLines": 1437,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/LoginView.tsx": {
+      "filePath": "src/views/LoginView.tsx",
+      "contentHash": "86fe2d54554c6663a004d138d38656f01fb3ae245b94fa37181387054d2b09f2",
+      "functions": [
+        {
+          "name": "LoginView",
+          "params": [
+            "{ onLogin }"
+          ],
+          "exported": true,
+          "lineCount": 104
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "AlertCircle",
+            "Lock",
+            "User",
+            "ShieldCheck"
+          ]
+        }
+      ],
+      "exports": [
+        "LoginView"
+      ],
+      "totalLines": 112,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/ReportsView.tsx": {
+      "filePath": "src/views/ReportsView.tsx",
+      "contentHash": "dc36a016068c6e3a62f8253efa8f10fc4a2d71cacdbe93f63109f124a4bea922",
+      "functions": [
+        {
+          "name": "ReportsView",
+          "params": [],
+          "exported": true,
+          "lineCount": 624
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "FileText",
+            "Calendar",
+            "TrendingUp",
+            "Users",
+            "Activity",
+            "Printer",
+            "FileSpreadsheet",
+            "DollarSign",
+            "CreditCard",
+            "Package",
+            "Stethoscope",
+            "Clock"
+          ]
+        }
+      ],
+      "exports": [
+        "ReportsView"
+      ],
+      "totalLines": 634,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/SettingsView.tsx": {
+      "filePath": "src/views/SettingsView.tsx",
+      "contentHash": "5ae4722bfabeb146f80ffe093c42c3fc726ae6fdaed0ffa2b1290c24bbb5fb28",
+      "functions": [
+        {
+          "name": "SettingsView",
+          "params": [
+            "{ currentUser }"
+          ],
+          "exported": true,
+          "lineCount": 155
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState",
+            "useEffect"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "Plus",
+            "Clock",
+            "ShieldCheck",
+            "Database",
+            "FileSpreadsheet",
+            "Dumbbell",
+            "History",
+            "Sparkles",
+            "Share2",
+            "Network",
+            "FlaskConical",
+            "Building2"
+          ]
+        },
+        {
+          "source": "../components/BioMetrics",
+          "specifiers": [
+            "AssessmentAdmin"
+          ]
+        },
+        {
+          "source": "../components/Exercises",
+          "specifiers": [
+            "ExerciseAdmin"
+          ]
+        },
+        {
+          "source": "../components/UserManagement",
+          "specifiers": [
+            "UserManagement"
+          ]
+        },
+        {
+          "source": "../components/InvestigationAdmin",
+          "specifiers": [
+            "InvestigationAdmin"
+          ]
+        },
+        {
+          "source": "../components/BranchManagement",
+          "specifiers": [
+            "BranchManagement"
+          ]
+        }
+      ],
+      "exports": [
+        "SettingsView"
+      ],
+      "totalLines": 173,
+      "hasStructuralAnalysis": true
+    },
+    "src/views/SetupView.tsx": {
+      "filePath": "src/views/SetupView.tsx",
+      "contentHash": "c57a87e1c5ad83bfc90a1eb3690eb68c039613e3473dfd5fa4c0a06b7af61a3a",
+      "functions": [
+        {
+          "name": "SetupView",
+          "params": [
+            "{ onComplete }"
+          ],
+          "exported": true,
+          "lineCount": 129
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "react",
+          "specifiers": [
+            "useState"
+          ]
+        },
+        {
+          "source": "lucide-react",
+          "specifiers": [
+            "AlertCircle",
+            "UserPlus",
+            "ShieldCheck",
+            "Lock",
+            "User"
+          ]
+        }
+      ],
+      "exports": [
+        "SetupView"
+      ],
+      "totalLines": 137,
+      "hasStructuralAnalysis": true
+    },
+    "src/vite-env.d.ts": {
+      "filePath": "src/vite-env.d.ts",
+      "contentHash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 2,
+      "hasStructuralAnalysis": true
+    },
+    "src/window.d.ts": {
+      "filePath": "src/window.d.ts",
+      "contentHash": "e7b4e30277d46478c82f768d7906c3c1aa84e72f1b98a21cb17500dbafe8b641",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": "./types",
+          "specifiers": [
+            "SyncPayload"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 163,
+      "hasStructuralAnalysis": true
+    },
+    "tsconfig.app.json": {
+      "filePath": "tsconfig.app.json",
+      "contentHash": "15de47f71c24b7dfa95c382c8c01561481cd5365ef8c97ab27016461af2af77a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 27,
+      "hasStructuralAnalysis": true
+    },
+    "tsconfig.json": {
+      "filePath": "tsconfig.json",
+      "contentHash": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 8,
+      "hasStructuralAnalysis": true
+    },
+    "tsconfig.node.json": {
+      "filePath": "tsconfig.node.json",
+      "contentHash": "cdf03296db009821b4da76adbc99712072f85fa48731d5c0b4e7f8d28a82f453",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 25,
+      "hasStructuralAnalysis": true
+    },
+    "vite.config.mts": {
+      "filePath": "vite.config.mts",
+      "contentHash": "2273579e6eacd528f4096c423e81a80472febfb506824d50086db81d83f9ba00",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": false
+    }
+  }
+}

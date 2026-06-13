@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "httpUrl": "https://mcp.supabase.com/mcp?project_ref=csubxhxsspzeioukowta&features=docs%2Caccount%2Cdatabase%2Cstorage%2Cbranching%2Cfunctions%2Cdevelopment%2Cdebugging"
+    }
+  }
+}

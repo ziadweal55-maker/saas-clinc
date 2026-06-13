@@ -1,0 +1,1844 @@
+{
+  "name": "clinic-app",
+  "description": "A clinic management application built with React, TypeScript, and Vite, packaged as a desktop app using Electron, and integrated with Supabase and TailwindCSS. Note: this project has over 100 source files; consider scoping analysis to a subdirectory for faster results.",
+  "languages": [
+    "typescript",
+    "javascript",
+    "python",
+    "markdown",
+    "json",
+    "csv",
+    "html",
+    "yaml",
+    "sql",
+    "css",
+    "mts"
+  ],
+  "frameworks": [
+    "React",
+    "Electron",
+    "TailwindCSS",
+    "Shadcn UI",
+    "Supabase",
+    "Framer Motion",
+    "Vite"
+  ],
+  "files": [
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/_contributing.md",
+      "language": "markdown",
+      "sizeLines": 170,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/_sections.md",
+      "language": "markdown",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/_template.md",
+      "language": "markdown",
+      "sizeLines": 34,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md",
+      "language": "markdown",
+      "sizeLines": 49,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/conn-limits.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/conn-pooling.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md",
+      "language": "markdown",
+      "sizeLines": 54,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md",
+      "language": "markdown",
+      "sizeLines": 53,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/data-pagination.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/data-upsert.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/lock-advisory.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md",
+      "language": "markdown",
+      "sizeLines": 68,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md",
+      "language": "markdown",
+      "sizeLines": 54,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md",
+      "language": "markdown",
+      "sizeLines": 44,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md",
+      "language": "markdown",
+      "sizeLines": 40,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/query-index-types.md",
+      "language": "markdown",
+      "sizeLines": 48,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md",
+      "language": "markdown",
+      "sizeLines": 43,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-constraints.md",
+      "language": "markdown",
+      "sizeLines": 80,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-data-types.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md",
+      "language": "markdown",
+      "sizeLines": 59,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md",
+      "language": "markdown",
+      "sizeLines": 55,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md",
+      "language": "markdown",
+      "sizeLines": 61,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/security-privileges.md",
+      "language": "markdown",
+      "sizeLines": 54,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md",
+      "language": "markdown",
+      "sizeLines": 57,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".agents/skills/supabase-postgres-best-practices/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 64,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".env",
+      "language": "config",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/charts.csv",
+      "language": "csv",
+      "sizeLines": 26,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/colors.csv",
+      "language": "csv",
+      "sizeLines": 97,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/icons.csv",
+      "language": "csv",
+      "sizeLines": 101,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/landing.csv",
+      "language": "csv",
+      "sizeLines": 31,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/products.csv",
+      "language": "csv",
+      "sizeLines": 96,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/react-performance.csv",
+      "language": "csv",
+      "sizeLines": 45,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "language": "csv",
+      "sizeLines": 54,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "language": "csv",
+      "sizeLines": 53,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "language": "csv",
+      "sizeLines": 56,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "language": "csv",
+      "sizeLines": 53,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "language": "csv",
+      "sizeLines": 53,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "language": "csv",
+      "sizeLines": 51,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "language": "csv",
+      "sizeLines": 59,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "language": "csv",
+      "sizeLines": 52,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "language": "csv",
+      "sizeLines": 54,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "language": "csv",
+      "sizeLines": 61,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "language": "csv",
+      "sizeLines": 54,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "language": "csv",
+      "sizeLines": 51,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "language": "csv",
+      "sizeLines": 50,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/styles.csv",
+      "language": "csv",
+      "sizeLines": 68,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/typography.csv",
+      "language": "csv",
+      "sizeLines": 57,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "language": "csv",
+      "sizeLines": 101,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "language": "csv",
+      "sizeLines": 99,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/data/web-interface.csv",
+      "language": "csv",
+      "sizeLines": 31,
+      "fileCategory": "data"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/scripts/core.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/scripts/design_system.py",
+      "language": "python",
+      "sizeLines": 1067,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/scripts/search.py",
+      "language": "python",
+      "sizeLines": 114,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".gemini/skills/ui-ux-pro-max/SKILL.md",
+      "language": "markdown",
+      "sizeLines": 292,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".superpowers/brainstorm/25889-1776980462/content/ui-ux-mockup.html",
+      "language": "html",
+      "sizeLines": 93,
+      "fileCategory": "markup"
+    },
+    {
+      "path": ".superpowers/brainstorm/25889-1776980462/state/server-info",
+      "language": "unknown",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".understand-anything/.understandignore",
+      "language": "unknown",
+      "sizeLines": 37,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".understand-anything/config.json",
+      "language": "json",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "design-system/evolve-suite/MASTER.md",
+      "language": "markdown",
+      "sizeLines": 203,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "dist-electron/builder-debug.yml",
+      "language": "yaml",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": "dist-electron/builder-effective-config.yaml",
+      "language": "yaml",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": "dist-electron/win-unpacked/chrome_100_percent.pak",
+      "language": "pak",
+      "sizeLines": 945,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/chrome_200_percent.pak",
+      "language": "pak",
+      "sizeLines": 1275,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/d3dcompiler_47.dll",
+      "language": "dll",
+      "sizeLines": 11195,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/ffmpeg.dll",
+      "language": "dll",
+      "sizeLines": 7705,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/icudtl.dat",
+      "language": "dat",
+      "sizeLines": 51077,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/libEGL.dll",
+      "language": "dll",
+      "sizeLines": 1394,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/libGLESv2.dll",
+      "language": "dll",
+      "sizeLines": 19652,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/LICENSE.electron.txt",
+      "language": "txt",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "dist-electron/win-unpacked/LICENSES.chromium.html",
+      "language": "html",
+      "sizeLines": 169693,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/af.pak",
+      "language": "pak",
+      "sizeLines": 380,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/am.pak",
+      "language": "pak",
+      "sizeLines": 1317,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ar.pak",
+      "language": "pak",
+      "sizeLines": 1137,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/bg.pak",
+      "language": "pak",
+      "sizeLines": 1088,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/bn.pak",
+      "language": "pak",
+      "sizeLines": 1102,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ca.pak",
+      "language": "pak",
+      "sizeLines": 359,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/cs.pak",
+      "language": "pak",
+      "sizeLines": 360,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/da.pak",
+      "language": "pak",
+      "sizeLines": 390,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/de.pak",
+      "language": "pak",
+      "sizeLines": 356,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/el.pak",
+      "language": "pak",
+      "sizeLines": 1034,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/en-GB.pak",
+      "language": "pak",
+      "sizeLines": 404,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/en-US.pak",
+      "language": "pak",
+      "sizeLines": 951,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/es-419.pak",
+      "language": "pak",
+      "sizeLines": 391,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/es.pak",
+      "language": "pak",
+      "sizeLines": 378,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/et.pak",
+      "language": "pak",
+      "sizeLines": 367,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/fa.pak",
+      "language": "pak",
+      "sizeLines": 1168,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/fi.pak",
+      "language": "pak",
+      "sizeLines": 367,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/fil.pak",
+      "language": "pak",
+      "sizeLines": 418,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/fr.pak",
+      "language": "pak",
+      "sizeLines": 370,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/gu.pak",
+      "language": "pak",
+      "sizeLines": 1031,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/he.pak",
+      "language": "pak",
+      "sizeLines": 1493,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/hi.pak",
+      "language": "pak",
+      "sizeLines": 1069,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/hr.pak",
+      "language": "pak",
+      "sizeLines": 414,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/hu.pak",
+      "language": "pak",
+      "sizeLines": 362,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/id.pak",
+      "language": "pak",
+      "sizeLines": 379,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/it.pak",
+      "language": "pak",
+      "sizeLines": 345,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ja.pak",
+      "language": "pak",
+      "sizeLines": 1087,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/kn.pak",
+      "language": "pak",
+      "sizeLines": 1016,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ko.pak",
+      "language": "pak",
+      "sizeLines": 353,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/lt.pak",
+      "language": "pak",
+      "sizeLines": 431,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/lv.pak",
+      "language": "pak",
+      "sizeLines": 351,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ml.pak",
+      "language": "pak",
+      "sizeLines": 951,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/mr.pak",
+      "language": "pak",
+      "sizeLines": 976,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ms.pak",
+      "language": "pak",
+      "sizeLines": 378,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/nb.pak",
+      "language": "pak",
+      "sizeLines": 340,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/nl.pak",
+      "language": "pak",
+      "sizeLines": 377,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/pl.pak",
+      "language": "pak",
+      "sizeLines": 380,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/pt-BR.pak",
+      "language": "pak",
+      "sizeLines": 367,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/pt-PT.pak",
+      "language": "pak",
+      "sizeLines": 356,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ro.pak",
+      "language": "pak",
+      "sizeLines": 329,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ru.pak",
+      "language": "pak",
+      "sizeLines": 966,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/sk.pak",
+      "language": "pak",
+      "sizeLines": 359,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/sl.pak",
+      "language": "pak",
+      "sizeLines": 363,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/sr.pak",
+      "language": "pak",
+      "sizeLines": 1105,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/sv.pak",
+      "language": "pak",
+      "sizeLines": 410,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/sw.pak",
+      "language": "pak",
+      "sizeLines": 350,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ta.pak",
+      "language": "pak",
+      "sizeLines": 970,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/te.pak",
+      "language": "pak",
+      "sizeLines": 988,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/th.pak",
+      "language": "pak",
+      "sizeLines": 1068,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/tr.pak",
+      "language": "pak",
+      "sizeLines": 359,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/uk.pak",
+      "language": "pak",
+      "sizeLines": 1010,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/ur.pak",
+      "language": "pak",
+      "sizeLines": 1158,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/vi.pak",
+      "language": "pak",
+      "sizeLines": 876,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/zh-CN.pak",
+      "language": "pak",
+      "sizeLines": 336,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/locales/zh-TW.pak",
+      "language": "pak",
+      "sizeLines": 348,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/resources.pak",
+      "language": "pak",
+      "sizeLines": 22012,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/resources/app.asar",
+      "language": "asar",
+      "sizeLines": 897871,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/Revive Clinic.exe",
+      "language": "exe",
+      "sizeLines": 915652,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/snapshot_blob.bin",
+      "language": "bin",
+      "sizeLines": 1047,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/v8_context_snapshot.bin",
+      "language": "bin",
+      "sizeLines": 2952,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/vk_swiftshader_icd.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "dist-electron/win-unpacked/vk_swiftshader.dll",
+      "language": "dll",
+      "sizeLines": 12330,
+      "fileCategory": "code"
+    },
+    {
+      "path": "dist-electron/win-unpacked/vulkan-1.dll",
+      "language": "dll",
+      "sizeLines": 2479,
+      "fileCategory": "code"
+    },
+    {
+      "path": "docs/supabase/migration.sql",
+      "language": "sql",
+      "sizeLines": 289,
+      "fileCategory": "data"
+    },
+    {
+      "path": "docs/supabase/schema.sql",
+      "language": "sql",
+      "sizeLines": 207,
+      "fileCategory": "data"
+    },
+    {
+      "path": "docs/superpowers/plans/2025-05-14-patient-portal-auth.md",
+      "language": "markdown",
+      "sizeLines": 230,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-04-23-home-exercise-portal.md",
+      "language": "markdown",
+      "sizeLines": 163,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-04-23-patient-portal-sync-design.md",
+      "language": "markdown",
+      "sizeLines": 47,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-04-24-patient-portal-vercel-deployment-design.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "electron/database.js",
+      "language": "javascript",
+      "sizeLines": 745,
+      "fileCategory": "code"
+    },
+    {
+      "path": "electron/logger.js",
+      "language": "javascript",
+      "sizeLines": 75,
+      "fileCategory": "code"
+    },
+    {
+      "path": "electron/main.js",
+      "language": "javascript",
+      "sizeLines": 3178,
+      "fileCategory": "code"
+    },
+    {
+      "path": "electron/preload.js",
+      "language": "javascript",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "electron/sync.js",
+      "language": "javascript",
+      "sizeLines": 754,
+      "fileCategory": "code"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "language": "javascript",
+      "sizeLines": 28,
+      "fileCategory": "code"
+    },
+    {
+      "path": "index.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "management-dashboard/.env",
+      "language": "config",
+      "sizeLines": 2,
+      "fileCategory": "config"
+    },
+    {
+      "path": "management-dashboard/eslint.config.js",
+      "language": "javascript",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "management-dashboard/index.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "management-dashboard/package.json",
+      "language": "json",
+      "sizeLines": 38,
+      "fileCategory": "config"
+    },
+    {
+      "path": "management-dashboard/README.md",
+      "language": "markdown",
+      "sizeLines": 73,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "management-dashboard/src/App.tsx",
+      "language": "typescript",
+      "sizeLines": 1850,
+      "fileCategory": "code"
+    },
+    {
+      "path": "management-dashboard/src/index.css",
+      "language": "css",
+      "sizeLines": 19,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "management-dashboard/src/lib/supabase.ts",
+      "language": "typescript",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": "management-dashboard/src/main.tsx",
+      "language": "typescript",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "management-dashboard/tsconfig.app.json",
+      "language": "json",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": "management-dashboard/tsconfig.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "management-dashboard/tsconfig.node.json",
+      "language": "json",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "management-dashboard/vite.config.ts",
+      "language": "typescript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": "package.json",
+      "language": "json",
+      "sizeLines": 71,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/.env",
+      "language": "config",
+      "sizeLines": 2,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/eslint.config.js",
+      "language": "javascript",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/index.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "patient-portal/package.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/README.md",
+      "language": "markdown",
+      "sizeLines": 73,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "patient-portal/src/App.css",
+      "language": "css",
+      "sizeLines": 184,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "patient-portal/src/App.tsx",
+      "language": "typescript",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/src/components/DailyCheckIn.tsx",
+      "language": "typescript",
+      "sizeLines": 141,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/src/components/ExerciseList.tsx",
+      "language": "typescript",
+      "sizeLines": 191,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/src/components/PinEntry.tsx",
+      "language": "typescript",
+      "sizeLines": 112,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/src/index.css",
+      "language": "css",
+      "sizeLines": 115,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "patient-portal/src/lib/supabase.ts",
+      "language": "typescript",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/src/main.tsx",
+      "language": "typescript",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "patient-portal/tsconfig.app.json",
+      "language": "json",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/tsconfig.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/tsconfig.node.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "patient-portal/vite.config.ts",
+      "language": "typescript",
+      "sizeLines": 11,
+      "fileCategory": "code"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 50,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "schedule-portal/.env",
+      "language": "config",
+      "sizeLines": 2,
+      "fileCategory": "config"
+    },
+    {
+      "path": "schedule-portal/index.html",
+      "language": "html",
+      "sizeLines": 13,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "schedule-portal/package.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "schedule-portal/src/App.tsx",
+      "language": "typescript",
+      "sizeLines": 701,
+      "fileCategory": "code"
+    },
+    {
+      "path": "schedule-portal/src/index.css",
+      "language": "css",
+      "sizeLines": 115,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "schedule-portal/src/lib/supabase.ts",
+      "language": "typescript",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "schedule-portal/src/main.tsx",
+      "language": "typescript",
+      "sizeLines": 10,
+      "fileCategory": "code"
+    },
+    {
+      "path": "schedule-portal/tsconfig.app.json",
+      "language": "json",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "schedule-portal/tsconfig.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "schedule-portal/tsconfig.node.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "schedule-portal/vite.config.ts",
+      "language": "typescript",
+      "sizeLines": 11,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/test_gemini.js",
+      "language": "javascript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/zip_app.py",
+      "language": "python",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/zip_build.py",
+      "language": "python",
+      "sizeLines": 17,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/zip_network_test.py",
+      "language": "python",
+      "sizeLines": 23,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scratch/zip_ui_update.py",
+      "language": "python",
+      "sizeLines": 21,
+      "fileCategory": "code"
+    },
+    {
+      "path": "skills-lock.json",
+      "language": "json",
+      "sizeLines": 11,
+      "fileCategory": "config"
+    },
+    {
+      "path": "src/App.css",
+      "language": "css",
+      "sizeLines": 33,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "src/App.tsx",
+      "language": "typescript",
+      "sizeLines": 472,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/Assessment.tsx",
+      "language": "typescript",
+      "sizeLines": 422,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/BioMetrics.tsx",
+      "language": "typescript",
+      "sizeLines": 317,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/BranchManagement.tsx",
+      "language": "typescript",
+      "sizeLines": 279,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/CommandPalette.tsx",
+      "language": "typescript",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/Exercises.tsx",
+      "language": "typescript",
+      "sizeLines": 474,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/HomeExercises.tsx",
+      "language": "typescript",
+      "sizeLines": 475,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/InvestigationAdmin.tsx",
+      "language": "typescript",
+      "sizeLines": 187,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/LymphaticProfile.tsx",
+      "language": "typescript",
+      "sizeLines": 519,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/NutritionProfile.tsx",
+      "language": "typescript",
+      "sizeLines": 1169,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/PhysicalTherapyProfile.tsx",
+      "language": "typescript",
+      "sizeLines": 1643,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/Progress.tsx",
+      "language": "typescript",
+      "sizeLines": 193,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/components/UserManagement.tsx",
+      "language": "typescript",
+      "sizeLines": 371,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/index.css",
+      "language": "css",
+      "sizeLines": 151,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "src/main.tsx",
+      "language": "typescript",
+      "sizeLines": 17,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/types/index.ts",
+      "language": "typescript",
+      "sizeLines": 82,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/AIView.tsx",
+      "language": "typescript",
+      "sizeLines": 155,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/AssessmentView.tsx",
+      "language": "typescript",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/AttendanceView.tsx",
+      "language": "typescript",
+      "sizeLines": 384,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/BranchSelectorView.tsx",
+      "language": "typescript",
+      "sizeLines": 147,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/CalendarView.tsx",
+      "language": "typescript",
+      "sizeLines": 491,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/ClientProfileView.tsx",
+      "language": "typescript",
+      "sizeLines": 1199,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/ClientsView.tsx",
+      "language": "typescript",
+      "sizeLines": 360,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/DashboardView.tsx",
+      "language": "typescript",
+      "sizeLines": 638,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/DoctorsView.tsx",
+      "language": "typescript",
+      "sizeLines": 226,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/ExercisesView.tsx",
+      "language": "typescript",
+      "sizeLines": 22,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/FinanceManagementView.tsx",
+      "language": "typescript",
+      "sizeLines": 1436,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/LoginView.tsx",
+      "language": "typescript",
+      "sizeLines": 111,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/ReportsView.tsx",
+      "language": "typescript",
+      "sizeLines": 633,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/SettingsView.tsx",
+      "language": "typescript",
+      "sizeLines": 172,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/views/SetupView.tsx",
+      "language": "typescript",
+      "sizeLines": 136,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "language": "typescript",
+      "sizeLines": 1,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/window.d.ts",
+      "language": "typescript",
+      "sizeLines": 162,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tsconfig.app.json",
+      "language": "json",
+      "sizeLines": 26,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tsconfig.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tsconfig.node.json",
+      "language": "json",
+      "sizeLines": 24,
+      "fileCategory": "config"
+    },
+    {
+      "path": "vite.config.mts",
+      "language": "mts",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 244,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "large",
+  "importMap": {
+    ".agents/skills/supabase-postgres-best-practices/references/_contributing.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/_sections.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/_template.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/conn-limits.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/conn-pooling.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/data-pagination.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/data-upsert.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/lock-advisory.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/query-index-types.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-constraints.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-data-types.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/security-privileges.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md": [],
+    ".agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md": [],
+    ".agents/skills/supabase-postgres-best-practices/SKILL.md": [],
+    ".env": [],
+    ".gemini/settings.json": [],
+    ".gemini/skills/ui-ux-pro-max/data/charts.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/colors.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/icons.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/landing.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/products.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/react-performance.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/astro.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/flutter.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nextjs.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/react-native.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/react.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/shadcn.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/svelte.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/swiftui.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/stacks/vue.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/styles.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/typography.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/ui-reasoning.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/ux-guidelines.csv": [],
+    ".gemini/skills/ui-ux-pro-max/data/web-interface.csv": [],
+    ".gemini/skills/ui-ux-pro-max/scripts/core.py": [],
+    ".gemini/skills/ui-ux-pro-max/scripts/design_system.py": [
+      ".gemini/skills/ui-ux-pro-max/scripts/core.py"
+    ],
+    ".gemini/skills/ui-ux-pro-max/scripts/search.py": [
+      ".gemini/skills/ui-ux-pro-max/scripts/core.py",
+      ".gemini/skills/ui-ux-pro-max/scripts/design_system.py"
+    ],
+    ".gemini/skills/ui-ux-pro-max/SKILL.md": [],
+    ".superpowers/brainstorm/25889-1776980462/content/ui-ux-mockup.html": [],
+    ".superpowers/brainstorm/25889-1776980462/state/server-info": [],
+    ".understand-anything/.understandignore": [],
+    ".understand-anything/config.json": [],
+    "design-system/evolve-suite/MASTER.md": [],
+    "dist-electron/builder-debug.yml": [],
+    "dist-electron/builder-effective-config.yaml": [],
+    "dist-electron/win-unpacked/chrome_100_percent.pak": [],
+    "dist-electron/win-unpacked/chrome_200_percent.pak": [],
+    "dist-electron/win-unpacked/d3dcompiler_47.dll": [],
+    "dist-electron/win-unpacked/ffmpeg.dll": [],
+    "dist-electron/win-unpacked/icudtl.dat": [],
+    "dist-electron/win-unpacked/libEGL.dll": [],
+    "dist-electron/win-unpacked/libGLESv2.dll": [],
+    "dist-electron/win-unpacked/LICENSE.electron.txt": [],
+    "dist-electron/win-unpacked/LICENSES.chromium.html": [],
+    "dist-electron/win-unpacked/locales/af.pak": [],
+    "dist-electron/win-unpacked/locales/am.pak": [],
+    "dist-electron/win-unpacked/locales/ar.pak": [],
+    "dist-electron/win-unpacked/locales/bg.pak": [],
+    "dist-electron/win-unpacked/locales/bn.pak": [],
+    "dist-electron/win-unpacked/locales/ca.pak": [],
+    "dist-electron/win-unpacked/locales/cs.pak": [],
+    "dist-electron/win-unpacked/locales/da.pak": [],
+    "dist-electron/win-unpacked/locales/de.pak": [],
+    "dist-electron/win-unpacked/locales/el.pak": [],
+    "dist-electron/win-unpacked/locales/en-GB.pak": [],
+    "dist-electron/win-unpacked/locales/en-US.pak": [],
+    "dist-electron/win-unpacked/locales/es-419.pak": [],
+    "dist-electron/win-unpacked/locales/es.pak": [],
+    "dist-electron/win-unpacked/locales/et.pak": [],
+    "dist-electron/win-unpacked/locales/fa.pak": [],
+    "dist-electron/win-unpacked/locales/fi.pak": [],
+    "dist-electron/win-unpacked/locales/fil.pak": [],
+    "dist-electron/win-unpacked/locales/fr.pak": [],
+    "dist-electron/win-unpacked/locales/gu.pak": [],
+    "dist-electron/win-unpacked/locales/he.pak": [],
+    "dist-electron/win-unpacked/locales/hi.pak": [],
+    "dist-electron/win-unpacked/locales/hr.pak": [],
+    "dist-electron/win-unpacked/locales/hu.pak": [],
+    "dist-electron/win-unpacked/locales/id.pak": [],
+    "dist-electron/win-unpacked/locales/it.pak": [],
+    "dist-electron/win-unpacked/locales/ja.pak": [],
+    "dist-electron/win-unpacked/locales/kn.pak": [],
+    "dist-electron/win-unpacked/locales/ko.pak": [],
+    "dist-electron/win-unpacked/locales/lt.pak": [],
+    "dist-electron/win-unpacked/locales/lv.pak": [],
+    "dist-electron/win-unpacked/locales/ml.pak": [],
+    "dist-electron/win-unpacked/locales/mr.pak": [],
+    "dist-electron/win-unpacked/locales/ms.pak": [],
+    "dist-electron/win-unpacked/locales/nb.pak": [],
+    "dist-electron/win-unpacked/locales/nl.pak": [],
+    "dist-electron/win-unpacked/locales/pl.pak": [],
+    "dist-electron/win-unpacked/locales/pt-BR.pak": [],
+    "dist-electron/win-unpacked/locales/pt-PT.pak": [],
+    "dist-electron/win-unpacked/locales/ro.pak": [],
+    "dist-electron/win-unpacked/locales/ru.pak": [],
+    "dist-electron/win-unpacked/locales/sk.pak": [],
+    "dist-electron/win-unpacked/locales/sl.pak": [],
+    "dist-electron/win-unpacked/locales/sr.pak": [],
+    "dist-electron/win-unpacked/locales/sv.pak": [],
+    "dist-electron/win-unpacked/locales/sw.pak": [],
+    "dist-electron/win-unpacked/locales/ta.pak": [],
+    "dist-electron/win-unpacked/locales/te.pak": [],
+    "dist-electron/win-unpacked/locales/th.pak": [],
+    "dist-electron/win-unpacked/locales/tr.pak": [],
+    "dist-electron/win-unpacked/locales/uk.pak": [],
+    "dist-electron/win-unpacked/locales/ur.pak": [],
+    "dist-electron/win-unpacked/locales/vi.pak": [],
+    "dist-electron/win-unpacked/locales/zh-CN.pak": [],
+    "dist-electron/win-unpacked/locales/zh-TW.pak": [],
+    "dist-electron/win-unpacked/resources.pak": [],
+    "dist-electron/win-unpacked/resources/app.asar": [],
+    "dist-electron/win-unpacked/Revive Clinic.exe": [],
+    "dist-electron/win-unpacked/snapshot_blob.bin": [],
+    "dist-electron/win-unpacked/v8_context_snapshot.bin": [],
+    "dist-electron/win-unpacked/vk_swiftshader_icd.json": [],
+    "dist-electron/win-unpacked/vk_swiftshader.dll": [],
+    "dist-electron/win-unpacked/vulkan-1.dll": [],
+    "docs/supabase/migration.sql": [],
+    "docs/supabase/schema.sql": [],
+    "docs/superpowers/plans/2025-05-14-patient-portal-auth.md": [],
+    "docs/superpowers/plans/2026-04-23-home-exercise-portal.md": [],
+    "docs/superpowers/specs/2026-04-23-patient-portal-sync-design.md": [],
+    "docs/superpowers/specs/2026-04-24-patient-portal-vercel-deployment-design.md": [],
+    "electron/database.js": [
+      "electron/logger.js"
+    ],
+    "electron/logger.js": [],
+    "electron/main.js": [
+      "electron/database.js",
+      "electron/logger.js",
+      "electron/sync.js"
+    ],
+    "electron/preload.js": [],
+    "electron/sync.js": [],
+    "eslint.config.mjs": [],
+    "index.html": [],
+    "management-dashboard/.env": [],
+    "management-dashboard/eslint.config.js": [],
+    "management-dashboard/index.html": [],
+    "management-dashboard/package.json": [],
+    "management-dashboard/README.md": [],
+    "management-dashboard/src/App.tsx": [
+      "management-dashboard/src/lib/supabase.ts"
+    ],
+    "management-dashboard/src/index.css": [],
+    "management-dashboard/src/lib/supabase.ts": [],
+    "management-dashboard/src/main.tsx": [
+      "management-dashboard/src/App.tsx",
+      "management-dashboard/src/index.css"
+    ],
+    "management-dashboard/tsconfig.app.json": [],
+    "management-dashboard/tsconfig.json": [],
+    "management-dashboard/tsconfig.node.json": [],
+    "management-dashboard/vite.config.ts": [],
+    "package.json": [],
+    "patient-portal/.env": [],
+    "patient-portal/eslint.config.js": [],
+    "patient-portal/index.html": [],
+    "patient-portal/package.json": [],
+    "patient-portal/README.md": [],
+    "patient-portal/src/App.css": [],
+    "patient-portal/src/App.tsx": [
+      "patient-portal/src/components/DailyCheckIn.tsx",
+      "patient-portal/src/components/ExerciseList.tsx",
+      "patient-portal/src/components/PinEntry.tsx"
+    ],
+    "patient-portal/src/components/DailyCheckIn.tsx": [
+      "patient-portal/src/lib/supabase.ts"
+    ],
+    "patient-portal/src/components/ExerciseList.tsx": [
+      "patient-portal/src/lib/supabase.ts"
+    ],
+    "patient-portal/src/components/PinEntry.tsx": [
+      "patient-portal/src/lib/supabase.ts"
+    ],
+    "patient-portal/src/index.css": [],
+    "patient-portal/src/lib/supabase.ts": [],
+    "patient-portal/src/main.tsx": [
+      "patient-portal/src/App.tsx",
+      "patient-portal/src/index.css"
+    ],
+    "patient-portal/tsconfig.app.json": [],
+    "patient-portal/tsconfig.json": [],
+    "patient-portal/tsconfig.node.json": [],
+    "patient-portal/vite.config.ts": [],
+    "README.md": [],
+    "schedule-portal/.env": [],
+    "schedule-portal/index.html": [],
+    "schedule-portal/package.json": [],
+    "schedule-portal/src/App.tsx": [
+      "schedule-portal/src/lib/supabase.ts"
+    ],
+    "schedule-portal/src/index.css": [],
+    "schedule-portal/src/lib/supabase.ts": [],
+    "schedule-portal/src/main.tsx": [
+      "schedule-portal/src/App.tsx",
+      "schedule-portal/src/index.css"
+    ],
+    "schedule-portal/tsconfig.app.json": [],
+    "schedule-portal/tsconfig.json": [],
+    "schedule-portal/tsconfig.node.json": [],
+    "schedule-portal/vite.config.ts": [],
+    "scratch/test_gemini.js": [],
+    "scratch/zip_app.py": [],
+    "scratch/zip_build.py": [],
+    "scratch/zip_network_test.py": [],
+    "scratch/zip_ui_update.py": [],
+    "skills-lock.json": [],
+    "src/App.css": [],
+    "src/App.tsx": [
+      "src/components/InvestigationAdmin.tsx",
+      "src/types/index.ts",
+      "src/views/AIView.tsx",
+      "src/views/AssessmentView.tsx",
+      "src/views/AttendanceView.tsx",
+      "src/views/BranchSelectorView.tsx",
+      "src/views/CalendarView.tsx",
+      "src/views/ClientProfileView.tsx",
+      "src/views/ClientsView.tsx",
+      "src/views/DashboardView.tsx",
+      "src/views/DoctorsView.tsx",
+      "src/views/ExercisesView.tsx",
+      "src/views/FinanceManagementView.tsx",
+      "src/views/LoginView.tsx",
+      "src/views/ReportsView.tsx",
+      "src/views/SettingsView.tsx",
+      "src/views/SetupView.tsx"
+    ],
+    "src/components/Assessment.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/BioMetrics.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/BranchManagement.tsx": [],
+    "src/components/CommandPalette.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/Exercises.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/HomeExercises.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/InvestigationAdmin.tsx": [],
+    "src/components/LymphaticProfile.tsx": [],
+    "src/components/NutritionProfile.tsx": [],
+    "src/components/PhysicalTherapyProfile.tsx": [],
+    "src/components/Progress.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/components/UserManagement.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/index.css": [],
+    "src/main.tsx": [
+      "src/App.tsx",
+      "src/index.css"
+    ],
+    "src/types/index.ts": [],
+    "src/views/AIView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/AssessmentView.tsx": [
+      "src/components/BioMetrics.tsx"
+    ],
+    "src/views/AttendanceView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/BranchSelectorView.tsx": [],
+    "src/views/CalendarView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/ClientProfileView.tsx": [
+      "src/components/Exercises.tsx",
+      "src/components/HomeExercises.tsx",
+      "src/components/LymphaticProfile.tsx",
+      "src/components/NutritionProfile.tsx",
+      "src/components/PhysicalTherapyProfile.tsx",
+      "src/components/Progress.tsx",
+      "src/types/index.ts"
+    ],
+    "src/views/ClientsView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/DashboardView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/DoctorsView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/ExercisesView.tsx": [
+      "src/components/Exercises.tsx"
+    ],
+    "src/views/FinanceManagementView.tsx": [
+      "src/types/index.ts"
+    ],
+    "src/views/LoginView.tsx": [],
+    "src/views/ReportsView.tsx": [],
+    "src/views/SettingsView.tsx": [
+      "src/components/BioMetrics.tsx",
+      "src/components/BranchManagement.tsx",
+      "src/components/Exercises.tsx",
+      "src/components/InvestigationAdmin.tsx",
+      "src/components/UserManagement.tsx"
+    ],
+    "src/views/SetupView.tsx": [],
+    "src/vite-env.d.ts": [],
+    "src/window.d.ts": [
+      "src/types/index.ts"
+    ],
+    "tsconfig.app.json": [],
+    "tsconfig.json": [],
+    "tsconfig.node.json": [],
+    "vite.config.mts": []
+  }
+}
