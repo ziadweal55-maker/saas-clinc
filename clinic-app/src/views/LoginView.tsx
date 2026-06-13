@@ -55,9 +55,10 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
         try {
           if (window.api && (window.api as any).getBranches) {
             const data = await (window.api as any).getBranches();
-            setBranches(data || []);
-            if (data && data.length > 0) {
-              setSelectedBranch(data[0].id.toString());
+            const branchList = Array.isArray(data) ? data : [];
+            setBranches(branchList);
+            if (branchList.length > 0) {
+              setSelectedBranch(branchList[0].id.toString());
             }
           }
         } catch (err) {

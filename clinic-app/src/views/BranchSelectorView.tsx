@@ -27,9 +27,11 @@ export function BranchSelectorView({ onBranchSelected, userDisplayName }: Branch
     setLoading(true);
     try {
       const data = await (window.api as any).getBranches();
-      setBranches(data || []);
+      // Guard: API may return an error object instead of array if not authenticated
+      setBranches(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error loading branches:', err);
+      setBranches([]);
     } finally {
       setLoading(false);
     }
