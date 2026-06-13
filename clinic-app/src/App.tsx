@@ -53,11 +53,22 @@ export default function App() {
   const [hasUsers, setHasUsers] = useState<boolean | null>(null);
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
 
+
   const isBaseDomain = useCallback(() => {
     if (typeof window === 'undefined' || !window.location) return false;
     const hostname = window.location.hostname;
-    return hostname === 'localhost' || hostname === '127.0.0.1';
+    // Always base domain on localhost
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+    // Treat hosting platform domains as base unless ?tenant= is present
+    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+    const isHostingBase = HOSTING_DOMAINS.some(d => hostname.endsWith(d));
+    if (isHostingBase) {
+      const params = new URLSearchParams(window.location.search);
+      return !params.get('tenant'); // base domain if no ?tenant= param
+    }
+    return false;
   }, []);
+
 
   const [isRegisteringTenant, setIsRegisteringTenant] = useState(() => isBaseDomain());
 

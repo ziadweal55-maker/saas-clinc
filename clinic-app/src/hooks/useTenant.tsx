@@ -56,35 +56,56 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [error, setError] = useState<string | null>(null);
 
   const getTenantId = useCallback(() => {
-    // 1. Resolve from subdomain/hostname first to enforce hostname-based routing
+    // Known hosting domains that are NOT tenant subdomains
+    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+
+    // 1. Check ?tenant= query parameter (e.g. saas-clinc.vercel.app?tenant=revive)
+    if (typeof window !== 'undefined' && window.location) {
+      const params = new URLSearchParams(window.location.search);
+      const queryTenant = params.get('tenant');
+      if (queryTenant) {
+        localStorage.setItem('tenantId', queryTenant);
+        return queryTenant;
+      }
+    }
+
+    // 2. Resolve from subdomain — but ignore hosting platform domains
     if (typeof window !== 'undefined' && window.location) {
       const hostname = window.location.hostname;
       if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-        const parts = hostname.split('.');
-        if (parts.length === 2 && parts[1] === 'localhost') {
-          return parts[0];
-        }
-        if (parts.length >= 3) {
-          const sub = parts[0];
-          if (sub !== 'www' && sub !== 'api') {
-            return sub;
+        // Check if we're on a hosting platform base domain (not a real clinic subdomain)
+        const isHostingBase = HOSTING_DOMAINS.some(d => hostname.endsWith(d));
+        if (isHostingBase) {
+          // Only treat as tenant subdomain if it has 4+ parts (e.g. revive.saas-clinc.vercel.app)
+          const parts = hostname.split('.');
+          if (parts.length >= 4) {
+            const sub = parts[0];
+            if (sub !== 'www' && sub !== 'api') return sub;
+          }
+          // Otherwise fall through to localStorage / null
+        } else {
+          // Custom domain: e.g. revive.yourclinic.com
+          const parts = hostname.split('.');
+          if (parts.length === 2 && parts[1] === 'localhost') return parts[0];
+          if (parts.length >= 3) {
+            const sub = parts[0];
+            if (sub !== 'www' && sub !== 'api') return sub;
           }
         }
       }
     }
 
-    // 2. Do NOT default to localStorage or fallback if we are on the base domain (localhost/127.0.0.1)
+    // 3. Do NOT default to localStorage if we are on localhost
     if (typeof window !== 'undefined' && window.location) {
       const hostname = window.location.hostname;
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return null;
-      }
+      if (hostname === 'localhost' || hostname === '127.0.0.1') return null;
     }
 
-    let tenantId = localStorage.getItem('tenantId');
+    // 4. Use persisted tenant from localStorage
+    const tenantId = localStorage.getItem('tenantId');
     if (tenantId) return tenantId;
 
-    return 'revive';
+    return null;
   }, []);
 
   const refreshSettings = useCallback(async () => {
