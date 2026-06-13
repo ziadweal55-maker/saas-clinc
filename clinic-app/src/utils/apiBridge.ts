@@ -13,7 +13,18 @@ if (!isElectron) {
 
   // Helper to resolve the tenant ID
   const getTenantId = () => {
-    // 1. Resolve from subdomain/hostname first to enforce hostname-based routing
+    // 1. Check ?tenant= query parameter first (e.g. saas-clinc.vercel.app?tenant=revive)
+    if (typeof window !== 'undefined' && window.location) {
+      const params = new URLSearchParams(window.location.search);
+      const queryTenant = params.get('tenant');
+      if (queryTenant) {
+        // Persist so it survives page navigation
+        localStorage.setItem('tenantId', queryTenant);
+        return queryTenant;
+      }
+    }
+
+    // 2. Resolve from subdomain/hostname to enforce hostname-based routing
     if (typeof window !== 'undefined' && window.location) {
       const hostname = window.location.hostname;
       if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
@@ -23,14 +34,14 @@ if (!isElectron) {
         }
         if (parts.length >= 3) {
           const sub = parts[0];
-          if (sub !== 'www' && sub !== 'api') {
+          if (sub !== 'www' && sub !== 'api' && sub !== 'saas-clinc') {
             return sub;
           }
         }
       }
     }
 
-    // 2. Do NOT default to localStorage if we are on the base domain (localhost/127.0.0.1)
+    // 3. Do NOT default to localStorage if we are on the base domain (localhost/127.0.0.1)
     if (typeof window !== 'undefined' && window.location) {
       const hostname = window.location.hostname;
       if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -41,7 +52,7 @@ if (!isElectron) {
     let tenantId = localStorage.getItem('tenantId');
     if (tenantId) return tenantId;
 
-    return 'revive';
+    return null;
   };
 
   // Helper to make authenticated HTTP requests to the Express server
