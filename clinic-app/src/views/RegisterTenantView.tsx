@@ -62,10 +62,24 @@ export function RegisterTenantView({ onComplete, onBackToLogin }: RegisterTenant
         throw new Error(result.error || 'Registration failed.');
       }
 
-      setSuccess(`Clinic successfully registered! Setting workspace...`);
+      const clinicUrl = (() => {
+        const hostname = window.location.hostname;
+        const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+        if (HOSTING_DOMAINS.some(d => hostname.endsWith(d))) {
+          return `${window.location.origin}?tenant=${tenantId.trim().toLowerCase()}`;
+        }
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+          return `http://${tenantId.trim().toLowerCase()}.localhost:${window.location.port || 5173}`;
+        }
+        const parts = hostname.split('.');
+        const baseDomain = parts.slice(-2).join('.');
+        return `https://${tenantId.trim().toLowerCase()}.${baseDomain}`;
+      })();
+
+      setSuccess(`✅ Clinic registered! Your login link: ${clinicUrl}`);
       setTimeout(() => {
         onComplete(tenantId.trim().toLowerCase());
-      }, 1500);
+      }, 2500);
     } catch (err: any) {
       setError(err.message || 'An error occurred during registration.');
     } finally {

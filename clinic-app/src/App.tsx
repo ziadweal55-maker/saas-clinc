@@ -230,18 +230,32 @@ export default function App() {
       <RegisterTenantView
         onComplete={(tenantId) => {
           if (typeof window !== 'undefined' && window.location) {
+            const hostname = window.location.hostname;
             const port = window.location.port ? `:${window.location.port}` : '';
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+
+            // Localhost → use subdomain routing
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
               window.location.href = `http://${tenantId}.localhost${port}`;
               return;
             }
-            const parts = window.location.hostname.split('.');
+
+            // Hosting platforms (Vercel, Railway, Netlify) → use ?tenant= param
+            const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+            const isHostingPlatform = HOSTING_DOMAINS.some(d => hostname.endsWith(d));
+            if (isHostingPlatform) {
+              window.location.href = `${window.location.origin}?tenant=${tenantId}`;
+              return;
+            }
+
+            // Custom domain → use real subdomain (e.g. revive.yourclinic.com)
+            const parts = hostname.split('.');
             if (parts.length >= 2) {
               const baseDomain = parts.slice(-2).join('.');
-              window.location.href = `http://${tenantId}.${baseDomain}${port}`;
+              window.location.href = `https://${tenantId}.${baseDomain}`;
               return;
             }
           }
+          // Fallback: store in localStorage and reload
           localStorage.setItem('tenantId', tenantId);
           setIsRegisteringTenant(false);
           checkUsers();
