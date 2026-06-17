@@ -11,11 +11,22 @@ import {
 
 function resolveInbodyImageUrl(localPath: string) {
   if (!localPath) return '';
+  if (localPath.startsWith('http://') || localPath.startsWith('https://')) {
+    return localPath;
+  }
   const parts = localPath.split(/[\\/]/);
   const fileName = parts[parts.length - 1];
 
   if ((window as any).isMobilePortal) {
     return '/files/' + fileName;
+  }
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3000/api/v1';
+  const apiServer = apiBase.replace('/api/v1', '');
+  const isRunningInBrowser = typeof navigator !== 'undefined' && !navigator.userAgent.includes('Electron');
+  
+  if (isRunningInBrowser) {
+    return apiServer + localPath;
   }
   return 'file://' + localPath;
 }
