@@ -698,6 +698,27 @@ async function createTenantSchema(tenantId) {
       ON CONFLICT DO NOTHING;
     `);
 
+    // Performance Indexes for Neon free tier optimization
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_doctors_branch ON Doctors(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_users_doctor ON Users(doctor_id);
+      CREATE INDEX IF NOT EXISTS idx_users_branch ON Users(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_clients_branch ON Clients(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_clients_phone ON Clients(phone);
+      CREATE INDEX IF NOT EXISTS idx_appointments_client ON Appointments(client_id);
+      CREATE INDEX IF NOT EXISTS idx_appointments_doctor ON Appointments(doctor_id);
+      CREATE INDEX IF NOT EXISTS idx_appointments_date ON Appointments(appointment_date);
+      CREATE INDEX IF NOT EXISTS idx_appointments_branch ON Appointments(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_sessions_client ON Sessions(client_id);
+      CREATE INDEX IF NOT EXISTS idx_sessions_doctor ON Sessions(doctor_id);
+      CREATE INDEX IF NOT EXISTS idx_sessions_date ON Sessions(session_date);
+      CREATE INDEX IF NOT EXISTS idx_payments_client ON Payments(client_id);
+      CREATE INDEX IF NOT EXISTS idx_payments_date ON Payments(payment_date);
+      CREATE INDEX IF NOT EXISTS idx_profiles_client ON ClientProfiles(client_id);
+      CREATE INDEX IF NOT EXISTS idx_investigations_profile ON ClientInvestigations(profile_id);
+      CREATE INDEX IF NOT EXISTS idx_home_exercises_client ON ClientExercisesHome(client_id);
+    `);
+
     await client.query('COMMIT');
     console.log(`[MIGRATION] Tenant schema ${schemaName} created and tables initialized successfully`);
     return schemaName;
