@@ -6,6 +6,7 @@ const { ADMIN_JWT_SECRET } = require('../middlewares/adminAuth');
 const { logAdminAction } = require('../utils/adminAuditLogger');
 const { sendApprovalEmail, sendRejectionEmail, sendAnnouncementBroadcast } = require('../utils/emailService');
 require('dotenv').config();
+const { clearSettingsCache } = require('./tenantController');
 
 // ─── AUTH ────────────────────────────────────────────────
 
@@ -194,6 +195,10 @@ exports.approveTenant = async (req, res) => {
     }
 
     await logAdminAction(req.admin.email, 'approve_tenant', id, { tenantName: tenant.name }, req.ip);
+    
+    // Clear in-memory settings cache
+    clearSettingsCache(id);
+    
     // Send approval email (non-blocking)
     sendApprovalEmail(tenant.email, tenant.name, id, `https://${id}.saasclinic.com`).catch(console.error);
 
@@ -222,6 +227,10 @@ exports.rejectTenant = async (req, res) => {
       [id, tenant.status, req.admin.email, reason || 'No reason provided']
     );
     await logAdminAction(req.admin.email, 'reject_tenant', id, { reason }, req.ip);
+    
+    // Clear in-memory settings cache
+    clearSettingsCache(id);
+    
     sendRejectionEmail(tenant.email, tenant.name, reason).catch(console.error);
     return res.json({ success: true, message: `Clinic '${tenant.name}' rejected.` });
   } catch (e) {
@@ -251,6 +260,10 @@ exports.updateTenantStatus = async (req, res) => {
     );
     const action = status === 'suspended' ? 'suspend_tenant' : 'reactivate_tenant';
     await logAdminAction(req.admin.email, action, id, { reason }, req.ip);
+    
+    // Clear in-memory settings cache
+    clearSettingsCache(id);
+    
     return res.json({ success: true, message: `Clinic '${tenant.name}' status updated to '${status}'.` });
   } catch (e) {
     console.error('[ADMIN UPDATE STATUS]', e);
@@ -269,6 +282,10 @@ exports.updateTenantFeatures = async (req, res) => {
   try {
     await pool.query('UPDATE public.tenants SET features = $1 WHERE id = $2', [JSON.stringify(safeFeatures), id]);
     await logAdminAction(req.admin.email, 'update_features', id, { features: safeFeatures }, req.ip);
+    
+    // Clear in-memory settings cache
+    clearSettingsCache(id);
+    
     return res.json({ success: true, features: safeFeatures });
   } catch (e) {
     console.error('[ADMIN UPDATE FEATURES]', e);
@@ -619,6 +636,9 @@ exports.deleteTenant = async (req, res) => {
     
     await client.query('COMMIT');
     client.release();
+    
+    // Clear in-memory settings cache
+    clearSettingsCache(cleanId);
     
     console.log(`[ADMIN DELETE] Clinic '${cleanId}' and schema '${schemaName}' deleted successfully.`);
     return res.json({ success: true, message: `Clinic '${tenantName}' and all associated data have been deleted.` });

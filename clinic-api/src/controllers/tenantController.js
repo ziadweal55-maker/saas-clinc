@@ -80,12 +80,30 @@ exports.registerTenant = async (req, res) => {
   }
 };
 
+// In-memory cache for tenant settings to reduce Neon DB queries
+const settingsCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // Cache for 5 minutes
+
+exports.clearSettingsCache = (tenantId) => {
+  if (!tenantId) return;
+  const cleanId = tenantId.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  settingsCache.delete(cleanId);
+  console.log(`[CACHE] Settings cache cleared for tenant: ${cleanId}`);
+};
+
 /**
  * Get Tenant settings & themes (public route, loaded on UI init)
  */
 exports.getTenantSettings = async (req, res) => {
   const tenantId = req.headers['x-tenant-id'] || req.headers['x-tenant'] || req.hostname.split('.')[0];
+  if (!tenantId) return res.status(400).json({ error: 'Tenant context is required.' });
   const cleanTenantId = tenantId.toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+  // Check cache
+  const cached = settingsCache.get(cleanTenantId);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+    return res.json(cached.data);
+  }
 
   try {
     const result = await pool.query(
@@ -97,7 +115,15 @@ exports.getTenantSettings = async (req, res) => {
       return res.status(404).json({ error: 'Tenant settings not found' });
     }
 
-    return res.json(result.rows[0]);
+    const settings = result.rows[0];
+    
+    // Save to cache
+    settingsCache.set(cleanTenantId, {
+      timestamp: Date.now(),
+      data: settings
+    });
+
+    return res.json(settings);
   } catch (error) {
     console.error('[TENANT CONTROLLER] Error fetching settings:', error);
     return res.status(500).json({ error: error.message });
