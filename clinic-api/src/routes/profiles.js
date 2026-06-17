@@ -4,6 +4,36 @@ const fs = require('fs');
 const path = require('path');
 const { authMiddleware } = require('../middlewares/auth');
 const { logAudit } = require('../utils/auditLogger');
+const cloudinary = require('cloudinary').v2;
+
+// Initialize Cloudinary if credentials exist
+const isCloudinaryConfigured = process.env.CLOUDINARY_CLOUD_NAME && 
+                              process.env.CLOUDINARY_API_KEY && 
+                              process.env.CLOUDINARY_API_SECRET;
+
+if (isCloudinaryConfigured) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+  console.log('[CLOUDINARY] Cloudinary configured successfully.');
+} else {
+  console.warn('[CLOUDINARY] Warning: Cloudinary is not configured. Falling back to local storage.');
+}
+
+async function uploadBase64ToCloudinary(base64Data, subfolder, tenantId) {
+  let uploadData = base64Data;
+  if (!base64Data.startsWith('data:')) {
+    uploadData = `data:image/jpeg;base64,${base64Data}`;
+  }
+  const folderPath = `saas-clinic/${tenantId}/${subfolder}`;
+  const uploadResult = await cloudinary.uploader.upload(uploadData, {
+    folder: folderPath,
+    resource_type: 'auto'
+  });
+  return uploadResult.secure_url;
+}
 
 // Helper to decode base64 file and save to local disk
 function saveBase64File(base64Data, originalName, subfolder, tenantId) {
@@ -593,7 +623,12 @@ router.post('/inbody/:profileId/upload', authMiddleware, async (req, res) => {
   const profileId = parseInt(req.params.profileId);
   const tenantId = req.headers['x-tenant-id'] || 'default';
   try {
-    const savedPath = saveBase64File(base64, fileName, 'inbody', tenantId);
+    let savedPath;
+    if (isCloudinaryConfigured) {
+      savedPath = await uploadBase64ToCloudinary(base64, 'inbody', tenantId);
+    } else {
+      savedPath = saveBase64File(base64, fileName, 'inbody', tenantId);
+    }
     
     const result = await req.db.query(
       `INSERT INTO InbodyUploads (profile_id, file_name, local_file_path, session_date, upload_date)
@@ -613,14 +648,34 @@ router.delete('/inbody/upload/:id', authMiddleware, async (req, res) => {
   try {
     const fileRes = await req.db.query('SELECT local_file_path FROM InbodyUploads WHERE id = $1', [parseInt(req.params.id)]);
     if (fileRes.rowCount > 0) {
-      const relativePath = fileRes.rows[0].local_file_path;
-      // Resolve path relative to project root
-      const absolutePath = path.join(__dirname, '../..', relativePath);
-      if (fs.existsSync(absolutePath)) {
+      const filePath = fileRes.rows[0].local_file_path;
+      if (filePath.startsWith('http')) {
         try {
-          fs.unlinkSync(absolutePath);
-        } catch (unlinkErr) {
-          console.error('[PROFILES ROUTE] Failed to delete inbody file:', unlinkErr);
+          const parts = filePath.split('/upload/');
+          if (parts.length === 2) {
+            const pathAfterUpload = parts[1];
+            let pathSegments = pathAfterUpload.split('/');
+            if (pathSegments[0].match(/^v\d+$/)) {
+              pathSegments.shift();
+            }
+            const fullPublicIdWithExt = pathSegments.join('/');
+            const lastDotIdx = fullPublicIdWithExt.lastIndexOf('.');
+            const publicId = lastDotIdx !== -1 ? fullPublicIdWithExt.substring(0, lastDotIdx) : fullPublicIdWithExt;
+            
+            await cloudinary.uploader.destroy(publicId);
+            console.log(`[CLOUDINARY] Deleted asset: ${publicId}`);
+          }
+        } catch (cloudinaryErr) {
+          console.error('[PROFILES ROUTE] Failed to delete file from Cloudinary:', cloudinaryErr.message);
+        }
+      } else {
+        const absolutePath = path.join(__dirname, '../..', filePath);
+        if (fs.existsSync(absolutePath)) {
+          try {
+            fs.unlinkSync(absolutePath);
+          } catch (unlinkErr) {
+            console.error('[PROFILES ROUTE] Failed to delete local file:', unlinkErr);
+          }
         }
       }
     }
@@ -652,7 +707,12 @@ router.post('/documents/:clientId/upload', authMiddleware, async (req, res) => {
   const clientId = parseInt(req.params.clientId);
   const tenantId = req.headers['x-tenant-id'] || 'default';
   try {
-    const savedPath = saveBase64File(base64, fileName, 'documents', tenantId);
+    let savedPath;
+    if (isCloudinaryConfigured) {
+      savedPath = await uploadBase64ToCloudinary(base64, 'documents', tenantId);
+    } else {
+      savedPath = saveBase64File(base64, fileName, 'documents', tenantId);
+    }
     
     const result = await req.db.query(
       `INSERT INTO ClientFiles (client_id, file_name, local_file_path, upload_date)

@@ -263,11 +263,57 @@ if (!isElectron) {
     // --- Inbody Uploads ---
     getInbodyUploads: (profileId: number) => request('GET', `/profiles/inbody/${profileId}`),
     uploadInbodyMobile: (profileId: number, fileName: string, base64: string) => request('POST', `/profiles/inbody/${profileId}/upload`, { fileName, base64 }),
+    uploadInbodyPhoto: (profileId: number) => {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e: any) => {
+          const file = e.target?.files?.[0];
+          if (!file) {
+            resolve({ success: false, error: 'No file selected' });
+            return;
+          }
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Data = reader.result as string;
+            const res = await apiImplementation.uploadInbodyMobile(profileId, file.name, base64Data);
+            resolve(res);
+          };
+          reader.onerror = () => resolve({ success: false, error: 'Read file error' });
+          reader.readAsDataURL(file);
+        };
+        input.click();
+      });
+    },
     deleteInbodyUpload: (id: number) => request('DELETE', `/profiles/inbody/upload/${id}`),
 
     // --- Document Records ---
     getDocuments: (clientId: number) => request('GET', `/profiles/documents/${clientId}`),
     uploadDocumentMobile: (clientId: number, fileName: string, base64: string) => request('POST', `/profiles/documents/${clientId}/upload`, { fileName, base64 }),
+    uploadDocument: (clientId: number) => {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt';
+        input.onchange = async (e: any) => {
+          const file = e.target?.files?.[0];
+          if (!file) {
+            resolve({ success: false, error: 'No file selected' });
+            return;
+          }
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64Data = reader.result as string;
+            const res = await apiImplementation.uploadDocumentMobile(clientId, file.name, base64Data);
+            resolve(res);
+          };
+          reader.onerror = () => resolve({ success: false, error: 'Read file error' });
+          reader.readAsDataURL(file);
+        };
+        input.click();
+      });
+    },
     openDocument: async (path: string) => {
       if (typeof window !== 'undefined') {
         const fullUrl = path.startsWith('http') ? path : `${API_SERVER}${path}`;
@@ -331,7 +377,8 @@ if (!isElectron) {
     getTenantSettings: () => request('GET', '/global/settings'),
     getDbPath: async () => 'SaaS Postgres Cloud Database',
     selectDbPath: async () => 'Cloud Server',
-    reloadDatabase: async () => ({ success: true })
+    reloadDatabase: async () => ({ success: true }),
+    exportBackup: async () => ({ success: false, error: 'Backup is managed automatically on the cloud database server.' })
   };
 
   // Helper to generate type-safe default responses for unimplemented features
