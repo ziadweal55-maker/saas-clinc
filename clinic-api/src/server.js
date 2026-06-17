@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 require('dotenv').config();
 
 const { createGlobalSchema } = require('./scripts/migrate');
@@ -32,6 +36,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Global routes (do not require tenant isolation context)
 app.use('/api/v1/global', require('./routes/global'));
+
+// Admin dashboard routes (super-admin only, no tenant middleware)
+app.use('/api/v1/admin', require('./routes/admin'));
 
 // Tenant isolation context boundary
 app.use('/api/v1', tenantMiddleware);
@@ -72,3 +79,6 @@ const startServer = async () => {
 };
 
 startServer();
+
+// Activate scheduled jobs
+require('./utils/scheduler');

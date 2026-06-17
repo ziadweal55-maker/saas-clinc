@@ -6,6 +6,7 @@ import { UserManagement } from '../components/UserManagement';
 import { InvestigationAdmin } from '../components/InvestigationAdmin';
 import { BranchManagement } from '../components/BranchManagement';
 import { DEFAULT_WHATSAPP_TEMPLATE } from '../utils/whatsapp';
+import { useTenant } from '../hooks/useTenant';
 
 interface SettingsViewProps {
   currentUser: {
@@ -17,6 +18,18 @@ interface SettingsViewProps {
 }
 
 export function SettingsView({ currentUser }: SettingsViewProps) {
+  const { tenantSettings } = useTenant();
+  const isFeatureEnabled = (key: string) => {
+    if (!tenantSettings || !tenantSettings.features) return true;
+    return !!(tenantSettings.features as Record<string, boolean>)[key];
+  };
+
+  const showAssessment = isFeatureEnabled('assessments');
+  const showExercises = isFeatureEnabled('exercises');
+  const showInvestigations = isFeatureEnabled('investigations');
+  const showUsers = isFeatureEnabled('users');
+  const showBranches = isFeatureEnabled('branches');
+
   const [activeSubTab, setActiveSubTab] = useState('backup');
   const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [currentDbPath, setCurrentDbPath] = useState<string>('');
@@ -77,36 +90,46 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
             className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'backup' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
             <Database size={16} /> Database & Backup
           </button>
-          <button 
-            onClick={() => setActiveSubTab('assessment')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'assessment' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <FileSpreadsheet size={16} /> Clinical Assessment
-          </button>
-          <button 
-            onClick={() => setActiveSubTab('exercises')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'exercises' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <Dumbbell size={16} /> Exercise Library
-          </button>
-          <button 
-            onClick={() => setActiveSubTab('investigations')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'investigations' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <FlaskConical size={16} /> Investigation Library
-          </button>
+          {showAssessment && (
+            <button 
+              onClick={() => setActiveSubTab('assessment')}
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'assessment' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
+              <FileSpreadsheet size={16} /> Clinical Assessment
+            </button>
+          )}
+          {showExercises && (
+            <button 
+              onClick={() => setActiveSubTab('exercises')}
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'exercises' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
+              <Dumbbell size={16} /> Exercise Library
+            </button>
+          )}
+          {showInvestigations && (
+            <button 
+              onClick={() => setActiveSubTab('investigations')}
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'investigations' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
+              <FlaskConical size={16} /> Investigation Library
+            </button>
+          )}
           <button 
             onClick={() => setActiveSubTab('whatsapp')}
             className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'whatsapp' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
             <MessageSquare size={16} /> WhatsApp Templates
           </button>
-          <button 
-            onClick={() => setActiveSubTab('users')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'users' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <ShieldCheck size={16} /> Team Management
-          </button>
-          <button 
-            onClick={() => setActiveSubTab('branches')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'branches' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <Building2 size={16} /> Branches
-          </button>
+          {showUsers && (
+            <button 
+              onClick={() => setActiveSubTab('users')}
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'users' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
+              <ShieldCheck size={16} /> Team Management
+            </button>
+          )}
+          {showBranches && (
+            <button 
+              onClick={() => setActiveSubTab('branches')}
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'branches' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
+              <Building2 size={16} /> Branches
+            </button>
+          )}
         </div>
 
         <div className="p-10 flex-1">
@@ -219,11 +242,11 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
           )}
           
           <div className="animate-in fade-in duration-300">
-            {activeSubTab === 'assessment' && <AssessmentAdmin />}
-            {activeSubTab === 'exercises' && <ExerciseAdmin />}
-            {activeSubTab === 'investigations' && <InvestigationAdmin />}
-            {activeSubTab === 'users' && <UserManagement />}
-            {activeSubTab === 'branches' && <BranchManagement />}
+            {activeSubTab === 'assessment' && showAssessment && <AssessmentAdmin />}
+            {activeSubTab === 'exercises' && showExercises && <ExerciseAdmin />}
+            {activeSubTab === 'investigations' && showInvestigations && <InvestigationAdmin />}
+            {activeSubTab === 'users' && showUsers && <UserManagement />}
+            {activeSubTab === 'branches' && showBranches && <BranchManagement />}
           </div>
         </div>
       </div>

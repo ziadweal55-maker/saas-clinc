@@ -7,6 +7,8 @@ interface TenantSettings {
   primary_color: string;
   whatsapp_number: string | null;
   status: string;
+  features?: Record<string, boolean>;
+  rejection_reason?: string | null;
 }
 
 interface TenantContextType {

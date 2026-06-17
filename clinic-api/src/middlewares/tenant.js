@@ -45,7 +45,7 @@ const tenantMiddleware = async (req, res, next) => {
     }
 
     const tenant = tenantCheck.rows[0];
-    if (tenant.status !== 'active' && !req.path.startsWith('/api/v1/setup')) {
+    if (tenant.status !== 'active') {
       return res.status(403).json({ 
         error: `Tenant '${tenantId}' is suspended or inactive. Please contact support.` 
       });

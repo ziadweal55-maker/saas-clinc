@@ -20,8 +20,9 @@ exports.registerTenant = async (req, res) => {
 
   const cleanTenantId = tenantId.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     await client.query('BEGIN');
 
     // 1. Check if tenantId already exists in global registry
@@ -30,62 +31,49 @@ exports.registerTenant = async (req, res) => {
       return res.status(400).json({ error: `Subdomain/tenant ID '${cleanTenantId}' is already taken.` });
     }
 
-    // 2. Insert into public.tenants registry
-    // status is 'active' for default setup (can be modified later to integrate paymob payment checkout screen)
+    // 2. Insert into public.tenants registry with status 'pending' (approved by admin before provisioning)
     await client.query(
-      `INSERT INTO public.tenants (id, name, logo_url, primary_color, whatsapp_number, status) 
-       VALUES ($1, $2, $3, $4, $5, 'active')`,
-      [cleanTenantId, clinicName, logoUrl || null, primaryColor || '#C8102E', whatsappNumber || null]
+      `INSERT INTO public.tenants (id, name, logo_url, primary_color, whatsapp_number, status, email)
+       VALUES ($1, $2, $3, $4, $5, 'pending', $6)`,
+      [cleanTenantId, clinicName, logoUrl || null, primaryColor || '#C8102E', whatsappNumber || null, email.trim().toLowerCase()]
     );
 
-    // 3. Create Subscription entry (trial / active)
+    // 2b. Insert status history entry
+    await client.query(
+      `INSERT INTO public.tenant_status_history (tenant_id, old_status, new_status, changed_by, reason)
+       VALUES ($1, NULL, 'pending', 'system', 'Clinic registered - awaiting admin approval')`,
+      [cleanTenantId]
+    );
+
+    // 3. Create Subscription entry (pending trial — activated upon admin approval)
     const startDate = new Date();
     const endDate = new Date();
-    endDate.setDate(startDate.getDate() + 30); // 30-day trial
+    endDate.setDate(startDate.getDate() + 30); // 30-day trial starts on approval
 
     await client.query(
       `INSERT INTO public.subscriptions (tenant_id, plan_id, status, current_period_start, current_period_end)
-       VALUES ($1, 'starter', 'active', $2, $3)`,
+       VALUES ($1, 'starter', 'pending', $2, $3)`,
       [cleanTenantId, startDate, endDate]
     );
 
     await client.query('COMMIT');
     client.release();
 
-    // 4. Provision the database schema for the new tenant
-    await createTenantSchema(cleanTenantId);
+    // Note: schema provisioning and admin user creation happen on admin approval, not here.
+    console.log(`[TENANT REGISTRATION] Clinic '${cleanTenantId}' registered — pending admin approval.`);
 
-    // 5. Create initial administrator user inside the new tenant schema
-    const tenantDbClient = await pool.connect();
-    try {
-      const schemaName = `tenant_${cleanTenantId}`;
-      await tenantDbClient.query(`SET search_path TO ${schemaName}`);
-
-      const hashedPassword = hashPassword(password);
-      
-      // Insert first admin user
-      await tenantDbClient.query(
-        `INSERT INTO Users (username, password_hash, role, status, branch_id) 
-         VALUES ($1, $2, 'admin', 'active', 1)`,
-        [email.trim(), hashedPassword]
-      );
-      
-      console.log(`[TENANT PROVISION] Successfully created admin user '${email}' in schema '${schemaName}'`);
-    } finally {
-      tenantDbClient.release();
-    }
-
-    return res.json({ 
-      success: true, 
-      message: `Tenant '${cleanTenantId}' provisioned successfully. You can now log in.`,
-      subdomain: cleanTenantId
+    return res.json({
+      success: true,
+      message: `Clinic '${cleanTenantId}' registered successfully. Your application is pending admin review. You will receive an email once approved.`,
+      subdomain: cleanTenantId,
+      status: 'pending'
     });
   } catch (error) {
     // If anything fails, rollback transaction if client is still active
     try {
-      await client.query('ROLLBACK');
+      if (client) await client.query('ROLLBACK');
     } catch(e) {}
-    client.release();
+    if (client) client.release();
     
     console.error('[TENANT CONTROLLER] Signup and provisioning failed:', error);
     return res.status(500).json({ error: `Provisioning failed: ${error.message}` });
@@ -101,7 +89,7 @@ exports.getTenantSettings = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id, name, logo_url, primary_color, whatsapp_number, status FROM public.tenants WHERE id = $1',
+      'SELECT id, name, logo_url, primary_color, whatsapp_number, status, features, rejection_reason FROM public.tenants WHERE id = $1',
       [cleanTenantId]
     );
 

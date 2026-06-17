@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Home, Users, Calendar, Settings, FileText, Bot, Activity, RefreshCw, X, Stethoscope, ClipboardList, Dumbbell, DollarSign, Menu, Clock, FlaskConical, CheckCircle, AlertCircle, Info, Building2, UserCheck } from 'lucide-react';
+import { Home, Users, Calendar, Settings, FileText, Bot, Activity, RefreshCw, X, Stethoscope, ClipboardList, Dumbbell, DollarSign, Menu, Clock, FlaskConical, CheckCircle, AlertCircle, Info, Building2, UserCheck, Lock } from 'lucide-react';
 
 // Types
 import { Client, User as UserType } from './types';
@@ -25,7 +25,11 @@ import { AccountRequestsView } from './views/AccountRequestsView';
 import { InvestigationAdmin } from './components/InvestigationAdmin';
 
 export default function App() {
-  const { tenantSettings } = useTenant();
+  const { tenantSettings, loading: tenantLoading } = useTenant();
+  const isFeatureEnabled = useCallback((key: string) => {
+    if (!tenantSettings || !tenantSettings.features) return true;
+    return !!(tenantSettings.features as Record<string, boolean>)[key];
+  }, [tenantSettings]);
   const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'info' | 'warning' }>>([]);
   const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -78,9 +82,15 @@ export default function App() {
   const [needsBranchSelection, setNeedsBranchSelection] = useState(false);
   const [loadingBranchData, setLoadingBranchData] = useState(false);
 
-  const checkUsers = async () => {
+  const checkUsers = useCallback(async () => {
     if (isBaseDomain()) {
       setIsRegisteringTenant(true);
+      setHasUsers(false);
+      return;
+    }
+
+    if (tenantSettings && tenantSettings.status !== 'active') {
+      setIsRegisteringTenant(false);
       setHasUsers(false);
       return;
     }
@@ -110,11 +120,12 @@ export default function App() {
       setIsRegisteringTenant(true);
       setHasUsers(false);
     }
-  };
+  }, [isBaseDomain, tenantSettings, showToast]);
 
   useEffect(() => {
+    if (tenantLoading) return;
     checkUsers();
-  }, []);
+  }, [tenantLoading, checkUsers]);
 
   useEffect(() => {
     localStorage.setItem('pt_dark_mode', darkMode.toString());
@@ -224,6 +235,93 @@ export default function App() {
   useEffect(() => {
     setIsSidebarOpen(false);
   }, [currentView]);
+
+  if (tenantLoading) {
+    return (
+      <div className="h-screen w-full bg-[#0b0f19] flex items-center justify-center">
+        <div className="animate-spin text-primary">
+          <RefreshCw size={48} />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle workspace issues (tenant settings error or non-active tenant status)
+  if (!isRegisteringTenant && tenantSettings && tenantSettings.status !== 'active') {
+    const status = tenantSettings.status;
+    const name = tenantSettings.name;
+    const isPending = status === 'pending';
+    const isSuspended = status === 'suspended';
+    const isRejected = status === 'rejected';
+
+    return (
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-950 via-[#0d111d] to-[#121026] flex items-center justify-center p-4 antialiased text-white">
+        <div className="max-w-md w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 p-8 rounded-3xl shadow-2xl space-y-6 text-center">
+          <div className="inline-flex p-4 bg-primary/10 rounded-2xl border border-primary/20 text-primary animate-pulse">
+            {isPending && <Clock size={36} />}
+            {isSuspended && <Lock size={36} />}
+            {isRejected && <AlertCircle size={36} />}
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black tracking-tight text-white font-heading uppercase italic">
+              {isPending && 'Approval Pending'}
+              {isSuspended && 'Workspace Suspended'}
+              {isRejected && 'Registration Rejected'}
+            </h2>
+            <p className="text-sm font-bold uppercase tracking-widest text-primary font-mono">{name}</p>
+          </div>
+
+          <div className="bg-slate-950/40 border border-slate-800 p-5 rounded-2xl text-slate-300 text-xs leading-relaxed space-y-3 font-medium">
+            {isPending && (
+              <p>Your clinic registration is currently under review. Our team is verifying details and preparing your secure database partition. You will receive an email confirmation once it is active.</p>
+            )}
+            {isSuspended && (
+              <p>This workspace has been suspended. All customer and session data is securely preserved. Please contact your system administrator or renew your subscription plan to reactivate access.</p>
+            )}
+            {isRejected && (
+              <div className="space-y-2">
+                <p>We were unable to approve this clinic registration at this time.</p>
+                <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-xl text-[11px] font-bold text-left">
+                  Reason: {tenantSettings.rejection_reason || 'No reason provided.'}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 pt-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full bg-primary hover:bg-primary/95 text-primary-foreground py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-[0.98] cursor-pointer"
+            >
+              Refresh Status
+            </button>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  const hostname = window.location.hostname;
+                  const port = window.location.port ? `:${window.location.port}` : '';
+                  if (hostname.endsWith('.localhost')) {
+                    window.location.href = `http://localhost${port}`;
+                  } else {
+                    const parts = hostname.split('.');
+                    if (parts.length >= 3) {
+                      window.location.href = `https://${parts.slice(-2).join('.')}${port}`;
+                    } else {
+                      window.location.href = `${window.location.origin}`;
+                    }
+                  }
+                }
+              }}
+              className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-[0.98] border border-slate-700/50 cursor-pointer"
+            >
+              Register Another Workspace
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isRegisteringTenant) {
     return (
@@ -340,13 +438,15 @@ export default function App() {
             </button>
           )}
           
-          <button 
-            onClick={() => setCurrentView('calendar')} 
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'calendar' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-            <Calendar size={20} /> Calendar
-          </button>
+          {isFeatureEnabled('calendar') && (
+            <button 
+              onClick={() => setCurrentView('calendar')} 
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'calendar' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
+              <Calendar size={20} /> Calendar
+            </button>
+          )}
           
-          {(isAdmin || isDoctor || isStaff) && (
+          {(isAdmin || isDoctor || isStaff) && isFeatureEnabled('patients') && (
             <button 
               onClick={() => setCurrentView('clients')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'clients' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -355,7 +455,7 @@ export default function App() {
           )}
 
 
-          {(isAdmin || isCfo) && (
+          {(isAdmin || isCfo) && isFeatureEnabled('reports') && (
             <button 
               onClick={() => setCurrentView('reports')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'reports' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -363,7 +463,7 @@ export default function App() {
             </button>
           )}
 
-          {(isAdmin || isCfo) && (
+          {(isAdmin || isCfo) && isFeatureEnabled('finance') && (
             <button 
               onClick={() => setCurrentView('finance')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'finance' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -371,7 +471,7 @@ export default function App() {
             </button>
           )}
 
-          {(isAdmin || isDoctor) && (
+          {(isAdmin || isDoctor) && isFeatureEnabled('assessments') && (
             <button 
               onClick={() => setCurrentView('assessment')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'assessment' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -379,7 +479,7 @@ export default function App() {
             </button>
           )}
 
-          {(isAdmin || isDoctor) && (
+          {(isAdmin || isDoctor) && isFeatureEnabled('exercises') && (
             <button 
               onClick={() => setCurrentView('exercises')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'exercises' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -387,7 +487,7 @@ export default function App() {
             </button>
           )}
 
-          {(isAdmin || isDoctor) && (
+          {(isAdmin || isDoctor) && isFeatureEnabled('investigations') && (
             <button 
               onClick={() => setCurrentView('investigation-library')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'investigation-library' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -395,14 +495,14 @@ export default function App() {
             </button>
           )}
  
-          {isAdmin && (
+          {isAdmin && isFeatureEnabled('ai_assistant') && (
             <button 
               onClick={() => setCurrentView('ai-assistant')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'ai-assistant' ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20 font-bold' : 'hover:bg-accent/10 text-muted-foreground hover:text-accent'}`}>
               <Bot size={20} /> Revive AI Assist
             </button>
           )}
-          {isAdmin && (
+          {isAdmin && isFeatureEnabled('users') && (
             <button 
               onClick={() => setCurrentView('approvals')} 
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'approvals' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
@@ -412,11 +512,13 @@ export default function App() {
         </nav>
         
         <div className="p-6 border-t border-border space-y-2">
-           <button 
-             onClick={() => setCurrentView('attendance')}
-             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'attendance' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'}`}>
-             <Clock size={20} /> Shift Attendance
-           </button>
+           {isFeatureEnabled('attendance') && (
+             <button 
+               onClick={() => setCurrentView('attendance')}
+               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'attendance' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'}`}>
+               <Clock size={20} /> Shift Attendance
+             </button>
+           )}
            {isAdmin && (
              <button 
                onClick={() => setCurrentView('settings')}
@@ -434,13 +536,13 @@ export default function App() {
               <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
                 User: {currentUser?.username} ({currentUser?.role})
               </div>
-              {currentBranch && (
+              {currentBranch && isFeatureEnabled('branches') && (
                 <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold uppercase tracking-widest mb-1">
                   <Building2 size={12} className="shrink-0" />
                   {currentBranch.name}
                 </div>
               )}
-              {(isAdmin || isCfo) && currentBranch && (
+              {(isAdmin || isCfo) && currentBranch && isFeatureEnabled('branches') && (
                 <button
                   onClick={() => setNeedsBranchSelection(true)}
                   className="mt-1 w-full py-2 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-1"
@@ -478,9 +580,9 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto pb-[88px] lg:pb-0">
           {currentView === 'dashboard' && <DashboardView onNavigate={setCurrentView} currentUser={currentUser} />}
-          {currentView === 'calendar' && <CalendarView clients={clients} currentUser={currentUser} />}
-          {currentView === 'clients' && <ClientsView clients={clients} onSelectClient={(c) => { setSelectedClient(c); setCurrentView('clientProfile'); }} onClientAdded={loadClients} currentUser={currentUser} />}
-          {currentView === 'clientProfile' && selectedClient && (
+          {currentView === 'calendar' && isFeatureEnabled('calendar') && <CalendarView clients={clients} currentUser={currentUser} />}
+          {currentView === 'clients' && isFeatureEnabled('patients') && <ClientsView clients={clients} onSelectClient={(c) => { setSelectedClient(c); setCurrentView('clientProfile'); }} onClientAdded={loadClients} currentUser={currentUser} />}
+          {currentView === 'clientProfile' && isFeatureEnabled('patients') && selectedClient && (
             <ClientProfileView 
               key={selectedClient.id} 
               client={selectedClient} 
@@ -493,11 +595,11 @@ export default function App() {
               }}
             />
           )}
-          {currentView === 'reports' && <ReportsView />}
-          {currentView === 'finance' && <FinanceManagementView currentUser={currentUser} />}
-          {currentView === 'assessment' && <AssessmentView />}
-          {currentView === 'exercises' && <ExercisesView />}
-          {currentView === 'investigation-library' && (
+          {currentView === 'reports' && isFeatureEnabled('reports') && <ReportsView />}
+          {currentView === 'finance' && isFeatureEnabled('finance') && <FinanceManagementView currentUser={currentUser} />}
+          {currentView === 'assessment' && isFeatureEnabled('assessments') && <AssessmentView />}
+          {currentView === 'exercises' && isFeatureEnabled('exercises') && <ExercisesView />}
+          {currentView === 'investigation-library' && isFeatureEnabled('investigations') && (
             <div className="p-8 max-w-7xl mx-auto space-y-6">
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-black tracking-tight text-foreground font-heading uppercase italic flex items-center gap-2">
@@ -509,9 +611,9 @@ export default function App() {
             </div>
           )}
           {currentView === 'settings' && currentUser && <SettingsView currentUser={currentUser} />}
-          {currentView === 'attendance' && <AttendanceView currentUser={currentUser} />}
-          {currentView === 'ai-assistant' && <AIView clients={clients} />}
-          {currentView === 'approvals' && <AccountRequestsView />}
+          {currentView === 'attendance' && isFeatureEnabled('attendance') && <AttendanceView currentUser={currentUser} />}
+          {currentView === 'ai-assistant' && isFeatureEnabled('ai_assistant') && <AIView clients={clients} />}
+          {currentView === 'approvals' && isFeatureEnabled('users') && <AccountRequestsView />}
         </div>
 
         {/* Mobile Bottom Navigation Bar */}
@@ -524,13 +626,15 @@ export default function App() {
               <span className="text-[9px] uppercase tracking-wider font-black">Home</span>
             </button>
           )}
-          <button 
-            onClick={() => setCurrentView('calendar')} 
-            className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'calendar' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>
-            <Calendar size={18} />
-            <span className="text-[9px] uppercase tracking-wider font-black">Schedule</span>
-          </button>
-          {(isAdmin || isDoctor || isStaff) && (
+          {isFeatureEnabled('calendar') && (
+            <button 
+              onClick={() => setCurrentView('calendar')} 
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'calendar' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>
+              <Calendar size={18} />
+              <span className="text-[9px] uppercase tracking-wider font-black">Schedule</span>
+            </button>
+          )}
+          {(isAdmin || isDoctor || isStaff) && isFeatureEnabled('patients') && (
             <button 
               onClick={() => setCurrentView('clients')} 
               className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'clients' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>

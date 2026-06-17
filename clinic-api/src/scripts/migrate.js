@@ -36,6 +36,121 @@ async function createGlobalSchema() {
       );
     `);
 
+    // Add new columns to public.tenants (idempotent)
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS email VARCHAR(150)`);
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS features JSONB DEFAULT '{"calendar":true,"patients":true,"reports":true,"finance":true,"assessments":true,"exercises":true,"investigations":true,"ai_assistant":true,"attendance":true,"branches":true,"users":true}'`);
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ`);
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS rejected_at TIMESTAMPTZ`);
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS rejection_reason TEXT`);
+    await client.query(`ALTER TABLE public.tenants ADD COLUMN IF NOT EXISTS suspended_at TIMESTAMPTZ`);
+
+    // Add new columns to public.subscriptions (idempotent)
+    await client.query(`ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS trial_extended_by INTEGER DEFAULT 0`);
+    await client.query(`ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS notes TEXT`);
+
+    // Plans table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.plans (
+        id VARCHAR(50) PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        price_monthly NUMERIC(10,2) DEFAULT 0,
+        max_users INTEGER,
+        max_branches INTEGER,
+        max_storage_mb INTEGER,
+        max_patients INTEGER,
+        description TEXT,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      INSERT INTO public.plans (id, name, price_monthly, max_users, max_branches, max_storage_mb, max_patients, description) VALUES
+      ('starter', 'Starter', 0, 5, 1, 500, 200, 'Perfect for small clinics getting started'),
+      ('pro', 'Pro', 299, 20, 3, 2000, 1000, 'For growing clinics with multiple staff'),
+      ('enterprise', 'Enterprise', 799, NULL, NULL, NULL, NULL, 'Unlimited scale for large clinic networks')
+      ON CONFLICT DO NOTHING;
+    `);
+
+    // Tenant status history
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.tenant_status_history (
+        id SERIAL PRIMARY KEY,
+        tenant_id VARCHAR(50) REFERENCES public.tenants(id) ON DELETE CASCADE,
+        old_status VARCHAR(20),
+        new_status VARCHAR(20),
+        changed_by VARCHAR(100),
+        reason TEXT,
+        changed_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Admin audit logs
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
+        id SERIAL PRIMARY KEY,
+        admin_email VARCHAR(150),
+        action VARCHAR(100),
+        target_tenant_id VARCHAR(50),
+        metadata JSONB,
+        ip_address VARCHAR(45),
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Announcements
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.announcements (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(200) NOT NULL,
+        body TEXT NOT NULL,
+        type VARCHAR(30) DEFAULT 'info',
+        target VARCHAR(50) DEFAULT 'all',
+        is_active BOOLEAN DEFAULT TRUE,
+        created_by VARCHAR(150),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        expires_at TIMESTAMPTZ
+      );
+    `);
+
+    // Payment history
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.payment_history (
+        id SERIAL PRIMARY KEY,
+        tenant_id VARCHAR(50) REFERENCES public.tenants(id) ON DELETE CASCADE,
+        amount NUMERIC(10,2),
+        currency VARCHAR(10) DEFAULT 'EGP',
+        status VARCHAR(30),
+        paymob_order_id VARCHAR(100),
+        billing_period_start TIMESTAMPTZ,
+        billing_period_end TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Super admins table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.admins (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(150) UNIQUE NOT NULL,
+        name VARCHAR(100),
+        password_hash TEXT,
+        supabase_uid VARCHAR(100) UNIQUE,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    // Ensure password_hash column exists on admins (idempotent)
+    await client.query(`ALTER TABLE public.admins ADD COLUMN IF NOT EXISTS password_hash TEXT`);
+
+    // Seed default super admin (password: 'password' — bcrypt hash)
+    await client.query(`
+      INSERT INTO public.admins (email, name, password_hash, is_active)
+      VALUES ('admin@saasclinic.com', 'Super Admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', true)
+      ON CONFLICT DO NOTHING;
+    `);
+
     await client.query('COMMIT');
     console.log('[MIGRATION] Global schema initialized successfully');
   } catch (err) {
