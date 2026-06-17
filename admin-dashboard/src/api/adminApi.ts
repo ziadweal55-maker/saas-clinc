@@ -44,6 +44,7 @@ export const adminApi = {
   listTenants: (params?: Record<string, unknown>) =>
     api.get('/tenants', { params }),
   getTenant: (id: string) => api.get(`/tenants/${id}`),
+  deleteTenant: (id: string) => api.delete(`/tenants/${id}`),
   approveTenant: (id: string) => api.post(`/tenants/${id}/approve`),
   rejectTenant: (id: string, reason: string) =>
     api.post(`/tenants/${id}/reject`, { reason }),

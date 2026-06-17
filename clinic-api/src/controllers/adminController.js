@@ -590,3 +590,43 @@ exports.getAuditLogs = async (req, res) => {
     return res.json({ logs: dataRes.rows, total: countRes.rows[0].total });
   } catch (e) { return res.status(500).json({ error: e.message }); }
 };
+
+exports.deleteTenant = async (req, res) => {
+  const { id } = req.params;
+  const cleanId = id.toLowerCase().replace(/[^a-z0-9_]/g, '');
+  const schemaName = `tenant_${cleanId}`;
+  
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    
+    // Check if tenant exists
+    const checkRes = await client.query('SELECT name FROM public.tenants WHERE id = $1', [cleanId]);
+    if (checkRes.rowCount === 0) {
+      client.release();
+      return res.status(404).json({ error: 'Tenant not found.' });
+    }
+    const tenantName = checkRes.rows[0].name;
+
+    // 1. Delete tenant from public.tenants (this cascades to subscriptions, history, payments)
+    await client.query('DELETE FROM public.tenants WHERE id = $1', [cleanId]);
+    
+    // 2. Drop the tenant schema
+    await client.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
+    
+    // 3. Log admin action
+    await logAdminAction(req.admin.email, 'delete_tenant', cleanId, { tenantName }, req.ip);
+    
+    await client.query('COMMIT');
+    client.release();
+    
+    console.log(`[ADMIN DELETE] Clinic '${cleanId}' and schema '${schemaName}' deleted successfully.`);
+    return res.json({ success: true, message: `Clinic '${tenantName}' and all associated data have been deleted.` });
+  } catch (e) {
+    try { await client.query('ROLLBACK'); } catch (_) {}
+    client.release();
+    console.error('[ADMIN DELETE]', e);
+    return res.status(500).json({ error: e.message });
+  }
+};
+

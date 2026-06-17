@@ -17,6 +17,7 @@ router.get('/audit-logs', adminController.getAuditLogs);
 router.get('/tenants', adminController.listTenants);
 router.get('/tenants/expiring', adminController.getExpiringTenants);
 router.get('/tenants/:id', adminController.getTenant);
+router.delete('/tenants/:id', adminController.deleteTenant);
 router.post('/tenants/:id/approve', adminController.approveTenant);
 router.post('/tenants/:id/reject', adminController.rejectTenant);
 router.patch('/tenants/:id/status', adminController.updateTenantStatus);

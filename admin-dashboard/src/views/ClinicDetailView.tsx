@@ -128,6 +128,8 @@ const ClinicDetailView: React.FC = () => {
   const [rejectReason, setRejectReason] = useState('');
   const [suspendModal, setSuspendModal] = useState(false);
   const [suspendReason, setSuspendReason] = useState('');
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const fetchTenant = useCallback(async () => {
     if (!id) return;
@@ -175,7 +177,7 @@ const ClinicDetailView: React.FC = () => {
     }
   }, [activeTab, id, showToast]);
 
-  const handleAction = async (action: 'approve' | 'suspend' | 'reactivate' | 'reject') => {
+  const handleAction = async (action: 'approve' | 'suspend' | 'reactivate' | 'reject' | 'delete') => {
     if (!id) return;
     setActionLoading(action);
     try {
@@ -195,6 +197,13 @@ const ClinicDetailView: React.FC = () => {
         showToast('Clinic rejected', 'success');
         setRejectModal(false);
         setRejectReason('');
+      } else if (action === 'delete') {
+        await adminApi.deleteTenant(id);
+        showToast('Clinic deleted successfully!', 'success');
+        setDeleteModal(false);
+        setDeleteConfirmText('');
+        navigate('/clinics');
+        return;
       }
       fetchTenant();
     } catch {
@@ -355,6 +364,14 @@ const ClinicDetailView: React.FC = () => {
             onClick={handleImpersonate}
           >
             {actionLoading === 'impersonate' ? <span className="spinner" style={{ width: 14, height: 14 }} /> : '👤 Impersonate'}
+          </button>
+          <button
+            className="btn btn-danger"
+            disabled={actionLoading !== null}
+            onClick={() => setDeleteModal(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            🗑 Delete Clinic
           </button>
         </div>
       </div>
@@ -737,6 +754,46 @@ const ClinicDetailView: React.FC = () => {
                 onClick={() => handleAction('suspend')}
               >
                 {actionLoading === 'suspend' ? <span className="spinner" style={{ width: 14, height: 14 }} /> : '⏸ Suspend'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteModal && (
+        <div className="modal-overlay" onClick={() => { setDeleteModal(false); setDeleteConfirmText(''); }}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3 style={{ color: 'var(--danger)' }}>Delete Clinic</h3>
+            <p style={{ margin: '8px 0 16px', color: 'var(--text-secondary)' }}>
+              Are you absolutely sure you want to delete clinic <strong>{tenant.name}</strong>?
+            </p>
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: 12, borderRadius: 8, border: '1px solid rgba(239, 68, 68, 0.2)', marginBottom: 16, fontSize: 13, color: 'var(--text-secondary)' }}>
+              <strong>WARNING:</strong> This action is permanent and cannot be undone. 
+              It will completely drop the database schema <strong>tenant_{tenant.subdomain}</strong>, deleting all patients, appointments, staff accounts, payments, and clinic settings.
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="delete-confirm">
+                Type <strong style={{ userSelect: 'all', color: 'var(--text-primary)' }}>{tenant.subdomain}</strong> to confirm:
+              </label>
+              <input
+                type="text"
+                id="delete-confirm"
+                className="form-input"
+                value={deleteConfirmText}
+                onChange={e => setDeleteConfirmText(e.target.value)}
+                placeholder={tenant.subdomain}
+                autoComplete="off"
+              />
+            </div>
+            <div className="modal-actions" style={{ marginTop: 24 }}>
+              <button className="btn btn-ghost" onClick={() => { setDeleteModal(false); setDeleteConfirmText(''); }}>Cancel</button>
+              <button
+                className="btn btn-danger"
+                disabled={deleteConfirmText !== tenant.subdomain || actionLoading === 'delete'}
+                onClick={() => handleAction('delete')}
+              >
+                {actionLoading === 'delete' ? <span className="spinner" style={{ width: 14, height: 14 }} /> : '🗑 Permanently Delete'}
               </button>
             </div>
           </div>
