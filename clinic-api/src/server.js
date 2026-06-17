@@ -21,7 +21,10 @@ app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true); // server-to-server or Postman
     const isLocalhost = /localhost|127\.0\.0\.1/.test(origin);
-    const isProd = ALLOWED_ORIGIN_PATTERN && origin.endsWith(ALLOWED_ORIGIN_PATTERN);
+    const isProd = (ALLOWED_ORIGIN_PATTERN && origin.endsWith(ALLOWED_ORIGIN_PATTERN)) ||
+                   origin.endsWith('.vercel.app') ||
+                   origin.endsWith('saasclinic.com') ||
+                   origin.endsWith('.saasclinic.com');
     if (isLocalhost || isProd) {
       callback(null, true);
     } else {
