@@ -1,7 +1,8 @@
 const { Resend } = require('resend');
 require('dotenv').config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+const resend = apiKey ? new Resend(apiKey) : null;
 const FROM = `${process.env.RESEND_FROM_NAME || 'SaaS Clinic'} <${process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'}>`;
 
 // Helper: chunk array into batches
@@ -38,6 +39,10 @@ const baseTemplate = (content) => `
 
 exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl) => {
   if (!clinicEmail) return;
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping approval email to ${clinicEmail}`);
+    return;
+  }
   const content = `
     <h2 style="color:#10b981;margin:0 0 16px;">✅ Your Clinic Has Been Approved!</h2>
     <p style="color:#94a3b8;line-height:1.6;">Congratulations! <strong style="color:#f1f5f9;">${clinicName}</strong> has been approved and your clinic workspace is now active.</p>
@@ -55,6 +60,10 @@ exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl)
 
 exports.sendRejectionEmail = async (clinicEmail, clinicName, reason) => {
   if (!clinicEmail) return;
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping rejection email to ${clinicEmail}`);
+    return;
+  }
   const content = `
     <h2 style="color:#ef4444;margin:0 0 16px;">❌ Clinic Registration Update</h2>
     <p style="color:#94a3b8;line-height:1.6;">Thank you for registering <strong style="color:#f1f5f9;">${clinicName}</strong>. After review, we were unable to approve your application at this time.</p>
@@ -68,6 +77,10 @@ exports.sendRejectionEmail = async (clinicEmail, clinicName, reason) => {
 
 exports.sendAnnouncementBroadcast = async (announcement, clinicEmails) => {
   if (!clinicEmails || clinicEmails.length === 0) return;
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping announcement broadcast to ${clinicEmails.length} emails`);
+    return;
+  }
   const typeColors = { info: '#0ea5e9', warning: '#f59e0b', maintenance: '#ef4444', feature: '#10b981' };
   const typeIcons = { info: 'ℹ️', warning: '⚠️', maintenance: '🔧', feature: '🚀' };
   const color = typeColors[announcement.type] || '#6366f1';
@@ -89,6 +102,10 @@ exports.sendAnnouncementBroadcast = async (announcement, clinicEmails) => {
 
 exports.sendExpiryWarningEmail = async (clinicEmail, clinicName, expiryDate) => {
   if (!clinicEmail) return;
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping expiry warning email to ${clinicEmail}`);
+    return;
+  }
   const dateStr = new Date(expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const content = `
     <h2 style="color:#f59e0b;margin:0 0 16px;">⚠️ Subscription Expiring Soon</h2>
@@ -103,6 +120,10 @@ exports.sendExpiryWarningEmail = async (clinicEmail, clinicName, expiryDate) => 
 
 exports.sendSuspendedEmail = async (clinicEmail, clinicName) => {
   if (!clinicEmail) return;
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping suspension email to ${clinicEmail}`);
+    return;
+  }
   const content = `
     <h2 style="color:#ef4444;margin:0 0 16px;">🚫 Clinic Account Suspended</h2>
     <p style="color:#94a3b8;line-height:1.6;">Your clinic <strong style="color:#f1f5f9;">${clinicName}</strong> has been suspended due to a lapsed subscription.</p>
