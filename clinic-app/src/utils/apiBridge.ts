@@ -682,8 +682,36 @@ if (!isElectron) {
     };
   };
 
+  // Wrap all API implementations to return safe fallbacks on error
+  const safeApi: Record<string, any> = {};
+  for (const [key, value] of Object.entries(apiImplementation)) {
+    if (typeof value === 'function') {
+      safeApi[key] = async (...args: any[]) => {
+        try {
+          const res = await (value as any)(...args);
+          // If it failed with success: false (API error or 429)
+          if (res && res.success === false) {
+            console.error(`[API BRIDGE FAIL] window.api.${key} failed:`, res.error);
+            // Return safe fallback
+            return defaultMock(key)(...args);
+          }
+          // Special case for getClients: extract .data if it's paginated
+          if (key === 'getClients') {
+            return (res && res.data) || res || [];
+          }
+          return res;
+        } catch (err) {
+          console.error(`[API BRIDGE CRITICAL] window.api.${key} crashed:`, err);
+          return defaultMock(key)(...args);
+        }
+      };
+    } else {
+      safeApi[key] = value;
+    }
+  }
+
   // Setup the Proxy wrapper to intercept any missing methods gracefully
-  (window as any).api = new Proxy(apiImplementation, {
+  (window as any).api = new Proxy(safeApi, {
     get: (target, prop) => {
       if (prop in target) {
         return (target as any)[prop];
