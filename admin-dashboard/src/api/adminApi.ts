@@ -5,7 +5,7 @@ import axios from 'axios';
 // when served over HTTPS and behind network access controls.
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api/v1/admin',
+  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.trim() : '/api/v1/admin',
 });
 
 api.interceptors.request.use(config => {
