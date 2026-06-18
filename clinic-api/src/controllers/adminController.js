@@ -213,7 +213,7 @@ exports.approveTenant = async (req, res) => {
     clearSettingsCache(id);
     
     // Send approval email (non-blocking)
-    sendApprovalEmail(tenant.email, tenant.name, id, `https://${id}.saasclinic.com`).catch(console.error);
+    sendApprovalEmail(tenant.email, tenant.name, id, `https://${id}.saasclinic.com`, generatedPassword).catch(console.error);
 
     return res.json({ 
       success: true, 

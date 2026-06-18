@@ -37,7 +37,7 @@ const baseTemplate = (content) => `
 </body>
 </html>`;
 
-exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl) => {
+exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl, tempPassword) => {
   if (!clinicEmail) return;
   if (!resend) {
     console.warn(`[EMAIL] Resend is not configured. Skipping approval email to ${clinicEmail}`);
@@ -48,7 +48,11 @@ exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl)
     <p style="color:#94a3b8;line-height:1.6;">Congratulations! <strong style="color:#f1f5f9;">${clinicName}</strong> has been approved and your clinic workspace is now active.</p>
     <div style="background:#12151f;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #1e2333;">
       <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Your Clinic Subdomain</p>
-      <p style="margin:0;color:#6366f1;font-size:18px;font-weight:700;">${subdomain}</p>
+      <p style="margin:0 0 16px;color:#6366f1;font-size:18px;font-weight:700;">${subdomain}</p>
+      ${tempPassword ? `
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Temporary Admin Password</p>
+      <p style="margin:0;color:#6366f1;font-size:18px;font-weight:700;font-family:monospace;">${tempPassword}</p>
+      ` : ''}
     </div>
     <a href="${loginUrl || '#'}" style="display:inline-block;background:#6366f1;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;margin-top:8px;">Log In to Your Clinic →</a>
     <p style="margin-top:24px;color:#64748b;font-size:13px;">If you have any questions, reply to this email and our team will help you get started.</p>`;
