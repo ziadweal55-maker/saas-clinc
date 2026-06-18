@@ -304,12 +304,7 @@ export default function App() {
                   if (hostname.endsWith('.localhost')) {
                     window.location.href = `http://localhost${port}`;
                   } else {
-                    const parts = hostname.split('.');
-                    if (parts.length >= 3) {
-                      window.location.href = `https://${parts.slice(-2).join('.')}${port}`;
-                    } else {
-                      window.location.href = `${window.location.origin}`;
-                    }
+                    window.location.href = window.location.origin;
                   }
                 }
               }}
@@ -337,21 +332,9 @@ export default function App() {
               return;
             }
 
-            // Hosting platforms (Vercel, Railway, Netlify) → use ?tenant= param
-            const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
-            const isHostingPlatform = HOSTING_DOMAINS.some(d => hostname.endsWith(d));
-            if (isHostingPlatform) {
-              window.location.href = `${window.location.origin}?tenant=${tenantId}`;
-              return;
-            }
-
-            // Custom domain → use real subdomain (e.g. revive.yourclinic.com)
-            const parts = hostname.split('.');
-            if (parts.length >= 2) {
-              const baseDomain = parts.slice(-2).join('.');
-              window.location.href = `https://${tenantId}.${baseDomain}`;
-              return;
-            }
+            // For production (both custom domains and hosting platforms) → use ?tenant= param
+            window.location.href = `${window.location.origin}?tenant=${tenantId}`;
+            return;
           }
           // Fallback: store in localStorage and reload
           localStorage.setItem('tenantId', tenantId);
