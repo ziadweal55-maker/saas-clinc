@@ -32,6 +32,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
 const App: React.FC = () => {
   const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
   // Load user from localStorage on init/boot
@@ -45,6 +46,11 @@ const App: React.FC = () => {
       }
     }
   }, [location]);
+
+  // Close sidebar on navigation change
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     setUser(null);
@@ -62,9 +68,20 @@ const App: React.FC = () => {
         </Routes>
       ) : (
         <PrivateRoute>
-          <div className="app-layout">
+          <div className={`app-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
             <Sidebar user={user} onLogout={handleLogout} />
             <main className="main-content">
+              <header className="mobile-header">
+                <button className="mobile-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </svg>
+                </button>
+                <h2>🏥 SaaS Clinic Panel</h2>
+              </header>
               <Routes>
                 <Route path="/overview" element={<OverviewView />} />
                 <Route path="/clinics" element={<ClinicsView />} />
