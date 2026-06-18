@@ -18,7 +18,7 @@ router.get('/dashboard-stats', authMiddleware, async (req, res) => {
         [sinceDate, branchId]
       ),
       req.db.query(
-        'SELECT COUNT(*)::int as count FROM Appointments WHERE DATE(appointment_date) = CURRENT_DATE AND branch_id = $1',
+        'SELECT COUNT(*)::int as count FROM Appointments WHERE appointment_date::date = CURRENT_DATE AND branch_id = $1',
         [branchId]
       ),
       req.db.query(
@@ -48,7 +48,7 @@ router.get('/today-appointments', authMiddleware, async (req, res) => {
        FROM Appointments a 
        JOIN Clients c ON a.client_id = c.id 
        LEFT JOIN Doctors d ON a.doctor_id = d.id 
-       WHERE DATE(a.appointment_date) = CURRENT_DATE AND a.branch_id = $1
+       WHERE a.appointment_date::date = CURRENT_DATE AND a.branch_id = $1
        ORDER BY a.appointment_date ASC`,
       [branchId]
     );
@@ -106,7 +106,7 @@ router.get('/active-sessions', authMiddleware, async (req, res) => {
        FROM Sessions s 
        JOIN Clients c ON s.client_id = c.id 
        LEFT JOIN Doctors d ON s.doctor_id = d.id 
-       WHERE DATE(s.session_date) = CURRENT_DATE AND s.branch_id = $1
+       WHERE s.session_date::date = CURRENT_DATE AND s.branch_id = $1
        ORDER BY s.session_date DESC`,
       [branchId]
     );
@@ -201,6 +201,19 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
     }
     detAttendanceQuery += ' ORDER BY al.log_date DESC, u.username ASC';
 
+    // Define daily sessions query
+    let dailySessionsQuery = `
+      SELECT TO_CHAR(session_date, 'YYYY-MM-DD') as date, COUNT(*)::int as sessions, COUNT(DISTINCT client_id)::int as clients 
+      FROM Sessions 
+      WHERE session_date >= $1 AND session_date <= $2 AND branch_id = $3
+    `;
+    let dailySessionsParams = [start, end, branchId];
+    if (docId) {
+      dailySessionsQuery += ' AND doctor_id = $4';
+      dailySessionsParams.push(docId);
+    }
+    dailySessionsQuery += " GROUP BY TO_CHAR(session_date, 'YYYY-MM-DD')";
+
     // Run all independent queries in parallel
     const [
       clientsRes,
@@ -208,12 +221,13 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       incomeRes,
       loansRes,
       wastesRes,
-      dailyRes,
+      dailyPaymentsRes,
       paymentsRes,
       detSessionsRes,
       detLoansRes,
       detWastesRes,
-      detAttendanceRes
+      detAttendanceRes,
+      dailySessionsRes
     ] = await Promise.all([
       req.db.query(
         'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
@@ -230,10 +244,10 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
         [start, end, branchId]
       ),
       req.db.query(
-        `SELECT DATE(payment_date) as date, SUM(amount)::numeric as amount 
+        `SELECT TO_CHAR(payment_date, 'YYYY-MM-DD') as date, SUM(amount)::numeric as income 
          FROM Payments 
          WHERE payment_date >= $1 AND payment_date <= $2 AND branch_id = $3
-         GROUP BY DATE(payment_date) 
+         GROUP BY TO_CHAR(payment_date, 'YYYY-MM-DD')
          ORDER BY date ASC`,
         [start, end, branchId]
       ),
@@ -251,8 +265,27 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
         'SELECT * FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3 ORDER BY created_at DESC',
         [start, end, branchId]
       ),
-      req.db.query(detAttendanceQuery, detAttendanceParams)
+      req.db.query(detAttendanceQuery, detAttendanceParams),
+      req.db.query(dailySessionsQuery, dailySessionsParams)
     ]);
+
+    // Merge daily breakdown
+    const breakdownMap = new Map();
+    dailySessionsRes.rows.forEach(r => {
+      if (r.date) {
+        breakdownMap.set(r.date, { date: r.date, sessions: r.sessions || 0, clients: r.clients || 0, income: 0.0 });
+      }
+    });
+    dailyPaymentsRes.rows.forEach(r => {
+      if (r.date) {
+        if (breakdownMap.has(r.date)) {
+          breakdownMap.get(r.date).income = parseFloat(r.income) || 0.0;
+        } else {
+          breakdownMap.set(r.date, { date: r.date, sessions: 0, clients: 0, income: parseFloat(r.income) || 0.0 });
+        }
+      }
+    });
+    const dailyBreakdown = Array.from(breakdownMap.values()).sort((a, b) => b.date.localeCompare(a.date));
 
     return res.json({
       clientsInPeriod: clientsRes.rows[0].count,
@@ -260,7 +293,7 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       totalIncome: parseFloat(incomeRes.rows[0].total),
       totalLoans: parseFloat(loansRes.rows[0].total),
       totalWastes: parseFloat(wastesRes.rows[0].total),
-      dailyBreakdown: dailyRes.rows.map(r => ({ date: r.date, amount: parseFloat(r.amount) })),
+      dailyBreakdown,
       detailedPayments: paymentsRes.rows.map(r => ({ ...r, amount: parseFloat(r.amount) })),
       detailedSessions: detSessionsRes.rows.map(r => ({ ...r, payment_amount: parseFloat(r.payment_amount) })),
       loanDetails: detLoansRes.rows.map(r => ({ ...r, amount: parseFloat(r.amount) })),
@@ -448,7 +481,7 @@ router.get('/daily-summary', authMiddleware, async (req, res) => {
   try {
     // Total payments
     const paymentsRes = await req.db.query(
-      'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE DATE(payment_date) = $1 AND branch_id = $2',
+      'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE payment_date::date = $1 AND branch_id = $2',
       [date, branchId]
     );
 
@@ -463,7 +496,7 @@ router.get('/daily-summary', authMiddleware, async (req, res) => {
       `SELECT l.*, u.username, u.role 
        FROM Loans l 
        JOIN Users u ON l.user_id = u.id 
-       WHERE DATE(l.loan_date) = $1 AND l.branch_id = $2
+       WHERE l.loan_date = $1 AND l.branch_id = $2
        ORDER BY l.loan_date DESC`,
       [date, branchId]
     );
