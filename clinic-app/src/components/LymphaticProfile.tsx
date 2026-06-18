@@ -8,6 +8,14 @@ import {
   Ruler, Activity, TrendingUp, TrendingDown, Minus, BarChart2
 } from 'lucide-react';
 
+function formatDate(dateStr: string | null | undefined) {
+  if (!dateStr) return '';
+  const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString();
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface LymphaticMeasurement {
@@ -171,7 +179,7 @@ function MeasurementRow({
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-xs text-primary font-semibold">{latest.value} {latest.unit}</span>
                 <TrendIcon trend={trend} />
-                <span className="text-[10px] text-muted-foreground">{latest.session_date}</span>
+                <span className="text-[10px] text-muted-foreground">{formatDate(latest.session_date)}</span>
               </div>
             ) : (
               <span className="text-[10px] text-muted-foreground">No data yet</span>
@@ -238,7 +246,7 @@ function MeasurementRow({
           {sorted.slice(0, 5).map(h => (
             <div key={h.id} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-muted/40">
               <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-24 shrink-0">{h.session_date}</span>
+                <span className="text-xs text-muted-foreground w-24 shrink-0">{formatDate(h.session_date)}</span>
                 <span className="text-sm font-semibold text-foreground">{h.value} <span className="text-xs text-muted-foreground">{h.unit}</span></span>
                 {(h as any).doctor_name && (
                   <span className="text-[10px] text-muted-foreground italic bg-muted px-2 py-0.5 rounded-full shrink-0">

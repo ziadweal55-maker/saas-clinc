@@ -31,6 +31,14 @@ function resolveInbodyImageUrl(localPath: string) {
   return 'file://' + localPath;
 }
 
+function formatDate(dateStr: string | null | undefined) {
+  if (!dateStr) return '';
+  const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString();
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface NutritionHistoryEntry {
@@ -402,7 +410,7 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                  <span className="font-bold text-primary">{entry.session_date}</span>
+                  <span className="font-bold text-primary">{formatDate(entry.session_date)}</span>
                   <span>·</span>
                   <span>Added {new Date(entry.created_at).toLocaleDateString()}</span>
                   {entry.weight && (
@@ -1077,7 +1085,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
               >
                 <img
                   src={resolveInbodyImageUrl(item.local_file_path)}
-                  alt={`InBody scan ${item.session_date}`}
+                  alt={`InBody scan ${formatDate(item.session_date)}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -1085,7 +1093,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
 
               {/* Meta */}
               <div className="p-2.5">
-                <p className="text-xs font-bold text-primary">{item.session_date}</p>
+                <p className="text-xs font-bold text-primary">{formatDate(item.session_date)}</p>
                 <p className="text-[10px] text-muted-foreground truncate" title={item.file_name}>{item.file_name}</p>
               </div>
 

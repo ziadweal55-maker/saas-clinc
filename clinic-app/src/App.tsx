@@ -159,6 +159,7 @@ export default function App() {
 
   // Called when user logs in — admins see branch picker, staff/doctors go straight in
   const handleLogin = async (user: any) => {
+    if (!user) return;
     setCurrentUser(user);
     if (user.role === 'admin' || user.role === 'cfo' || user.isRoot) {
       // Admin, CFO & root must pick a branch every login

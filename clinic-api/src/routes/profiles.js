@@ -255,7 +255,11 @@ router.get('/pt/subjectives/:profileId', authMiddleware, async (req, res) => {
   try {
     if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
-      'SELECT * FROM PTSubjective WHERE profile_id = $1 ORDER BY updated_at DESC', 
+      `SELECT s.*, d.name as doctor_name 
+       FROM PTSubjective s
+       LEFT JOIN Doctors d ON s.doctor_id = d.id
+       WHERE s.profile_id = $1 
+       ORDER BY s.updated_at DESC`, 
       [parseInt(req.params.profileId)]
     );
     return res.json(result.rows);
@@ -455,7 +459,11 @@ router.get('/pt/session-plans/:profileId', authMiddleware, async (req, res) => {
   try {
     if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
-      'SELECT * FROM PTSessionPlan WHERE profile_id = $1 ORDER BY updated_at DESC', 
+      `SELECT p.*, d.name as doctor_name 
+       FROM PTSessionPlan p
+       LEFT JOIN Doctors d ON p.doctor_id = d.id
+       WHERE p.profile_id = $1 
+       ORDER BY p.updated_at DESC`, 
       [parseInt(req.params.profileId)]
     );
     return res.json(result.rows);
