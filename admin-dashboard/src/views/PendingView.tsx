@@ -29,6 +29,7 @@ const PendingView: React.FC = () => {
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [approvedPasswordModal, setApprovedPasswordModal] = useState<{ name: string; password: string } | null>(null);
 
   const fetchPending = useCallback(async () => {
     setLoading(true);
@@ -45,11 +46,16 @@ const PendingView: React.FC = () => {
 
   useEffect(() => { fetchPending(); }, [fetchPending]);
 
-  const handleApprove = async (id: string) => {
+  const handleApprove = async (id: string, name: string) => {
     setActionLoading(id + '-approve');
     try {
-      await adminApi.approveTenant(id);
-      showToast('Clinic approved!', 'success');
+      const res = await adminApi.approveTenant(id);
+      const tempPassword = res.data?.password;
+      if (tempPassword) {
+        setApprovedPasswordModal({ name, password: tempPassword });
+      } else {
+        showToast('Clinic approved!', 'success');
+      }
       fetchPending();
     } catch {
       showToast('Failed to approve clinic', 'error');
@@ -134,7 +140,7 @@ const PendingView: React.FC = () => {
                 <button
                   className="btn btn-success btn-sm"
                   disabled={actionLoading === t.id + '-approve'}
-                  onClick={() => handleApprove(t.id)}
+                  onClick={() => handleApprove(t.id, t.name)}
                   style={{ flex: 1, justifyContent: 'center' }}
                 >
                   {actionLoading === t.id + '-approve'
@@ -189,6 +195,46 @@ const PendingView: React.FC = () => {
                 {actionLoading === rejectModal.id + '-reject'
                   ? <span className="spinner" style={{ width: 14, height: 14 }} />
                   : 'Reject Clinic'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approved Password Modal */}
+      {approvedPasswordModal && (
+        <div className="modal-overlay" onClick={() => setApprovedPasswordModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>🎉 Clinic Approved Successfully</h3>
+            <p><strong>{approvedPasswordModal.name}</strong> has been approved and its workspace is ready.</p>
+            <div className="form-group" style={{ marginTop: 16 }}>
+              <label className="form-label">Temporary Admin Password</label>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  readOnly
+                  className="form-input"
+                  value={approvedPasswordModal.password}
+                  style={{ fontFamily: 'monospace', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '0.05em', flex: 1 }}
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    navigator.clipboard.writeText(approvedPasswordModal.password);
+                    showToast('Password copied to clipboard!', 'success');
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+              <p className="form-hint" style={{ marginTop: 8, fontSize: '0.8rem', color: '#64748b' }}>
+                Share this temporary password with the clinic administrator. They can use it to log in and configure their workspace.
+              </p>
+            </div>
+            <div className="modal-actions" style={{ marginTop: 24 }}>
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => setApprovedPasswordModal(null)}>
+                Got it
               </button>
             </div>
           </div>
