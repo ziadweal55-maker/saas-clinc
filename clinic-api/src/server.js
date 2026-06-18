@@ -40,10 +40,10 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Rate limiting for auth endpoints (10 requests per 15 minutes per IP)
+// Rate limiting for auth endpoints (100 requests per 15 minutes per IP)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  max: 100,
   message: { error: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
