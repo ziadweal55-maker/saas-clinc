@@ -14,6 +14,7 @@ const { createGlobalSchema } = require('./scripts/migrate');
 const tenantMiddleware = require('./middlewares/tenant');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // Setup Middlewares

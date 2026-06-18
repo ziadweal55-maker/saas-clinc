@@ -38,4 +38,7 @@ router.post('/delete-user', authMiddleware, authorize('admin'), authController.d
 // Update user status (freeze/unfreeze)
 router.post('/update-status', authMiddleware, authorize('admin'), authController.updateUserStatus);
 
+// Change own password
+router.post('/change-password', authMiddleware, authController.changePassword);
+
 module.exports = router;

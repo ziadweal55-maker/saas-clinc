@@ -199,7 +199,7 @@ exports.approveTenant = async (req, res) => {
         if (existing.rowCount === 0) {
           const tempHash = bcrypt.hashSync(generatedPassword, 10);
           await tenantClient.query(
-            `INSERT INTO Users (username, password_hash, role, status, branch_id) VALUES ($1, $2, 'admin', 'active', 1)`,
+            `INSERT INTO Users (username, password_hash, role, status, branch_id, require_password_change) VALUES ($1, $2, 'admin', 'active', 1, TRUE)`,
             [tenant.email, tempHash]
           );
         }

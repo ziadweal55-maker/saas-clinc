@@ -15,12 +15,7 @@ const pool = new Pool({
   max: 3 // Limit pool size for Neon free tier compatibility
 });
 
-// Set session timezone to Africa/Cairo for all Postgres connections
-pool.on('connect', (client) => {
-  client.query("SET timezone TO 'Africa/Cairo'").catch(err => {
-    console.error('[DB] Failed to set connection timezone to Africa/Cairo:', err);
-  });
-});
+// Note: Session timezone is already set to Africa/Cairo at connection level via connectionString options.
 
 module.exports = {
   pool,

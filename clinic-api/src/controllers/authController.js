@@ -136,7 +136,8 @@ exports.loginUser = async (req, res) => {
           username: user.username, 
           role: user.role, 
           doctor_id: user.doctor_id, 
-          branch_id: user.branch_id || 1 
+          branch_id: user.branch_id || 1,
+          requirePasswordChange: !!user.require_password_change
         }
       });
     } else {
@@ -365,6 +366,33 @@ exports.updateUserStatus = async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     console.error('[AUTH CONTROLLER] Error updating user status:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// Change own password
+exports.changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword || newPassword.length < 6) {
+    return res.status(400).json({ success: false, error: 'Current password is required, and new password must be at least 6 characters.' });
+  }
+  try {
+    const userRes = await req.db.query('SELECT * FROM Users WHERE id = $1', [req.user.id]);
+    if (userRes.rowCount === 0) {
+      return res.status(404).json({ success: false, error: 'User not found.' });
+    }
+    const user = userRes.rows[0];
+    if (!verifyPassword(currentPassword, user.password_hash)) {
+      return res.status(401).json({ success: false, error: 'Invalid current password.' });
+    }
+    const hashedPassword = hashPasswordBcrypt(newPassword);
+    await req.db.query(
+      'UPDATE Users SET password_hash = $1, require_password_change = FALSE WHERE id = $2',
+      [hashedPassword, req.user.id]
+    );
+    return res.json({ success: true, message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('[AUTH CONTROLLER] Error changing password:', error);
     return res.status(500).json({ success: false, error: error.message });
   }
 };

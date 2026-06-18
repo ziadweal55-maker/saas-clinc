@@ -69,6 +69,7 @@ export interface User {
   doctor_id?: number;
   status?: 'active' | 'frozen';
   base_salary?: number;
+  requirePasswordChange?: boolean;
 }
 
 export interface SyncPayload {

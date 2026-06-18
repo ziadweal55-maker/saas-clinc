@@ -305,6 +305,7 @@ if (!isElectron) {
       }
       return res;
     },
+    changePassword: (data: { currentPassword: string; newPassword: string }) => request('POST', '/auth/change-password', data),
     registerPendingUser: (data: any) => request('POST', '/auth/register-pending', data),
     getPendingAccounts: () => request('GET', '/auth/pending-requests'),
     approveAccountRequest: (userId: number) => request('POST', '/auth/approve-request', { userId }),

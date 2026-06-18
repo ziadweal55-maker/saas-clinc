@@ -228,9 +228,13 @@ async function createTenantSchema(tenantId) {
         branch_id INTEGER DEFAULT 1 REFERENCES Branches(id),
         status TEXT DEFAULT 'active',
         base_salary NUMERIC(10,2) DEFAULT 0,
+        require_password_change BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+
+    // Ensure column exists for any pre-existing schemas
+    await client.query(`ALTER TABLE Users ADD COLUMN IF NOT EXISTS require_password_change BOOLEAN DEFAULT FALSE`);
 
     // 4. Clients
     await client.query(`

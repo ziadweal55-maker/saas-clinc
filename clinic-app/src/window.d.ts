@@ -82,6 +82,7 @@ declare global {
       checkUsersExist: () => Promise<boolean>;
       setupAdmin: (data: any) => Promise<{ success: boolean; error?: string }>;
       loginUser: (data: any) => Promise<{ success: boolean; user?: any; error?: string }>;
+      changePassword: (data: { currentPassword: string; newPassword: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
       registerPendingUser: (data: any) => Promise<{ success: boolean; error?: string }>;
       getPendingAccounts: () => Promise<any[]>;
       approveAccountRequest: (userId: number) => Promise<{ success: boolean; error?: string }>;

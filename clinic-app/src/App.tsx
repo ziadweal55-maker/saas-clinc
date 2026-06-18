@@ -23,6 +23,7 @@ import { FinanceManagementView } from './views/FinanceManagementView';
 import { AttendanceView } from './views/AttendanceView';
 import { AccountRequestsView } from './views/AccountRequestsView';
 import { InvestigationAdmin } from './components/InvestigationAdmin';
+import { ChangePasswordView } from './views/ChangePasswordView';
 
 export default function App() {
   const { tenantSettings, loading: tenantLoading } = useTenant();
@@ -358,6 +359,18 @@ export default function App() {
   if (hasUsers === null) return <div className="h-screen w-full bg-background flex items-center justify-center"><div className="animate-spin text-primary"><RefreshCw size={48} /></div></div>;
   if (hasUsers === false) return <SetupView onComplete={checkUsers} />;
   if (!currentUser) return <LoginView onLogin={handleLogin} onRegisterTenant={() => setIsRegisteringTenant(true)} />;
+  if (currentUser?.requirePasswordChange) {
+    return (
+      <ChangePasswordView 
+        currentUser={currentUser} 
+        onComplete={(updatedUser) => {
+          setCurrentUser(updatedUser);
+          showToast('Password updated successfully! Welcome to your workspace.', 'success');
+        }}
+        onLogout={handleLogout}
+      />
+    );
+  }
   if (needsBranchSelection) return <BranchSelectorView onBranchSelected={handleBranchSelected} userDisplayName={currentUser.username} />;
   if (loadingBranchData) {
     return (
