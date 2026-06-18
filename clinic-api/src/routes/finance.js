@@ -132,6 +132,14 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
 
   try {
+    if (docId) {
+      // Verify doctor belongs to the active branch
+      const docCheck = await req.db.query('SELECT id FROM Doctors WHERE id = $1 AND branch_id = $2', [docId, branchId]);
+      if (docCheck.rowCount === 0) {
+        return res.status(403).json({ error: 'Access denied. Doctor belongs to another branch.' });
+      }
+    }
+
     // Define sessions query
     let sessionsQuery = 'SELECT COUNT(*)::int as count FROM Sessions WHERE session_date >= $1 AND session_date <= $2 AND branch_id = $3';
     let sessionsParams = [start, end, branchId];
@@ -177,6 +185,22 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
     }
     detLoansQuery += ' ORDER BY l.loan_date DESC';
 
+    // Define detailed attendance query
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    let detAttendanceQuery = `
+      SELECT al.*, u.username, u.role 
+      FROM AttendanceLogs al
+      JOIN Users u ON al.user_id = u.id 
+      WHERE al.log_date >= $1 AND al.log_date <= $2 AND al.branch_id = $3
+    `;
+    let detAttendanceParams = [startStr, endStr, branchId];
+    if (docId) {
+      detAttendanceQuery += ' AND u.doctor_id = $4';
+      detAttendanceParams.push(docId);
+    }
+    detAttendanceQuery += ' ORDER BY al.log_date DESC, u.username ASC';
+
     // Run all independent queries in parallel
     const [
       clientsRes,
@@ -188,7 +212,8 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       paymentsRes,
       detSessionsRes,
       detLoansRes,
-      detWastesRes
+      detWastesRes,
+      detAttendanceRes
     ] = await Promise.all([
       req.db.query(
         'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
@@ -225,7 +250,8 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       req.db.query(
         'SELECT * FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3 ORDER BY created_at DESC',
         [start, end, branchId]
-      )
+      ),
+      req.db.query(detAttendanceQuery, detAttendanceParams)
     ]);
 
     return res.json({
@@ -238,7 +264,8 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       detailedPayments: paymentsRes.rows.map(r => ({ ...r, amount: parseFloat(r.amount) })),
       detailedSessions: detSessionsRes.rows.map(r => ({ ...r, payment_amount: parseFloat(r.payment_amount) })),
       loanDetails: detLoansRes.rows.map(r => ({ ...r, amount: parseFloat(r.amount) })),
-      wasteDetails: detWastesRes.rows.map(r => ({ ...r, total_cost: parseFloat(r.total_cost), unit_cost: parseFloat(r.unit_cost) }))
+      wasteDetails: detWastesRes.rows.map(r => ({ ...r, total_cost: parseFloat(r.total_cost), unit_cost: parseFloat(r.unit_cost) })),
+      attendanceLogs: detAttendanceRes.rows
     });
   } catch (error) {
     console.error('[FINANCE ROUTE] Error compiling report stats:', error);
@@ -248,11 +275,14 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
 
 // 7. GET Finance Users list
 router.get('/users', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
     const result = await req.db.query(
       `SELECT id, username, role, doctor_id, branch_id, status, base_salary::numeric as base_salary 
        FROM Users 
-       ORDER BY username ASC`
+       WHERE branch_id = $1
+       ORDER BY username ASC`,
+      [branchId]
     );
     return res.json(result.rows.map(r => ({ ...r, base_salary: parseFloat(r.base_salary) })));
   } catch (error) {
@@ -267,9 +297,10 @@ router.get('/monthly-revenue', authMiddleware, async (req, res) => {
   if (!month) return res.status(400).json({ error: 'month parameter is required' });
 
   try {
+    const branchId = req.user.branchId || 1;
     const result = await req.db.query(
-      "SELECT COALESCE(SUM(amount), 0)::numeric as revenue FROM Payments WHERE TO_CHAR(payment_date, 'YYYY-MM') = $1",
-      [month]
+      "SELECT COALESCE(SUM(amount), 0)::numeric as revenue FROM Payments WHERE TO_CHAR(payment_date, 'YYYY-MM') = $1 AND branch_id = $2",
+      [month, branchId]
     );
     return res.json(parseFloat(result.rows[0].revenue));
   } catch (error) {
@@ -284,9 +315,10 @@ router.get('/salary-records', authMiddleware, async (req, res) => {
   if (!month) return res.status(400).json({ error: 'month parameter is required' });
 
   try {
+    const branchId = req.user.branchId || 1;
     const result = await req.db.query(
-      'SELECT * FROM SalaryRecords WHERE month = $1 ORDER BY created_at DESC',
-      [month]
+      'SELECT * FROM SalaryRecords WHERE month = $1 AND branch_id = $2 ORDER BY created_at DESC',
+      [month, branchId]
     );
     return res.json(result.rows.map(r => ({
       ...r,
@@ -305,10 +337,17 @@ router.get('/doctor-sessions-count', authMiddleware, async (req, res) => {
   const { doctorId, month } = req.query; // YYYY-MM
   if (!doctorId || !month) return res.status(400).json({ error: 'doctorId and month are required' });
 
+  const branchId = req.user.branchId || 1;
   try {
+    // Verify doctor belongs to the active branch
+    const docCheck = await req.db.query('SELECT id FROM Doctors WHERE id = $1 AND branch_id = $2', [parseInt(doctorId), branchId]);
+    if (docCheck.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Doctor belongs to another branch.' });
+    }
+
     const result = await req.db.query(
-      "SELECT session_type, COUNT(*)::int as count FROM Sessions WHERE doctor_id = $1 AND TO_CHAR(session_date, 'YYYY-MM') = $2 GROUP BY session_type",
-      [parseInt(doctorId), month]
+      "SELECT session_type, COUNT(*)::int as count FROM Sessions WHERE doctor_id = $1 AND TO_CHAR(session_date, 'YYYY-MM') = $2 AND branch_id = $3 GROUP BY session_type",
+      [parseInt(doctorId), month, branchId]
     );
 
     let total = 0;
@@ -348,13 +387,14 @@ router.get('/loans', authMiddleware, async (req, res) => {
   if (!month) return res.status(400).json({ error: 'month parameter is required' });
 
   try {
+    const branchId = req.user.branchId || 1;
     const result = await req.db.query(
       `SELECT l.*, u.username as staff_name 
        FROM Loans l 
        JOIN Users u ON l.user_id = u.id 
-       WHERE l.month = $1 
+       WHERE l.month = $1 AND l.branch_id = $2
        ORDER BY l.loan_date DESC`,
-      [month]
+      [month, branchId]
     );
     return res.json(result.rows.map(r => ({ ...r, amount: parseFloat(r.amount) })));
   } catch (error) {
@@ -368,10 +408,11 @@ router.get('/waste-items', authMiddleware, async (req, res) => {
   const { date } = req.query; // YYYY-MM-DD
   if (!date) return res.status(400).json({ error: 'date parameter is required' });
 
+  const branchId = req.user.branchId || 1;
   try {
     const result = await req.db.query(
-      'SELECT * FROM WasteItems WHERE waste_date = $1 ORDER BY created_at DESC',
-      [date]
+      'SELECT * FROM WasteItems WHERE waste_date = $1 AND branch_id = $2 ORDER BY created_at DESC',
+      [date, branchId]
     );
     return res.json(result.rows.map(r => ({ ...r, total_cost: parseFloat(r.total_cost), unit_cost: parseFloat(r.unit_cost) })));
   } catch (error) {
@@ -465,7 +506,14 @@ router.get('/daily-summary', authMiddleware, async (req, res) => {
 // 15. POST Update User Finance settings
 router.post('/user-finance', authMiddleware, async (req, res) => {
   const { userId, base_salary } = req.body;
+  const branchId = req.user.branchId || 1;
   try {
+    // Verify user belongs to the active branch
+    const userCheck = await req.db.query('SELECT id FROM Users WHERE id = $1 AND branch_id = $2', [parseInt(userId), branchId]);
+    if (userCheck.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. User belongs to another branch.' });
+    }
+
     await req.db.query(
       'UPDATE Users SET base_salary = $1 WHERE id = $2',
       [parseFloat(base_salary), parseInt(userId)]
@@ -482,6 +530,12 @@ router.post('/salary-record', authMiddleware, async (req, res) => {
   const { user_id, month, base_salary, dynamic_salary, sessions_count, total_salary } = req.body;
   const branchId = req.user.branchId || 1;
   try {
+    // Verify user belongs to the active branch
+    const userCheck = await req.db.query('SELECT id FROM Users WHERE id = $1 AND branch_id = $2', [parseInt(user_id), branchId]);
+    if (userCheck.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. User belongs to another branch.' });
+    }
+
     await req.db.query(
       `INSERT INTO SalaryRecords (user_id, month, base_salary, dynamic_salary, sessions_count, total_salary, branch_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -499,6 +553,12 @@ router.post('/loan', authMiddleware, async (req, res) => {
   const { user_id, amount, note, month } = req.body;
   const branchId = req.user.branchId || 1;
   try {
+    // Verify user belongs to the active branch
+    const userCheck = await req.db.query('SELECT id FROM Users WHERE id = $1 AND branch_id = $2', [parseInt(user_id), branchId]);
+    if (userCheck.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. User belongs to another branch.' });
+    }
+
     await req.db.query(
       `INSERT INTO Loans (user_id, amount, note, month, branch_id)
        VALUES ($1, $2, $3, $4, $5)`,
@@ -513,7 +573,13 @@ router.post('/loan', authMiddleware, async (req, res) => {
 
 // 18. DELETE Loan
 router.delete('/loan/:id', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
+    const check = await req.db.query('SELECT id FROM Loans WHERE id = $1 AND branch_id = $2', [parseInt(req.params.id), branchId]);
+    if (check.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Loan belongs to another branch.' });
+    }
+
     await req.db.query('DELETE FROM Loans WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -524,7 +590,13 @@ router.delete('/loan/:id', authMiddleware, async (req, res) => {
 
 // 19. POST Settle Loan
 router.post('/settle-loan/:id', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
+    const check = await req.db.query('SELECT id FROM Loans WHERE id = $1 AND branch_id = $2', [parseInt(req.params.id), branchId]);
+    if (check.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Loan belongs to another branch.' });
+    }
+
     await req.db.query(
       'UPDATE Loans SET is_settled = 1, settled_at = NOW() WHERE id = $1',
       [parseInt(req.params.id)]
@@ -539,10 +611,11 @@ router.post('/settle-loan/:id', authMiddleware, async (req, res) => {
 // 20. POST Reset Loans (delete unsettled loans for month)
 router.post('/reset-loans', authMiddleware, async (req, res) => {
   const { month } = req.body;
+  const branchId = req.user.branchId || 1;
   try {
     await req.db.query(
-      'DELETE FROM Loans WHERE month = $1 AND is_settled = 0',
-      [month]
+      'DELETE FROM Loans WHERE month = $1 AND is_settled = 0 AND branch_id = $2',
+      [month, branchId]
     );
     return res.json({ success: true });
   } catch (error) {
@@ -570,7 +643,13 @@ router.post('/waste-item', authMiddleware, async (req, res) => {
 
 // 22. DELETE Waste Item
 router.delete('/waste-item/:id', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
+    const check = await req.db.query('SELECT id FROM WasteItems WHERE id = $1 AND branch_id = $2', [parseInt(req.params.id), branchId]);
+    if (check.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Waste item belongs to another branch.' });
+    }
+
     await req.db.query('DELETE FROM WasteItems WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -599,7 +678,13 @@ router.post('/session-type', authMiddleware, async (req, res) => {
 // 24. PUT Update Session Type
 router.put('/session-type/:id', authMiddleware, async (req, res) => {
   const { name, cost, num_sessions, is_active } = req.body;
+  const branchId = req.user.branchId || 1;
   try {
+    const check = await req.db.query('SELECT id FROM SessionTypes WHERE id = $1 AND branch_id = $2', [parseInt(req.params.id), branchId]);
+    if (check.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Session type belongs to another branch.' });
+    }
+
     await req.db.query(
       `UPDATE SessionTypes SET name = $1, cost = $2, num_sessions = $3, is_active = $4
        WHERE id = $5`,
@@ -614,7 +699,13 @@ router.put('/session-type/:id', authMiddleware, async (req, res) => {
 
 // 25. DELETE Session Type
 router.delete('/session-type/:id', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
+    const check = await req.db.query('SELECT id FROM SessionTypes WHERE id = $1 AND branch_id = $2', [parseInt(req.params.id), branchId]);
+    if (check.rowCount === 0) {
+      return res.status(403).json({ error: 'Access denied. Session type belongs to another branch.' });
+    }
+
     await req.db.query('DELETE FROM SessionTypes WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {

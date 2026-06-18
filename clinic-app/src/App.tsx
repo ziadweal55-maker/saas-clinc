@@ -591,8 +591,8 @@ export default function App() {
               }}
             />
           )}
-          {currentView === 'reports' && isFeatureEnabled('reports') && <ReportsView />}
-          {currentView === 'finance' && isFeatureEnabled('finance') && <FinanceManagementView currentUser={currentUser} />}
+          {currentView === 'reports' && isFeatureEnabled('reports') && <ReportsView key={`reports-${currentBranch?.id || 1}`} />}
+          {currentView === 'finance' && isFeatureEnabled('finance') && <FinanceManagementView key={`finance-${currentBranch?.id || 1}`} currentUser={currentUser} />}
           {currentView === 'assessment' && isFeatureEnabled('assessments') && <AssessmentView />}
           {currentView === 'exercises' && isFeatureEnabled('exercises') && <ExercisesView />}
           {currentView === 'investigation-library' && isFeatureEnabled('investigations') && (
