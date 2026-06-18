@@ -4,7 +4,8 @@ const { authMiddleware } = require('../middlewares/auth');
 
 // Clock-in
 router.post('/clock-in', authMiddleware, async (req, res) => {
-  const { userId, date, time } = req.body;
+  const { date, time } = req.body;
+  const userId = req.user.id;
   const branchId = req.user.branchId || 1;
 
   try {
@@ -37,7 +38,8 @@ router.post('/clock-in', authMiddleware, async (req, res) => {
 
 // Clock-out
 router.post('/clock-out', authMiddleware, async (req, res) => {
-  const { userId, date, time } = req.body;
+  const { date, time } = req.body;
+  const userId = req.user.id;
   const branchId = req.user.branchId || 1;
 
   try {

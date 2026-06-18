@@ -90,9 +90,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
 
     // Fetch the client ID for this session to run sync afterwards
-    const oldSessionRes = await req.db.query('SELECT client_id FROM Sessions WHERE id = $1', [sid]);
+    const oldSessionRes = await req.db.query('SELECT client_id, branch_id FROM Sessions WHERE id = $1', [sid]);
     if (oldSessionRes.rowCount === 0) {
       return res.status(404).json({ error: 'Session not found' });
+    }
+    if (oldSessionRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Session does not belong to your branch.' });
     }
     const cid = oldSessionRes.rows[0].client_id;
 
@@ -124,9 +127,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Invalid Session ID' });
     }
 
-    const sessionRes = await req.db.query('SELECT client_id, session_number FROM Sessions WHERE id = $1', [sid]);
+    const sessionRes = await req.db.query('SELECT client_id, session_number, branch_id FROM Sessions WHERE id = $1', [sid]);
     if (sessionRes.rowCount === 0) {
       return res.status(404).json({ error: 'Session not found' });
+    }
+    if (sessionRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Session does not belong to your branch.' });
     }
     const { client_id, session_number } = sessionRes.rows[0];
 

@@ -22,6 +22,50 @@ if (isCloudinaryConfigured) {
   console.warn('[CLOUDINARY] Warning: Cloudinary is not configured. Falling back to local storage.');
 }
 
+const checkBranchAccessByClientId = async (req, res, clientId) => {
+  if (req.user.role === 'admin' || req.user.role === 'cfo') return true;
+  const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [parseInt(clientId)]);
+  if (clientCheck.rowCount === 0) {
+    res.status(404).json({ error: 'Patient not found.' });
+    return false;
+  }
+  if (clientCheck.rows[0].branch_id !== req.user.branchId) {
+    res.status(403).json({ error: 'Access denied. Patient belongs to another branch.' });
+    return false;
+  }
+  return true;
+};
+
+const checkBranchAccessByProfileId = async (req, res, profileId) => {
+  if (req.user.role === 'admin' || req.user.role === 'cfo') return true;
+  const profileCheck = await req.db.query('SELECT client_id FROM ClientProfiles WHERE id = $1', [parseInt(profileId)]);
+  if (profileCheck.rowCount === 0) {
+    res.status(404).json({ error: 'Profile not found.' });
+    return false;
+  }
+  return checkBranchAccessByClientId(req, res, profileCheck.rows[0].client_id);
+};
+
+const checkBranchAccessByRecordId = async (req, res, tableName, recordId) => {
+  if (req.user.role === 'admin' || req.user.role === 'cfo') return true;
+  if (tableName === 'ClientProfiles' || tableName === 'ClientFiles') {
+    const colName = 'client_id';
+    const recordCheck = await req.db.query(`SELECT ${colName} FROM ${tableName} WHERE id = $1`, [parseInt(recordId)]);
+    if (recordCheck.rowCount === 0) {
+      res.status(404).json({ error: 'Record not found.' });
+      return false;
+    }
+    return checkBranchAccessByClientId(req, res, recordCheck.rows[0][colName]);
+  } else {
+    const recordCheck = await req.db.query(`SELECT profile_id FROM ${tableName} WHERE id = $1`, [parseInt(recordId)]);
+    if (recordCheck.rowCount === 0) {
+      res.status(404).json({ error: 'Record not found.' });
+      return false;
+    }
+    return checkBranchAccessByProfileId(req, res, recordCheck.rows[0].profile_id);
+  }
+};
+
 async function uploadBase64ToCloudinary(base64Data, subfolder, tenantId) {
   let uploadData = base64Data;
   if (!base64Data.startsWith('data:')) {
@@ -64,6 +108,7 @@ function saveBase64File(base64Data, originalName, subfolder, tenantId) {
 // 1. GET client profiles
 router.get('/client/:clientId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByClientId(req, res, req.params.clientId))) return;
     const result = await req.db.query(
       'SELECT * FROM ClientProfiles WHERE client_id = $1 ORDER BY created_at DESC', 
       [parseInt(req.params.clientId)]
@@ -78,6 +123,7 @@ router.get('/client/:clientId', authMiddleware, async (req, res) => {
 // 2. GET single profile
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'ClientProfiles', req.params.id))) return;
     const result = await req.db.query(
       'SELECT * FROM ClientProfiles WHERE id = $1', 
       [parseInt(req.params.id)]
@@ -96,6 +142,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   const { client_id, profile_type, name } = req.body;
   try {
+    if (!(await checkBranchAccessByClientId(req, res, client_id))) return;
     const result = await req.db.query(
       'INSERT INTO ClientProfiles (client_id, profile_type, name) VALUES ($1, $2, $3) RETURNING id',
       [parseInt(client_id), profile_type, name]
@@ -110,6 +157,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // 4. DELETE client profile
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'ClientProfiles', req.params.id))) return;
     await req.db.query('DELETE FROM ClientProfiles WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -122,6 +170,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 router.patch('/:id/height', authMiddleware, async (req, res) => {
   const { height } = req.body;
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'ClientProfiles', req.params.id))) return;
     await req.db.query(
       'UPDATE ClientProfiles SET height = $1 WHERE id = $2', 
       [height ? parseFloat(height) : null, parseInt(req.params.id)]
@@ -136,6 +185,7 @@ router.patch('/:id/height', authMiddleware, async (req, res) => {
 // 6. GET PT Red Flags
 router.get('/pt/red-flags/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM PTRedFlags WHERE profile_id = $1', 
       [parseInt(req.params.profileId)]
@@ -155,6 +205,7 @@ router.post('/pt/red-flags/:profileId', authMiddleware, async (req, res) => {
   const { flags, other_text, doctor_id } = req.body;
   const profileId = parseInt(req.params.profileId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     const existing = await req.db.query('SELECT id FROM PTRedFlags WHERE profile_id = $1', [profileId]);
     if (existing.rowCount > 0) {
       await req.db.query(
@@ -179,6 +230,7 @@ router.get('/pt/subjective/:profileId', authMiddleware, async (req, res) => {
   const { assessmentId } = req.query;
   const profileId = parseInt(req.params.profileId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     let result;
     if (assessmentId && assessmentId !== 'undefined' && assessmentId !== 'null') {
       result = await req.db.query('SELECT * FROM PTSubjective WHERE id = $1', [parseInt(assessmentId)]);
@@ -201,6 +253,7 @@ router.get('/pt/subjective/:profileId', authMiddleware, async (req, res) => {
 // 9. GET all PT Subjectives list
 router.get('/pt/subjectives/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM PTSubjective WHERE profile_id = $1 ORDER BY updated_at DESC', 
       [parseInt(req.params.profileId)]
@@ -217,6 +270,7 @@ router.post('/pt/subjective/:profileId', authMiddleware, async (req, res) => {
   const { id, chief_complaint, aggravating, easing, irritability, irritability_notes, nature, nature_notes, pain_scale, doctor_id } = req.body;
   const profileId = parseInt(req.params.profileId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     if (id) {
       await req.db.query(
         `UPDATE PTSubjective SET 
@@ -245,6 +299,7 @@ router.post('/pt/subjective/:profileId', authMiddleware, async (req, res) => {
 // 11. DELETE PT Subjective assessment
 router.delete('/pt/assessment/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'PTSubjective', req.params.id))) return;
     await req.db.query('DELETE FROM PTSubjective WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -257,6 +312,7 @@ router.delete('/pt/assessment/:id', authMiddleware, async (req, res) => {
 router.get('/pt/objective-rows/:profileId', authMiddleware, async (req, res) => {
   const { subjectiveId } = req.query;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM PTObjectiveRows WHERE profile_id = $1 AND subjective_id = $2 ORDER BY sort_order ASC',
       [parseInt(req.params.profileId), subjectiveId ? parseInt(subjectiveId) : null]
@@ -274,6 +330,7 @@ router.post('/pt/objective-rows/:profileId', authMiddleware, async (req, res) =>
   const profileId = parseInt(req.params.profileId);
   const sId = parseInt(subjectiveId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     await req.db.query('DELETE FROM PTObjectiveRows WHERE profile_id = $1 AND subjective_id = $2', [profileId, sId]);
     if (Array.isArray(rows)) {
       for (const row of rows) {
@@ -295,6 +352,7 @@ router.post('/pt/objective-rows/:profileId', authMiddleware, async (req, res) =>
 router.get('/pt/palpation/:profileId', authMiddleware, async (req, res) => {
   const { subjectiveId } = req.query;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM PTObjectivePalpation WHERE profile_id = $1 AND subjective_id = $2',
       [parseInt(req.params.profileId), subjectiveId ? parseInt(subjectiveId) : null]
@@ -315,6 +373,7 @@ router.post('/pt/palpation/:profileId', authMiddleware, async (req, res) => {
   const profileId = parseInt(req.params.profileId);
   const sId = parseInt(subjectiveId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     const existing = await req.db.query(
       'SELECT id FROM PTObjectivePalpation WHERE profile_id = $1 AND subjective_id = $2', 
       [profileId, sId]
@@ -340,6 +399,7 @@ router.post('/pt/palpation/:profileId', authMiddleware, async (req, res) => {
 // 16. GET PT Special Tests
 router.get('/pt/special-tests/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM AssessmentResults WHERE client_id = (SELECT client_id FROM ClientProfiles WHERE id = $1)',
       [parseInt(req.params.profileId)]
@@ -355,6 +415,7 @@ router.get('/pt/special-tests/:profileId', authMiddleware, async (req, res) => {
 router.post('/pt/special-test-result', authMiddleware, async (req, res) => {
   const { profileId, testId, result } = req.body;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     const profileRes = await req.db.query('SELECT client_id FROM ClientProfiles WHERE id = $1', [parseInt(profileId)]);
     if (profileRes.rowCount === 0) {
       return res.status(404).json({ error: 'Profile not found' });
@@ -386,6 +447,7 @@ router.post('/pt/special-test-result', authMiddleware, async (req, res) => {
 // 18. GET PT Session Plans
 router.get('/pt/session-plans/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM PTSessionPlan WHERE profile_id = $1 ORDER BY updated_at DESC', 
       [parseInt(req.params.profileId)]
@@ -402,6 +464,7 @@ router.post('/pt/session-plan/:profileId', authMiddleware, async (req, res) => {
   const { id, electrotherapy, manual_therapy, tools, doctor_id } = req.body;
   const profileId = parseInt(req.params.profileId);
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     if (id) {
       await req.db.query(
         `UPDATE PTSessionPlan SET 
@@ -414,7 +477,7 @@ router.post('/pt/session-plan/:profileId', authMiddleware, async (req, res) => {
       const result = await req.db.query(
         `INSERT INTO PTSessionPlan (profile_id, electrotherapy, manual_therapy, tools, doctor_id, updated_at)
          VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
-        [profileId, electrotherapy, manual_therapy, tools, doctor_id || null]
+         [profileId, electrotherapy, manual_therapy, tools, doctor_id || null]
       );
       return res.json({ success: true, id: result.rows[0].id });
     }
@@ -427,6 +490,7 @@ router.post('/pt/session-plan/:profileId', authMiddleware, async (req, res) => {
 // 20. DELETE PT Session Plan
 router.delete('/pt/session-plan/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'PTSessionPlan', req.params.id))) return;
     await req.db.query('DELETE FROM PTSessionPlan WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -438,6 +502,7 @@ router.delete('/pt/session-plan/:id', authMiddleware, async (req, res) => {
 // 21. GET Lymphatic measurements
 router.get('/lymphatic/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM LymphaticMeasurements WHERE profile_id = $1 ORDER BY session_date DESC, created_at DESC',
       [parseInt(req.params.profileId)]
@@ -453,6 +518,7 @@ router.get('/lymphatic/:profileId', authMiddleware, async (req, res) => {
 router.post('/lymphatic/:profileId', authMiddleware, async (req, res) => {
   const { measurement_name, value, unit, session_date, doctor_id } = req.body;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       `INSERT INTO LymphaticMeasurements (profile_id, measurement_name, value, unit, session_date, doctor_id, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id`,
@@ -468,6 +534,7 @@ router.post('/lymphatic/:profileId', authMiddleware, async (req, res) => {
 // 23. DELETE Lymphatic measurement
 router.delete('/lymphatic/measurement/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'LymphaticMeasurements', req.params.id))) return;
     await req.db.query('DELETE FROM LymphaticMeasurements WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -479,6 +546,7 @@ router.delete('/lymphatic/measurement/:id', authMiddleware, async (req, res) => 
 // 24. GET Nutrition history
 router.get('/nutrition/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM NutritionMedicalHistory WHERE profile_id = $1 ORDER BY session_date DESC, created_at DESC',
       [parseInt(req.params.profileId)]
@@ -494,6 +562,7 @@ router.get('/nutrition/:profileId', authMiddleware, async (req, res) => {
 router.post('/nutrition/:profileId', authMiddleware, async (req, res) => {
   const { content, weight, doctor_id, session_date } = req.body;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       `INSERT INTO NutritionMedicalHistory (profile_id, content, weight, doctor_id, session_date, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id`,
@@ -510,6 +579,7 @@ router.post('/nutrition/:profileId', authMiddleware, async (req, res) => {
 router.put('/nutrition/history/:id', authMiddleware, async (req, res) => {
   const { content, weight, doctor_id, session_date } = req.body;
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'NutritionMedicalHistory', req.params.id))) return;
     await req.db.query(
       `UPDATE NutritionMedicalHistory SET content = $1, weight = $2, doctor_id = $3, session_date = $4 WHERE id = $5`,
       [content, weight || null, doctor_id || null, session_date || null, parseInt(req.params.id)]
@@ -524,6 +594,7 @@ router.put('/nutrition/history/:id', authMiddleware, async (req, res) => {
 // 27. DELETE Nutrition history
 router.delete('/nutrition/history/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'NutritionMedicalHistory', req.params.id))) return;
     await req.db.query('DELETE FROM NutritionMedicalHistory WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -546,6 +617,7 @@ router.get('/investigations/library', authMiddleware, async (req, res) => {
 // 29. GET Client Investigations
 router.get('/investigations/client/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       `SELECT ci.*, il.name as investigation_name 
        FROM ClientInvestigations ci
@@ -565,6 +637,7 @@ router.get('/investigations/client/:profileId', authMiddleware, async (req, res)
 router.post('/investigations/assign/:profileId', authMiddleware, async (req, res) => {
   const { investigationId, doctorId } = req.body;
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       `INSERT INTO ClientInvestigations (profile_id, investigation_id, doctor_id, created_at)
        VALUES ($1, $2, $3, NOW()) RETURNING id`,
@@ -580,6 +653,7 @@ router.post('/investigations/assign/:profileId', authMiddleware, async (req, res
 // 31. DELETE Client Investigation
 router.delete('/investigations/client/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'ClientInvestigations', req.params.id))) return;
     await req.db.query('DELETE FROM ClientInvestigations WHERE id = $1', [parseInt(req.params.id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -592,6 +666,7 @@ router.delete('/investigations/client/:id', authMiddleware, async (req, res) => 
 router.put('/investigations/client/:id', authMiddleware, async (req, res) => {
   const { result_text, result_date } = req.body;
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'ClientInvestigations', req.params.id))) return;
     await req.db.query(
       `UPDATE ClientInvestigations SET result_text = $1, result_date = $2 WHERE id = $3`,
       [result_text, result_date || null, parseInt(req.params.id)]
@@ -606,6 +681,7 @@ router.put('/investigations/client/:id', authMiddleware, async (req, res) => {
 // 33. GET Inbody Uploads list
 router.get('/inbody/:profileId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
       'SELECT * FROM InbodyUploads WHERE profile_id = $1 ORDER BY upload_date DESC', 
       [parseInt(req.params.profileId)]
@@ -623,6 +699,7 @@ router.post('/inbody/:profileId/upload', authMiddleware, async (req, res) => {
   const profileId = parseInt(req.params.profileId);
   const tenantId = req.headers['x-tenant-id'] || 'default';
   try {
+    if (!(await checkBranchAccessByProfileId(req, res, profileId))) return;
     let savedPath;
     if (isCloudinaryConfigured) {
       savedPath = await uploadBase64ToCloudinary(base64, 'inbody', tenantId);
@@ -646,6 +723,7 @@ router.post('/inbody/:profileId/upload', authMiddleware, async (req, res) => {
 // 35. DELETE Inbody Upload
 router.delete('/inbody/upload/:id', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByRecordId(req, res, 'InbodyUploads', req.params.id))) return;
     const fileRes = await req.db.query('SELECT local_file_path FROM InbodyUploads WHERE id = $1', [parseInt(req.params.id)]);
     if (fileRes.rowCount > 0) {
       const filePath = fileRes.rows[0].local_file_path;
@@ -690,6 +768,7 @@ router.delete('/inbody/upload/:id', authMiddleware, async (req, res) => {
 // 36. GET Client Documents
 router.get('/documents/:clientId', authMiddleware, async (req, res) => {
   try {
+    if (!(await checkBranchAccessByClientId(req, res, req.params.clientId))) return;
     const result = await req.db.query(
       'SELECT * FROM ClientFiles WHERE client_id = $1 ORDER BY upload_date DESC', 
       [parseInt(req.params.clientId)]
@@ -707,6 +786,7 @@ router.post('/documents/:clientId/upload', authMiddleware, async (req, res) => {
   const clientId = parseInt(req.params.clientId);
   const tenantId = req.headers['x-tenant-id'] || 'default';
   try {
+    if (!(await checkBranchAccessByClientId(req, res, clientId))) return;
     let savedPath;
     if (isCloudinaryConfigured) {
       savedPath = await uploadBase64ToCloudinary(base64, 'documents', tenantId);

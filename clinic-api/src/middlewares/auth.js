@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_dev_only_9982';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error('[FATAL] JWT_SECRET environment variable is missing. Server cannot start.');
 
 /**
  * Authentication middleware that verifies JWT and enforces tenant context matching
@@ -20,7 +21,7 @@ const authMiddleware = (req, res, next) => {
 
     // Override branchId if client sent x-branch-id header
     const clientBranchId = req.headers['x-branch-id'];
-    if (clientBranchId) {
+    if (clientBranchId && (req.user.role === 'admin' || req.user.role === 'cfo')) {
       req.user.branchId = parseInt(clientBranchId) || 1;
     }
 

@@ -1,24 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const { authMiddleware } = require('../middlewares/auth');
+const { authMiddleware, authorize } = require('../middlewares/auth');
 
-// Get all clients (scoped by branch_id)
+// Get all clients (scoped by branch_id) with pagination
 router.get('/', authMiddleware, async (req, res) => {
   const branchId = req.query.branchId ? parseInt(req.query.branchId) : req.user.branchId;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const offset = (page - 1) * limit;
 
   try {
-    const result = await req.db.query(`
-      SELECT c.*, (
-        SELECT string_agg(cp.profile_type, ',') 
-        FROM ClientProfiles cp 
-        WHERE cp.client_id = c.id
-      ) as profile_types 
-      FROM Clients c 
-      WHERE c.branch_id = $1
-      ORDER BY c.last_name ASC
-    `, [branchId]);
+    const [countRes, dataRes] = await Promise.all([
+      req.db.query('SELECT COUNT(*)::int as count FROM Clients WHERE branch_id = $1', [branchId]),
+      req.db.query(`
+        SELECT c.*, (
+          SELECT string_agg(cp.profile_type, ',') 
+          FROM ClientProfiles cp 
+          WHERE cp.client_id = c.id
+        ) as profile_types 
+        FROM Clients c 
+        WHERE c.branch_id = $1
+        ORDER BY c.last_name ASC
+        LIMIT $2 OFFSET $3
+      `, [branchId, limit, offset])
+    ]);
 
-    return res.json(result.rows);
+    return res.json({
+      data: dataRes.rows,
+      total: countRes.rows[0].count,
+      page,
+      limit
+    });
   } catch (err) {
     console.error('[CLIENTS ROUTE] Error fetching clients:', err);
     return res.status(500).json({ error: err.message });
@@ -34,7 +46,11 @@ router.get('/:id', authMiddleware, async (req, res) => {
     if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Client not found' });
     }
-    return res.json(result.rows[0]);
+    const client = result.rows[0];
+    if (client.branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Client does not belong to your branch.' });
+    }
+    return res.json(client);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -93,6 +109,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
   const clientData = req.body;
 
   try {
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [parseInt(id)]);
+    if (clientCheck.rowCount === 0) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Client does not belong to your branch.' });
+    }
+
     const result = await req.db.query(`
       UPDATE Clients SET 
         first_name = $1, last_name = $2, phone = $3, age = $4, 
@@ -112,10 +136,6 @@ router.put('/:id', authMiddleware, async (req, res) => {
       clientData.referral_source || null,
       parseInt(id)
     ]);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Client not found' });
-    }
 
     return res.json({ success: true, client: result.rows[0] });
   } catch (err) {
@@ -144,14 +164,19 @@ router.patch('/:id/toggle-status', authMiddleware, async (req, res) => {
 });
 
 // Delete client
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, authorize('admin'), async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await req.db.query('DELETE FROM Clients WHERE id = $1 RETURNING *', [parseInt(id)]);
-    if (result.rowCount === 0) {
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [parseInt(id)]);
+    if (clientCheck.rowCount === 0) {
       return res.status(404).json({ error: 'Client not found' });
     }
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Client does not belong to your branch.' });
+    }
+
+    const result = await req.db.query('DELETE FROM Clients WHERE id = $1 RETURNING *', [parseInt(id)]);
     return res.json({ success: true, message: 'Client deleted successfully' });
   } catch (err) {
     return res.status(500).json({ error: err.message });

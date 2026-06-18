@@ -76,6 +76,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
   const { appointment_date, status, completed_by_staff_id, treatment_notes, progress_notes, doctor_id, session_type } = req.body;
 
   try {
+    const aptCheck = await req.db.query('SELECT branch_id FROM Appointments WHERE id = $1', [parseInt(id)]);
+    if (aptCheck.rowCount === 0) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    if (aptCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Appointment does not belong to your branch.' });
+    }
     const ALLOWED_SESSION_TYPES = ['Physical Therapy', 'Nutrition', 'Lymphatic', 'Other'];
     if (session_type && !ALLOWED_SESSION_TYPES.includes(session_type)) {
       return res.status(400).json({ error: 'Invalid session type.' });
@@ -153,6 +160,13 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
 
   try {
+    const aptCheck = await req.db.query('SELECT branch_id FROM Appointments WHERE id = $1', [parseInt(id)]);
+    if (aptCheck.rowCount === 0) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+    if (aptCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Appointment does not belong to your branch.' });
+    }
     await req.db.query('DELETE FROM Appointments WHERE id = $1', [parseInt(id)]);
     return res.json({ success: true });
   } catch (error) {

@@ -144,12 +144,23 @@ async function createGlobalSchema() {
     // Ensure password_hash column exists on admins (idempotent)
     await client.query(`ALTER TABLE public.admins ADD COLUMN IF NOT EXISTS password_hash TEXT`);
 
-    // Seed default super admin (password: 'password' — bcrypt hash)
-    await client.query(`
-      INSERT INTO public.admins (email, name, password_hash, is_active)
-      VALUES ('admin@saasclinic.com', 'Super Admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', true)
-      ON CONFLICT DO NOTHING;
-    `);
+    // Seed default super admin with a strong password if not exists
+    const adminCheck = await client.query(`SELECT 1 FROM public.admins WHERE email = 'admin@saasclinic.com'`);
+    if (adminCheck.rowCount === 0) {
+      const crypto = require('crypto');
+      const bcrypt = require('bcryptjs');
+      const strongPassword = crypto.randomBytes(16).toString('hex') + '!@#12A';
+      const hash = bcrypt.hashSync(strongPassword, 12);
+      await client.query(`
+        INSERT INTO public.admins (email, name, password_hash, is_active)
+        VALUES ('admin@saasclinic.com', 'Super Admin', $1, true)
+      `, [hash]);
+      console.log('========================================================');
+      console.log('[SECURITY] Seeded default super admin account:');
+      console.log('Email: admin@saasclinic.com');
+      console.log(`Password: ${strongPassword}`);
+      console.log('========================================================');
+    }
 
     await client.query('COMMIT');
     console.log('[MIGRATION] Global schema initialized successfully');
@@ -717,6 +728,14 @@ async function createTenantSchema(tenantId) {
       CREATE INDEX IF NOT EXISTS idx_profiles_client ON ClientProfiles(client_id);
       CREATE INDEX IF NOT EXISTS idx_investigations_profile ON ClientInvestigations(profile_id);
       CREATE INDEX IF NOT EXISTS idx_home_exercises_client ON ClientExercisesHome(client_id);
+      CREATE INDEX IF NOT EXISTS idx_assessments_branch ON Assessments(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_sessions_branch ON Sessions(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_waste_items_date ON WasteItems(waste_date);
+      CREATE INDEX IF NOT EXISTS idx_loans_branch ON Loans(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_loans_month ON Loans(month);
+      CREATE INDEX IF NOT EXISTS idx_salary_records_month ON SalaryRecords(month);
+      CREATE INDEX IF NOT EXISTS idx_attendance_logs_date ON AttendanceLogs(log_date);
+      CREATE INDEX IF NOT EXISTS idx_attendance_logs_branch ON AttendanceLogs(branch_id);
     `);
 
     await client.query('COMMIT');

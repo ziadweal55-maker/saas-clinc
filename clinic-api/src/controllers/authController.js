@@ -90,20 +90,6 @@ exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // Master Root Account Check (Only for dev/root config if configured)
-    if (username === 'root' && password === 'P@ssw0rd') {
-      const token = jwt.sign(
-        { id: 0, username: 'root', role: 'admin', isRoot: true, branchId: null, tenantId: req.tenantId },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      return res.json({
-        success: true,
-        token,
-        user: { id: 0, username: 'root', role: 'admin', isRoot: true, branch_id: null }
-      });
-    }
-
     const result = await req.db.query(
       'SELECT * FROM Users WHERE LOWER(username) = LOWER($1)',
       [username.trim()]

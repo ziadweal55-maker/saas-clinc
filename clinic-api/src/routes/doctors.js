@@ -56,6 +56,12 @@ router.put('/:id', authMiddleware, authorize('admin'), async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Doctor name is required' });
 
   try {
+    const doc = await req.db.query('SELECT branch_id FROM Doctors WHERE id = $1', [id]);
+    if (!doc.rows[0]) return res.status(404).json({ error: 'Doctor not found.' });
+    if (doc.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Doctor belongs to another branch.' });
+    }
+
     const result = await req.db.query(
       'UPDATE Doctors SET name = $1, specialty = $2, status = $3 WHERE id = $4 RETURNING *',
       [name.trim(), specialty || null, status || 'active', parseInt(id)]
@@ -72,6 +78,12 @@ router.delete('/:id', authMiddleware, authorize('admin'), async (req, res) => {
   const { id } = req.params;
 
   try {
+    const doc = await req.db.query('SELECT branch_id FROM Doctors WHERE id = $1', [id]);
+    if (!doc.rows[0]) return res.status(404).json({ error: 'Doctor not found.' });
+    if (doc.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Doctor belongs to another branch.' });
+    }
+
     const result = await req.db.query(
       'DELETE FROM Doctors WHERE id = $1 RETURNING *',
       [parseInt(id)]

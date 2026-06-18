@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 const dns = require('dns');
+const rateLimit = require('express-rate-limit');
 if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder('ipv4first');
 }
@@ -37,6 +38,17 @@ app.use(cors({
 app.use(express.json());
 app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Rate limiting for auth endpoints (10 requests per 15 minutes per IP)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/v1/auth', authLimiter);
+app.use('/api/v1/admin/auth', authLimiter);
 
 // Global routes (do not require tenant isolation context)
 app.use('/api/v1/global', require('./routes/global'));

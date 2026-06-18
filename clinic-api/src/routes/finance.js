@@ -12,18 +12,20 @@ router.get('/dashboard-stats', authMiddleware, async (req, res) => {
     const resetDateVal = resetDateRes.rows[0]?.value || '1970-01-01 00:00:00';
     const sinceDate = showAllTime ? '1970-01-01 00:00:00' : resetDateVal;
 
-    const clientsRes = await req.db.query(
-      'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND branch_id = $2', 
-      [sinceDate, branchId]
-    );
-    const todayAppsRes = await req.db.query(
-      'SELECT COUNT(*)::int as count FROM Appointments WHERE DATE(appointment_date) = CURRENT_DATE AND branch_id = $1',
-      [branchId]
-    );
-    const incomeRes = await req.db.query(
-      'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE payment_date >= $1 AND branch_id = $2', 
-      [sinceDate, branchId]
-    );
+    const [clientsRes, todayAppsRes, incomeRes] = await Promise.all([
+      req.db.query(
+        'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND branch_id = $2', 
+        [sinceDate, branchId]
+      ),
+      req.db.query(
+        'SELECT COUNT(*)::int as count FROM Appointments WHERE DATE(appointment_date) = CURRENT_DATE AND branch_id = $1',
+        [branchId]
+      ),
+      req.db.query(
+        'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE payment_date >= $1 AND branch_id = $2', 
+        [sinceDate, branchId]
+      )
+    ]);
 
     return res.json({
       clientsCount: clientsRes.rows[0].count,
@@ -130,63 +132,23 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
 
   try {
-    // Clients created in period
-    const clientsRes = await req.db.query(
-      'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
-      [start, end, branchId]
-    );
-
-    // Sessions count in period
+    // Define sessions query
     let sessionsQuery = 'SELECT COUNT(*)::int as count FROM Sessions WHERE session_date >= $1 AND session_date <= $2 AND branch_id = $3';
     let sessionsParams = [start, end, branchId];
     if (docId) {
       sessionsQuery += ' AND doctor_id = $4';
       sessionsParams.push(docId);
     }
-    const sessionsRes = await req.db.query(sessionsQuery, sessionsParams);
 
-    // Income in period
-    const incomeRes = await req.db.query(
-      'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE payment_date >= $1 AND payment_date <= $2 AND branch_id = $3',
-      [start, end, branchId]
-    );
-
-    // Loans in period
+    // Define loans query
     let loansQuery = 'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Loans WHERE loan_date >= $1 AND loan_date <= $2 AND branch_id = $3';
     let loansParams = [start, end, branchId];
     if (docId) {
       loansQuery += ' AND user_id IN (SELECT id FROM Users WHERE doctor_id = $4)';
       loansParams.push(docId);
     }
-    const loansRes = await req.db.query(loansQuery, loansParams);
 
-    // Wastes in period
-    const wastesRes = await req.db.query(
-      'SELECT COALESCE(SUM(total_cost), 0)::numeric as total FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
-      [start, end, branchId]
-    );
-
-    // Daily revenue breakdown
-    const dailyRes = await req.db.query(
-      `SELECT DATE(payment_date) as date, SUM(amount)::numeric as amount 
-       FROM Payments 
-       WHERE payment_date >= $1 AND payment_date <= $2 AND branch_id = $3
-       GROUP BY DATE(payment_date) 
-       ORDER BY date ASC`,
-      [start, end, branchId]
-    );
-
-    // Detailed payments
-    const paymentsRes = await req.db.query(
-      `SELECT p.*, c.first_name, c.last_name 
-       FROM Payments p 
-       JOIN Clients c ON p.client_id = c.id 
-       WHERE p.payment_date >= $1 AND p.payment_date <= $2 AND p.branch_id = $3
-       ORDER BY p.payment_date DESC`,
-      [start, end, branchId]
-    );
-
-    // Detailed sessions
+    // Define detailed sessions query
     let detSessionsQuery = `
       SELECT s.*, c.first_name, c.last_name, d.name as doctor_name 
       FROM Sessions s 
@@ -200,9 +162,8 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       detSessionsParams.push(docId);
     }
     detSessionsQuery += ' ORDER BY s.session_date DESC';
-    const detSessionsRes = await req.db.query(detSessionsQuery, detSessionsParams);
 
-    // Detailed loans
+    // Define detailed loans query
     let detLoansQuery = `
       SELECT l.*, u.username as staff_name 
       FROM Loans l 
@@ -215,13 +176,57 @@ router.get('/report-stats', authMiddleware, async (req, res) => {
       detLoansParams.push(docId);
     }
     detLoansQuery += ' ORDER BY l.loan_date DESC';
-    const detLoansRes = await req.db.query(detLoansQuery, detLoansParams);
 
-    // Detailed wastes
-    const detWastesRes = await req.db.query(
-      'SELECT * FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3 ORDER BY created_at DESC',
-      [start, end, branchId]
-    );
+    // Run all independent queries in parallel
+    const [
+      clientsRes,
+      sessionsRes,
+      incomeRes,
+      loansRes,
+      wastesRes,
+      dailyRes,
+      paymentsRes,
+      detSessionsRes,
+      detLoansRes,
+      detWastesRes
+    ] = await Promise.all([
+      req.db.query(
+        'SELECT COUNT(*)::int as count FROM Clients WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
+        [start, end, branchId]
+      ),
+      req.db.query(sessionsQuery, sessionsParams),
+      req.db.query(
+        'SELECT COALESCE(SUM(amount), 0)::numeric as total FROM Payments WHERE payment_date >= $1 AND payment_date <= $2 AND branch_id = $3',
+        [start, end, branchId]
+      ),
+      req.db.query(loansQuery, loansParams),
+      req.db.query(
+        'SELECT COALESCE(SUM(total_cost), 0)::numeric as total FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3',
+        [start, end, branchId]
+      ),
+      req.db.query(
+        `SELECT DATE(payment_date) as date, SUM(amount)::numeric as amount 
+         FROM Payments 
+         WHERE payment_date >= $1 AND payment_date <= $2 AND branch_id = $3
+         GROUP BY DATE(payment_date) 
+         ORDER BY date ASC`,
+        [start, end, branchId]
+      ),
+      req.db.query(
+        `SELECT p.*, c.first_name, c.last_name 
+         FROM Payments p 
+         JOIN Clients c ON p.client_id = c.id 
+         WHERE p.payment_date >= $1 AND p.payment_date <= $2 AND p.branch_id = $3
+         ORDER BY p.payment_date DESC`,
+        [start, end, branchId]
+      ),
+      req.db.query(detSessionsQuery, detSessionsParams),
+      req.db.query(detLoansQuery, detLoansParams),
+      req.db.query(
+        'SELECT * FROM WasteItems WHERE created_at >= $1 AND created_at <= $2 AND branch_id = $3 ORDER BY created_at DESC',
+        [start, end, branchId]
+      )
+    ]);
 
     return res.json({
       clientsInPeriod: clientsRes.rows[0].count,

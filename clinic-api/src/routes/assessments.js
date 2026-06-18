@@ -71,9 +71,12 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Valid assessment ID is required' });
     }
 
-    const assessmentRes = await req.db.query('SELECT client_id FROM Assessments WHERE id = $1', [aid]);
+    const assessmentRes = await req.db.query('SELECT client_id, branch_id FROM Assessments WHERE id = $1', [aid]);
     if (assessmentRes.rowCount === 0) {
       return res.status(404).json({ error: 'Assessment not found' });
+    }
+    if (assessmentRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Assessment does not belong to your branch.' });
     }
     const cid = assessmentRes.rows[0].client_id;
 
@@ -110,9 +113,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Valid assessment ID is required' });
     }
 
-    const assessmentRes = await req.db.query('SELECT client_id FROM Assessments WHERE id = $1', [aid]);
+    const assessmentRes = await req.db.query('SELECT client_id, branch_id FROM Assessments WHERE id = $1', [aid]);
     if (assessmentRes.rowCount === 0) {
       return res.status(404).json({ error: 'Assessment not found' });
+    }
+    if (assessmentRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Assessment does not belong to your branch.' });
     }
     const cid = assessmentRes.rows[0].client_id;
 

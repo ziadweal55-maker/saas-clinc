@@ -181,6 +181,12 @@ router.post('/progress', authMiddleware, async (req, res) => {
 router.get('/home/:clientId', authMiddleware, async (req, res) => {
   const { clientId } = req.params;
   try {
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [parseInt(clientId)]);
+    if (!clientCheck.rows[0]) return res.status(404).json({ error: 'Patient not found.' });
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Patient belongs to another branch.' });
+    }
+
     const result = await req.db.query(`
       SELECT he.*, e.name as exercise_name, e.instructions, e.video_url, er.name as region_name
       FROM ClientExercisesHome he
@@ -191,7 +197,7 @@ router.get('/home/:clientId', authMiddleware, async (req, res) => {
     `, [parseInt(clientId)]);
     return res.json(result.rows);
   } catch (error) {
-    return res.json([]);
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -199,10 +205,17 @@ router.get('/home/:clientId', authMiddleware, async (req, res) => {
 router.post('/home/assign', authMiddleware, async (req, res) => {
   const { client_id, exercise_id, doctor_id, sets, reps, frequency, notes, profile_id } = req.body;
   try {
+    const clientId = parseInt(client_id);
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [clientId]);
+    if (!clientCheck.rows[0]) return res.status(404).json({ error: 'Patient not found.' });
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Patient belongs to another branch.' });
+    }
+
     const result = await req.db.query(
       `INSERT INTO ClientExercisesHome (client_id, exercise_id, doctor_id, sets, reps, frequency, notes, profile_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [client_id, exercise_id, doctor_id || null, sets, reps, frequency, notes, profile_id || null]
+      [clientId, exercise_id, doctor_id || null, sets, reps, frequency, notes, profile_id || null]
     );
     return res.json({ success: true, id: result.rows[0].id });
   } catch (error) {
@@ -214,6 +227,16 @@ router.post('/home/assign', authMiddleware, async (req, res) => {
 router.delete('/home/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
+    const exerciseRes = await req.db.query('SELECT client_id FROM ClientExercisesHome WHERE id = $1', [parseInt(id)]);
+    if (!exerciseRes.rows[0]) return res.status(404).json({ error: 'Assigned exercise not found.' });
+    const clientId = exerciseRes.rows[0].client_id;
+
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [clientId]);
+    if (!clientCheck.rows[0]) return res.status(404).json({ error: 'Patient not found.' });
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Patient belongs to another branch.' });
+    }
+
     await req.db.query('DELETE FROM ClientExercisesHome WHERE id = $1', [parseInt(id)]);
     return res.json({ success: true });
   } catch (error) {
@@ -226,6 +249,16 @@ router.put('/home/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { sets, reps, frequency, notes } = req.body;
   try {
+    const exerciseRes = await req.db.query('SELECT client_id FROM ClientExercisesHome WHERE id = $1', [parseInt(id)]);
+    if (!exerciseRes.rows[0]) return res.status(404).json({ error: 'Assigned exercise not found.' });
+    const clientId = exerciseRes.rows[0].client_id;
+
+    const clientCheck = await req.db.query('SELECT branch_id FROM Clients WHERE id = $1', [clientId]);
+    if (!clientCheck.rows[0]) return res.status(404).json({ error: 'Patient not found.' });
+    if (clientCheck.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Patient belongs to another branch.' });
+    }
+
     await req.db.query(
       `UPDATE ClientExercisesHome 
        SET sets = $1, reps = $2, frequency = $3, notes = $4, updated_at = NOW() 

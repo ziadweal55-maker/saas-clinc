@@ -87,6 +87,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (existingRes.rowCount === 0) {
       return res.status(404).json({ error: 'Payment not found' });
     }
+    if (existingRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Payment does not belong to your branch.' });
+    }
     const existing = existingRes.rows[0];
 
     // Log to audit trail
@@ -128,6 +131,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const existingRes = await req.db.query('SELECT * FROM Payments WHERE id = $1', [pid]);
     if (existingRes.rowCount === 0) {
       return res.status(404).json({ error: 'Payment not found' });
+    }
+    if (existingRes.rows[0].branch_id !== req.user.branchId && req.user.role !== 'admin' && req.user.role !== 'cfo') {
+      return res.status(403).json({ error: 'Access denied. Payment does not belong to your branch.' });
     }
     const existing = existingRes.rows[0];
 

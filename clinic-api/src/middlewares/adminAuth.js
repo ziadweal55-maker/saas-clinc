@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'admin_fallback_secret';
+const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
+if (!ADMIN_JWT_SECRET) throw new Error('[FATAL] ADMIN_JWT_SECRET environment variable is missing. Server cannot start.');
 
 // Verify the admin JWT issued by our own login endpoint
 const adminAuthMiddleware = async (req, res, next) => {

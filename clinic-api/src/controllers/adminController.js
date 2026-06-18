@@ -1,4 +1,15 @@
 const { pool } = require('../config/db');
+const crypto = require('crypto');
+
+const generateRandomPassword = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+  let password = '';
+  const bytes = crypto.randomBytes(12);
+  for (let i = 0; i < 12; i++) {
+    password += chars[bytes[i] % chars.length];
+  }
+  return password;
+};
 const { createTenantSchema } = require('../scripts/migrate');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -176,6 +187,8 @@ exports.approveTenant = async (req, res) => {
       if (!e.message.includes('already exists')) throw e;
     }
 
+    const generatedPassword = generateRandomPassword();
+
     // Create initial admin user in tenant schema using the stored email as username
     if (tenant.email) {
       try {
@@ -184,7 +197,7 @@ exports.approveTenant = async (req, res) => {
         await tenantClient.query(`SET search_path TO ${schemaName}`);
         const existing = await tenantClient.query('SELECT id FROM Users WHERE username = $1', [tenant.email]);
         if (existing.rowCount === 0) {
-          const tempHash = bcrypt.hashSync('ChangeMe123!', 10);
+          const tempHash = bcrypt.hashSync(generatedPassword, 10);
           await tenantClient.query(
             `INSERT INTO Users (username, password_hash, role, status, branch_id) VALUES ($1, $2, 'admin', 'active', 1)`,
             [tenant.email, tempHash]
@@ -202,7 +215,11 @@ exports.approveTenant = async (req, res) => {
     // Send approval email (non-blocking)
     sendApprovalEmail(tenant.email, tenant.name, id, `https://${id}.saasclinic.com`).catch(console.error);
 
-    return res.json({ success: true, message: `Clinic '${tenant.name}' approved and provisioned.` });
+    return res.json({ 
+      success: true, 
+      message: `Clinic '${tenant.name}' approved and provisioned. Temporary password: ${generatedPassword}`, 
+      password: generatedPassword 
+    });
   } catch (e) {
     try { if (client) await client.query('ROLLBACK'); } catch (_) {}
     if (client) client.release();
