@@ -8,8 +8,8 @@ router.post('/clock-in', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
 
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
-    const checkInTime = time || new Date().toLocaleTimeString('en-US', { hour12: false });
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
+    const checkInTime = time || new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'Africa/Cairo' });
 
     const existingRes = await req.db.query(
       'SELECT id FROM AttendanceLogs WHERE user_id = $1 AND log_date = $2',
@@ -41,8 +41,8 @@ router.post('/clock-out', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
 
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
-    const checkOutTime = time || new Date().toLocaleTimeString('en-US', { hour12: false });
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
+    const checkOutTime = time || new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'Africa/Cairo' });
 
     const existingRes = await req.db.query(
       'SELECT id FROM AttendanceLogs WHERE user_id = $1 AND log_date = $2',
@@ -74,7 +74,7 @@ router.get('/logs', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
 
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
     const result = await req.db.query(
       `SELECT u.id as user_id, u.username, u.role, 
               al.check_in_time, al.check_out_time, al.log_date

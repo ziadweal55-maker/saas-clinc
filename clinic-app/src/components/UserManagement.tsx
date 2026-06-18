@@ -387,92 +387,8 @@ export function UserManagement() {
               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active Accounts</span>
               <span className="ml-auto text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{activeUsers.length}</span>
             </div>
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-muted/30 border-b border-border">
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Staff Member / Username</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Access Role</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Branch</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {activeUsers.length === 0 ? (
-                  <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No active accounts match your filter.</td></tr>
-                ) : activeUsers.map(user => (
-                  <tr key={user.id} className="hover:bg-primary/5 transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
-                          {user.username[0]}
-                        </div>
-                        <div>
-                          <div className="font-bold text-foreground group-hover:text-primary transition-colors">{user.username}</div>
-                          {user.username === 'root' && <span className="text-[9px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase mt-1 inline-block">System Root</span>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
-                        user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
-                        'bg-muted text-muted-foreground border border-border'
-                      }`}>
-                        {user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
-                        {user.role}
-                        {user.doctor_id && <span className="ml-1 opacity-60">#{user.doctor_id}</span>}
-                      </span>
-                    </td>
-                    <td className="px-8 py-5">
-                      {user.role === 'admin' ? (
-                        <span className="text-[10px] text-muted-foreground font-medium italic">All branches</span>
-                      ) : getBranchName(user.branch_id) ? (
-                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
-                          <Building2 size={10} /> {getBranchName(user.branch_id)}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-muted-foreground/50">—</span>
-                      )}
-                    </td>
-                    <td className="px-8 py-5">
-                      <button
-                        onClick={() => user.username !== 'root' && handleStatusToggle(user.id, user.status || 'active')}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                          user.username === 'root' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default' :
-                          'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
-                        }`}>
-                        <Flame size={10} />
-                        active
-                      </button>
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Reset Credentials">
-                          <Key size={18} />
-                        </button>
-                        {user.username !== 'root' && (
-                          <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
-                            <Trash2 size={18} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* ── Frozen Accounts Section ── */}
-          {(frozenUsers.length > 0 || selectedBranchFilter !== 'all' || userSearch) && (
-            <div className="bg-card rounded-3xl border border-rose-500/20 shadow-sm overflow-hidden">
-              <div className="bg-rose-500/5 border-b border-rose-500/20 px-8 py-4 flex items-center gap-3">
-                <Snowflake size={16} className="text-rose-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500">Frozen Accounts</span>
-                <span className="ml-auto text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{frozenUsers.length}</span>
-              </div>
-              <table className="w-full text-left">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left min-w-[700px]">
                 <thead>
                   <tr className="bg-muted/30 border-b border-border">
                     <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Staff Member / Username</th>
@@ -483,28 +399,30 @@ export function UserManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {frozenUsers.length === 0 ? (
-                    <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No frozen accounts match your filter.</td></tr>
-                  ) : frozenUsers.map(user => (
-                    <tr key={user.id} className="hover:bg-rose-500/5 transition-colors group opacity-80">
+                  {activeUsers.length === 0 ? (
+                    <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No active accounts match your filter.</td></tr>
+                  ) : activeUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-primary/5 transition-colors group">
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
+                          <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
                             {user.username[0]}
                           </div>
                           <div>
-                            <div className="font-bold text-foreground/70 group-hover:text-foreground transition-colors">{user.username}</div>
+                            <div className="font-bold text-foreground group-hover:text-primary transition-colors">{user.username}</div>
+                            {user.username === 'root' && <span className="text-[9px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase mt-1 inline-block">System Root</span>}
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-5">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider opacity-70 ${
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                           user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
                           user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
                           'bg-muted text-muted-foreground border border-border'
                         }`}>
                           {user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
                           {user.role}
+                          {user.doctor_id && <span className="ml-1 opacity-60">#{user.doctor_id}</span>}
                         </span>
                       </td>
                       <td className="px-8 py-5">
@@ -520,10 +438,13 @@ export function UserManagement() {
                       </td>
                       <td className="px-8 py-5">
                         <button
-                          onClick={() => handleStatusToggle(user.id, 'frozen')}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20">
-                          <Snowflake size={10} />
-                          frozen
+                          onClick={() => user.username !== 'root' && handleStatusToggle(user.id, user.status || 'active')}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                            user.username === 'root' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default' :
+                            'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
+                          }`}>
+                          <Flame size={10} />
+                          active
                         </button>
                       </td>
                       <td className="px-8 py-5 text-right">
@@ -531,15 +452,98 @@ export function UserManagement() {
                           <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Reset Credentials">
                             <Key size={18} />
                           </button>
-                          <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
-                            <Trash2 size={18} />
-                          </button>
+                          {user.username !== 'root' && (
+                            <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
+                              <Trash2 size={18} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* ── Frozen Accounts Section ── */}
+          {(frozenUsers.length > 0 || selectedBranchFilter !== 'all' || userSearch) && (
+            <div className="bg-card rounded-3xl border border-rose-500/20 shadow-sm overflow-hidden">
+              <div className="bg-rose-500/5 border-b border-rose-500/20 px-8 py-4 flex items-center gap-3">
+                <Snowflake size={16} className="text-rose-400" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500">Frozen Accounts</span>
+                <span className="ml-auto text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{frozenUsers.length}</span>
+              </div>
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left min-w-[700px]">
+                  <thead>
+                    <tr className="bg-muted/30 border-b border-border">
+                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Staff Member / Username</th>
+                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Access Role</th>
+                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Branch</th>
+                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
+                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {frozenUsers.length === 0 ? (
+                      <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No frozen accounts match your filter.</td></tr>
+                    ) : frozenUsers.map(user => (
+                      <tr key={user.id} className="hover:bg-rose-500/5 transition-colors group opacity-80">
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
+                              {user.username[0]}
+                            </div>
+                            <div>
+                              <div className="font-bold text-foreground/70 group-hover:text-foreground transition-colors">{user.username}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider opacity-70 ${
+                            user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
+                            user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
+                            'bg-muted text-muted-foreground border border-border'
+                          }`}>
+                            {user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="px-8 py-5">
+                          {user.role === 'admin' ? (
+                            <span className="text-[10px] text-muted-foreground font-medium italic">All branches</span>
+                          ) : getBranchName(user.branch_id) ? (
+                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
+                              <Building2 size={10} /> {getBranchName(user.branch_id)}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground/50">—</span>
+                          )}
+                        </td>
+                        <td className="px-8 py-5">
+                          <button
+                            onClick={() => handleStatusToggle(user.id, 'frozen')}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20">
+                            <Snowflake size={10} />
+                            frozen
+                          </button>
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <div className="flex justify-end gap-3">
+                            <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Reset Credentials">
+                              <Key size={18} />
+                            </button>
+                            <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </>
@@ -648,73 +652,75 @@ export function UserManagement() {
 
           {/* Doctors List */}
           <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-muted/30 border-b border-border">
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Doctor Name</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Specialty</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
-                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {doctors
-                  .filter(d => d.name.toLowerCase().includes(doctorSearch.toLowerCase()) || d.specialty.toLowerCase().includes(doctorSearch.toLowerCase()))
-                  .map(doc => (
-                    <tr key={doc.id} className="hover:bg-primary/5 transition-colors group">
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center font-bold text-xs uppercase">
-                            {doc.name[0] || 'D'}
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left min-w-[700px]">
+                <thead>
+                  <tr className="bg-muted/30 border-b border-border">
+                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Doctor Name</th>
+                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Specialty</th>
+                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
+                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {doctors
+                    .filter(d => d.name.toLowerCase().includes(doctorSearch.toLowerCase()) || d.specialty.toLowerCase().includes(doctorSearch.toLowerCase()))
+                    .map(doc => (
+                      <tr key={doc.id} className="hover:bg-primary/5 transition-colors group">
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center font-bold text-xs uppercase">
+                              {doc.name[0] || 'D'}
+                            </div>
+                            <div className="font-bold text-foreground group-hover:text-primary transition-colors">{doc.name}</div>
                           </div>
-                          <div className="font-bold text-foreground group-hover:text-primary transition-colors">{doc.name}</div>
-                        </div>
-                      </td>
-                      <td className="px-8 py-5">
-                        <span className="text-sm font-semibold text-muted-foreground">{doc.specialty}</span>
-                      </td>
-                      <td className="px-8 py-5">
-                        <button
-                          onClick={() => toggleDoctorStatus(doc)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                            doc.status === 'active'
-                              ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
-                              : 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20'
-                          }`}
-                        >
-                          {doc.status === 'active' ? (
-                            <><Flame size={10} /> active</>
-                          ) : (
-                            <><Snowflake size={10} /> frozen</>
-                          )}
-                        </button>
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <div className="flex justify-end gap-3">
+                        </td>
+                        <td className="px-8 py-5">
+                          <span className="text-sm font-semibold text-muted-foreground">{doc.specialty}</span>
+                        </td>
+                        <td className="px-8 py-5">
                           <button
-                            onClick={() => {
-                              setEditingDoctor(doc);
-                              setDoctorFormData({ name: doc.name, specialty: doc.specialty, status: doc.status });
-                              setIsAddingDoctor(false);
-                            }}
-                            className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
-                            title="Edit Profile"
+                            onClick={() => toggleDoctorStatus(doc)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                              doc.status === 'active'
+                                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
+                                : 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20'
+                            }`}
                           >
-                            <Edit2 size={18} className="w-4.5 h-4.5" />
+                            {doc.status === 'active' ? (
+                              <><Flame size={10} /> active</>
+                            ) : (
+                              <><Snowflake size={10} /> frozen</>
+                            )}
                           </button>
-                          <button
-                            onClick={() => handleDeleteDoctor(doc)}
-                            className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all"
-                            title="Delete Profile"
-                          >
-                            <Trash2 size={18} className="w-4.5 h-4.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={() => {
+                                setEditingDoctor(doc);
+                                setDoctorFormData({ name: doc.name, specialty: doc.specialty, status: doc.status });
+                                setIsAddingDoctor(false);
+                              }}
+                              className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
+                              title="Edit Profile"
+                            >
+                              <Edit2 size={18} className="w-4.5 h-4.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteDoctor(doc)}
+                              className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all"
+                              title="Delete Profile"
+                            >
+                              <Trash2 size={18} className="w-4.5 h-4.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

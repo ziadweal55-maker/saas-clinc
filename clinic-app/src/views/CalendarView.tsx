@@ -22,12 +22,38 @@ interface CalendarViewProps {
   currentUser: User | null;
 }
 
+// Helper to get Cairo YYYY-MM-DD date string
+const getCairoDateString = (dateInput: string) => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
+};
+
+// Helper to get Cairo hour (0-23)
+const getCairoHour = (dateInput: string) => {
+  if (!dateInput) return -1;
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return -1;
+  const hourStr = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', timeZone: 'Africa/Cairo' });
+  return parseInt(hourStr);
+};
+
+// Helper to convert Date/string to Cairo local datetime-local input string
+const toCairoDateTimeLocal = (dateInput: string) => {
+  if (!dateInput) return '';
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return '';
+  const localStr = d.toLocaleString('sv-SE', { timeZone: 'Africa/Cairo' });
+  return localStr.replace(' ', 'T').substring(0, 16);
+};
+
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 10); // 10 AM to 10 PM (22:00)
 
 export function CalendarView({ clients, currentUser }: CalendarViewProps) {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(() => getCairoDateString(new Date().toISOString()));
   const [showAdd, setShowAdd] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any | null>(null);
   const [formData, setFormData] = useState({ 
@@ -83,15 +109,14 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
       return;
     }
     
-    // Use local time parsing for hour comparison
-    const selectedDateObj = new Date(formData.appointment_date);
-    const selectedHour = selectedDateObj.getHours();
+    // Use Cairo timezone helper parsing for hour and date comparison
+    const selectedHour = getCairoHour(formData.appointment_date);
+    const selectedDateStr = getCairoDateString(formData.appointment_date);
     
     // Conflict Checks
     const sameHourAppointments = appointments.filter(apt => {
-      const aptDate = new Date(apt.appointment_date);
-      return aptDate.toLocaleDateString() === selectedDateObj.toLocaleDateString() && 
-             aptDate.getHours() === selectedHour;
+      return getCairoDateString(apt.appointment_date) === selectedDateStr && 
+             getCairoHour(apt.appointment_date) === selectedHour;
     });
 
     const sameDoctorInHour = sameHourAppointments.find(apt => apt.doctor_id === finalDoctorId && apt.id !== editingAppointment?.id);
@@ -172,32 +197,17 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
   const handleWhatsApp = (apt: any) => {
     const savedTemplate = localStorage.getItem('whatsapp_template') || DEFAULT_WHATSAPP_TEMPLATE;
     
-    // Format date for Egyptian standard (DD/MM/YYYY)
+    // Format date for Egyptian standard (DD/MM/YYYY) in Cairo timezone
     let formattedDate = '';
+    let formattedTime = '';
     try {
       const d = new Date(apt.appointment_date);
       if (!isNaN(d.getTime())) {
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        formattedDate = `${day}/${month}/${year}`;
+        formattedDate = d.toLocaleDateString('en-GB', { timeZone: 'Africa/Cairo' });
+        formattedTime = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
       }
     } catch (e) {
       formattedDate = apt.appointment_date.split(' ')[0] || '';
-    }
-
-    // Format time: extract HH:MM
-    let formattedTime = '';
-    try {
-      const parts = apt.appointment_date.split(' ');
-      if (parts.length >= 2) {
-        formattedTime = parts[1].substring(0, 5);
-      } else {
-        const d = new Date(apt.appointment_date);
-        formattedTime = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-      }
-    } catch (e) {
-      // fallback
     }
 
     const link = generateWhatsAppLink(savedTemplate, {
@@ -217,7 +227,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
     setFormData({ 
       client_id: apt.client_id.toString(), 
       doctor_id: apt.doctor_id ? apt.doctor_id.toString() : '',
-      appointment_date: apt.appointment_date.substring(0, 16), 
+      appointment_date: toCairoDateTimeLocal(apt.appointment_date), 
       status: apt.status,
       session_type: apt.session_type || ''
     });
@@ -234,9 +244,9 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
 
   const getAppointmentsForHour = (hour: number) => {
     return appointments.filter(apt => {
-      const aptDate = new Date(apt.appointment_date);
-      const isSameDate = apt.appointment_date.startsWith(selectedDate);
-      if (!isSameDate || aptDate.getHours() !== hour) return false;
+      const isSameDate = getCairoDateString(apt.appointment_date) === selectedDate;
+      const aptHour = getCairoHour(apt.appointment_date);
+      if (!isSameDate || aptHour !== hour) return false;
 
       const clientName = `${apt.client_first_name || ''} ${apt.client_last_name || ''}`;
       const doctorName = apt.doctor_name || '';
@@ -253,9 +263,13 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
   };
 
   const changeDate = (days: number) => {
-    const d = new Date(selectedDate);
+    const parts = selectedDate.split('-');
+    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
     d.setDate(d.getDate() + days);
-    setSelectedDate(d.toISOString().split('T')[0]);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    setSelectedDate(`${y}-${m}-${day}`);
   };
 
   const canModify = currentUser?.role !== 'doctor' && currentUser?.role !== 'cfo';

@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx';
+
 /**
  * API Bridge for browser-based SaaS execution.
  * Intercepts window.api calls and maps them to REST API calls over HTTP.
@@ -142,8 +144,130 @@ if (!isElectron) {
     addAssessmentTest: (data: any) => request('POST', '/assessments/tests', data),
     updateAssessmentTest: (data: any) => request('PUT', `/assessments/tests/${data.id}`, data),
     deleteAssessmentTest: (id: number) => request('DELETE', `/assessments/tests/${id}`),
-    importAssessmentsExcel: async () => { console.warn('importAssessmentsExcel is not implemented'); return { success: true }; },
-    exportAssessmentsExcel: async () => { console.warn('exportAssessmentsExcel is not implemented'); return { success: true }; },
+    importAssessmentsExcel: async (): Promise<any> => {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx, .xls, .csv';
+        input.style.display = 'none';
+        
+        input.onchange = async (e: any) => {
+          const file = e.target.files?.[0];
+          if (!file) {
+            resolve({ success: false, canceled: true });
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = async (event: any) => {
+            try {
+              const data = new Uint8Array(event.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+              const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+              
+              let imported = 0;
+              let skipped = 0;
+              const errors: string[] = [];
+              
+              // Fetch existing regions
+              const existingData = await apiImplementation.getAssessmentStructure();
+              const existingRegions = existingData.regions || [];
+              const regionCache: Record<string, number> = {};
+              existingRegions.forEach((r: any) => {
+                regionCache[r.name.trim().toLowerCase()] = r.id;
+              });
+              
+              const getOrCreateRegion = async (regionName: string) => {
+                const key = regionName.trim().toLowerCase();
+                if (regionCache[key]) return regionCache[key];
+                
+                const createRes = await apiImplementation.addAssessmentRegion({ name: regionName.trim() });
+                if (createRes && createRes.success && createRes.id) {
+                  regionCache[key] = createRes.id;
+                  return createRes.id;
+                }
+                throw new Error(createRes?.error || 'Failed to create assessment region');
+              };
+              
+              for (const row of rows) {
+                try {
+                  const regionName = String(row['region'] || row['Region'] || '').trim();
+                  const name = String(row['name'] || row['Name'] || '').trim();
+                  const description = String(row['description'] || row['Description'] || '').trim();
+                  
+                  if (!regionName || !name) {
+                    skipped++;
+                    continue;
+                  }
+                  
+                  const regionId = await getOrCreateRegion(regionName);
+                  const res = await apiImplementation.addAssessmentTest({
+                    regionId,
+                    name,
+                    description
+                  });
+                  
+                  if (res && res.success) {
+                    imported++;
+                  } else {
+                    errors.push(res?.error || 'Failed to insert assessment test');
+                  }
+                } catch (err: any) {
+                  errors.push(err.message);
+                }
+              }
+              
+              resolve({ success: true, imported, skipped, errors: errors.slice(0, 5) });
+            } catch (err: any) {
+              resolve({ success: false, error: err.message });
+            }
+          };
+          
+          reader.readAsArrayBuffer(file);
+        };
+        
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+      });
+    },
+    exportAssessmentsExcel: async (): Promise<any> => {
+      try {
+        const data = await apiImplementation.getAssessmentStructure();
+        const tests = data.tests || [];
+        const regions = data.regions || [];
+        const regionMap = new Map<number, string>();
+        regions.forEach((r: any) => regionMap.set(r.id, r.name));
+        
+        const exportRows = tests.map((t: any) => ({
+          Region: regionMap.get(t.region_id) || '',
+          Name: t.name || '',
+          Description: t.description || ''
+        }));
+        
+        const worksheet = XLSX.utils.json_to_sheet(exportRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessments');
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'assessment_library_export.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        return { success: true, filePath: 'assessment_library_export.xlsx' };
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    },
 
     // --- Doctors ---
     getDoctors: () => request('GET', '/doctors'),
@@ -211,8 +335,136 @@ if (!isElectron) {
     assignHomeExercise: (data: any) => request('POST', '/exercises/home/assign', data),
     removeHomeExercise: (id: number) => request('DELETE', `/exercises/home/${id}`),
     updateHomeExercise: (id: number, data: any) => request('PUT', `/exercises/home/${id}`, data),
-    importExercisesExcel: async () => { console.warn('importExercisesExcel is not implemented'); return { success: true }; },
-    exportExercisesExcel: async () => { console.warn('exportExercisesExcel is not implemented'); return { success: true }; },
+    importExercisesExcel: async (): Promise<any> => {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx, .xls, .csv';
+        input.style.display = 'none';
+        
+        input.onchange = async (e: any) => {
+          const file = e.target.files?.[0];
+          if (!file) {
+            resolve({ success: false, canceled: true });
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = async (event: any) => {
+            try {
+              const data = new Uint8Array(event.target.result);
+              const workbook = XLSX.read(data, { type: 'array' });
+              const sheetName = workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheetName];
+              const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+              
+              let imported = 0;
+              let skipped = 0;
+              const errors: string[] = [];
+              
+              // Fetch existing regions
+              const existingData = await apiImplementation.getExercises();
+              const existingRegions = existingData.regions || [];
+              const regionCache: Record<string, number> = {};
+              existingRegions.forEach((r: any) => {
+                regionCache[r.name.trim().toLowerCase()] = r.id;
+              });
+              
+              const getOrCreateRegion = async (regionName: string) => {
+                const key = regionName.trim().toLowerCase();
+                if (regionCache[key]) return regionCache[key];
+                
+                const createRes = await apiImplementation.addExerciseRegion({ name: regionName.trim() });
+                if (createRes && createRes.success && createRes.id) {
+                  regionCache[key] = createRes.id;
+                  return createRes.id;
+                }
+                throw new Error(createRes?.error || 'Failed to create exercise region');
+              };
+              
+              for (const row of rows) {
+                try {
+                  const regionName = String(row['region'] || row['Region'] || '').trim();
+                  const name = String(row['name'] || row['Name'] || '').trim();
+                  const type = String(row['type'] || row['Type'] || 'Strengthening').trim();
+                  const instructions = String(row['instructions'] || row['Instructions'] || '').trim();
+                  const videoUrl = String(row['video_url'] || row['Video URL'] || row['video'] || '').trim();
+                  
+                  if (!regionName || !name) {
+                    skipped++;
+                    continue;
+                  }
+                  
+                  const regionId = await getOrCreateRegion(regionName);
+                  const res = await apiImplementation.addExercise({
+                    regionId,
+                    name,
+                    type,
+                    instructions,
+                    video_url: videoUrl
+                  });
+                  
+                  if (res && res.success) {
+                    imported++;
+                  } else {
+                    errors.push(res?.error || 'Failed to insert exercise');
+                  }
+                } catch (err: any) {
+                  errors.push(err.message);
+                }
+              }
+              
+              resolve({ success: true, imported, skipped, errors: errors.slice(0, 5) });
+            } catch (err: any) {
+              resolve({ success: false, error: err.message });
+            }
+          };
+          
+          reader.readAsArrayBuffer(file);
+        };
+        
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+      });
+    },
+    exportExercisesExcel: async (): Promise<any> => {
+      try {
+        const data = await apiImplementation.getExercises();
+        const exercises = data.exercises || [];
+        const regions = data.regions || [];
+        const regionMap = new Map<number, string>();
+        regions.forEach((r: any) => regionMap.set(r.id, r.name));
+        
+        const exportRows = exercises.map((e: any) => ({
+          Region: regionMap.get(e.region_id) || '',
+          Name: e.name || '',
+          Type: e.type || '',
+          Instructions: e.instructions || '',
+          'Video URL': e.video_url || ''
+        }));
+        
+        const worksheet = XLSX.utils.json_to_sheet(exportRows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Exercises');
+        
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'exercise_library_export.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        return { success: true, filePath: 'exercise_library_export.xlsx' };
+      } catch (err: any) {
+        return { success: false, error: err.message };
+      }
+    },
 
     // --- Session Types & Package Status ---
     getSessionTypes: () => request('GET', '/sessions/types'),

@@ -1,3 +1,4 @@
+process.env.TZ = 'Africa/Cairo';
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -416,7 +417,7 @@ function startLocalServer() {
           const destPath = path.join(filesDir, safeFileName);
           fs.writeFileSync(destPath, buffer);
 
-          const today = new Date().toISOString().split('T')[0];
+          const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
           const resDb = db.prepare(
             "INSERT INTO InbodyUploads (profile_id, file_name, local_file_path, session_date, upload_date) VALUES (?, ?, ?, ?, datetime('now','localtime'))"
           );
@@ -3072,7 +3073,7 @@ ipcMain.handle('get-nutrition-history', async (event, profileId) => {
 
 ipcMain.handle('add-nutrition-history', async (event, profileId, data) => {
   try {
-    const res = db.prepare("INSERT INTO NutritionMedicalHistory (profile_id, content, session_date, height, weight, doctor_id, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now','localtime'))").run(profileId, data.content, data.session_date || new Date().toISOString().split('T')[0], data.height ? parseFloat(data.height) : null, data.weight ? parseFloat(data.weight) : null, data.doctor_id || null);
+    const res = db.prepare("INSERT INTO NutritionMedicalHistory (profile_id, content, session_date, height, weight, doctor_id, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now','localtime'))").run(profileId, data.content, data.session_date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' }), data.height ? parseFloat(data.height) : null, data.weight ? parseFloat(data.weight) : null, data.doctor_id || null);
     return { success: true, id: res.lastInsertRowid };
   } catch (error) {
     return { success: false, error: error.message };
@@ -3189,7 +3190,7 @@ ipcMain.handle('upload-inbody-photo', async (event, profileId) => {
     if (!fs.existsSync(filesDir)) fs.mkdirSync(filesDir, { recursive: true });
     const destPath = path.join(filesDir, safeFileName);
     fs.copyFileSync(sourcePath, destPath);
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
     const res = db.prepare("INSERT INTO InbodyUploads (profile_id, file_name, local_file_path, session_date, upload_date) VALUES (?, ?, ?, ?, datetime('now','localtime'))").run(profileId, fileName, destPath, today);
     return { success: true, id: res.lastInsertRowid, fileName, local_file_path: destPath, session_date: today };
   } catch (error) {
@@ -3238,7 +3239,7 @@ ipcMain.handle('get-lymphatic-measurements', async (event, profileId) => {
 
 ipcMain.handle('save-lymphatic-measurement', async (event, profileId, data) => {
   try {
-    const res = db.prepare("INSERT INTO LymphaticMeasurements (profile_id, measurement_name, value, unit, session_date, doctor_id, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now','localtime'))").run(profileId, data.measurement_name, data.value, data.unit || 'cm', data.session_date || new Date().toISOString().split('T')[0], data.doctor_id || null);
+    const res = db.prepare("INSERT INTO LymphaticMeasurements (profile_id, measurement_name, value, unit, session_date, doctor_id, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now','localtime'))").run(profileId, data.measurement_name, data.value, data.unit || 'cm', data.session_date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' }), data.doctor_id || null);
     return { success: true, id: res.lastInsertRowid };
   } catch (error) {
     return { success: false, error: error.message };
@@ -3347,8 +3348,8 @@ ipcMain.handle('update-home-exercise', async (event, id, data) => {
 
 ipcMain.handle('clock-in', async (event, { userId, date, time }) => {
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
-    const checkInTime = time || new Date().toLocaleTimeString('en-US', { hour12: false });
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
+    const checkInTime = time || new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'Africa/Cairo' });
     
     const existing = db.prepare('SELECT id FROM AttendanceLogs WHERE user_id = ? AND log_date = ?').get(userId, logDate);
     if (existing) {
@@ -3365,8 +3366,8 @@ ipcMain.handle('clock-in', async (event, { userId, date, time }) => {
 
 ipcMain.handle('clock-out', async (event, { userId, date, time }) => {
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
-    const checkOutTime = time || new Date().toLocaleTimeString('en-US', { hour12: false });
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
+    const checkOutTime = time || new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'Africa/Cairo' });
     
     const existing = db.prepare('SELECT id FROM AttendanceLogs WHERE user_id = ? AND log_date = ?').get(userId, logDate);
     if (existing) {
@@ -3383,7 +3384,7 @@ ipcMain.handle('clock-out', async (event, { userId, date, time }) => {
 
 ipcMain.handle('get-attendance-logs', async (event, date) => {
   try {
-    const logDate = date || new Date().toISOString().split('T')[0];
+    const logDate = date || new Date().toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
     return db.prepare(`
       SELECT u.id as user_id, u.username, u.role, 
              al.check_in_time, al.check_out_time, al.log_date

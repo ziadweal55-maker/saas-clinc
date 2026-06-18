@@ -558,7 +558,7 @@ export function DashboardView({ onNavigate, currentUser }: DashboardViewProps) {
                         <div className="flex items-center gap-4 md:gap-8 shrink-0">
                           <div className="text-right">
                             <div className="font-black text-primary text-base md:text-xl tabular-nums tracking-tighter italic">
-                              {new Date(apt.appointment_date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(apt.appointment_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' })}
                             </div>
                             <div className="text-[8px] text-muted-foreground font-black uppercase tracking-[0.1em] md:tracking-[0.2em] mt-0.5">Clinical</div>
                           </div>
