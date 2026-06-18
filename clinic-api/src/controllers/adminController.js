@@ -214,7 +214,7 @@ exports.approveTenant = async (req, res) => {
     
     // Send approval email (non-blocking)
     const baseDomain = process.env.CLINIC_BASE_DOMAIN || 'saasclinic.com';
-    sendApprovalEmail(tenant.email, tenant.name, id, `https://${id}.${baseDomain}`, generatedPassword).catch(console.error);
+    sendApprovalEmail(tenant.email, tenant.name, id, `https://${baseDomain}/?tenant=${id}`, generatedPassword).catch(console.error);
 
     return res.json({ 
       success: true, 
@@ -424,7 +424,7 @@ exports.impersonateTenant = async (req, res) => {
     );
     await logAdminAction(req.admin.email, 'impersonate_tenant', id, { tenantName: tenant.name }, req.ip);
     const baseDomain = process.env.CLINIC_BASE_DOMAIN || 'saasclinic.com';
-    const url = `https://${id}.${baseDomain}?token=${token}`;
+    const url = `https://${baseDomain}/?tenant=${id}&token=${token}`;
     return res.json({ token, tenantId: id, expiresIn: 1800, url });
   } catch (e) {
     console.error('[ADMIN IMPERSONATE]', e);

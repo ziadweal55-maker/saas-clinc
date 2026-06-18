@@ -64,16 +64,10 @@ export function RegisterTenantView({ onComplete, onBackToLogin }: RegisterTenant
 
       const clinicUrl = (() => {
         const hostname = window.location.hostname;
-        const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
-        if (HOSTING_DOMAINS.some(d => hostname.endsWith(d))) {
-          return `${window.location.origin}?tenant=${tenantId.trim().toLowerCase()}`;
-        }
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
           return `http://${tenantId.trim().toLowerCase()}.localhost:${window.location.port || 5173}`;
         }
-        const parts = hostname.split('.');
-        const baseDomain = parts.slice(-2).join('.');
-        return `https://${tenantId.trim().toLowerCase()}.${baseDomain}`;
+        return `${window.location.origin}?tenant=${tenantId.trim().toLowerCase()}`;
       })();
 
       setSuccess(`✅ Clinic registered! Your login link: ${clinicUrl}`);

@@ -232,7 +232,7 @@ const ClinicDetailView: React.FC = () => {
     try {
       const res = await adminApi.impersonateTenant(id);
       const d = res.data?.data ?? res.data;
-      const url = d?.url ?? `https://${tenant?.subdomain}.saasclinic.com?token=${d?.token}`;
+      const url = d?.url ?? `https://saasclinic.com/?tenant=${tenant?.subdomain}&token=${d?.token}`;
       window.open(url, '_blank', 'noopener,noreferrer');
       showToast('Impersonation session started', 'info');
     } catch {
