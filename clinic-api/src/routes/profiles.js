@@ -401,7 +401,13 @@ router.get('/pt/special-tests/:profileId', authMiddleware, async (req, res) => {
   try {
     if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
     const result = await req.db.query(
-      'SELECT * FROM AssessmentResults WHERE client_id = (SELECT client_id FROM ClientProfiles WHERE id = $1)',
+      `SELECT ar.*, 
+              at.name as test_name, 
+              arg.name as region_name
+       FROM AssessmentResults ar
+       JOIN AssessmentTests at ON ar.test_id = at.id
+       LEFT JOIN AssessmentRegions arg ON at.region_id = arg.id
+       WHERE ar.client_id = (SELECT client_id FROM ClientProfiles WHERE id = $1)`,
       [parseInt(req.params.profileId)]
     );
     return res.json(result.rows);

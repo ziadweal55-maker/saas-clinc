@@ -152,8 +152,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 
 // Get all session types
 router.get('/types', authMiddleware, async (req, res) => {
+  const branchId = req.user.branchId || 1;
   try {
-    const result = await req.db.query('SELECT * FROM SessionTypes ORDER BY name ASC');
+    const result = await req.db.query('SELECT * FROM SessionTypes WHERE branch_id = $1 ORDER BY name ASC', [branchId]);
     return res.json(result.rows);
   } catch (error) {
     console.error('[SESSIONS ROUTE] Error fetching session types:', error);
