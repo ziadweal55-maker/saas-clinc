@@ -226,13 +226,21 @@ export function RegisterTenantView({ onComplete, onBackToLogin }: RegisterTenant
           </button>
         </form>
 
-        <div className="text-center">
+        <div className="text-center pt-4 border-t border-slate-800/50 space-y-3">
           <button
             onClick={onBackToLogin}
-            className="text-xs text-slate-400 hover:text-indigo-400 transition cursor-pointer"
+            className="text-xs text-slate-400 hover:text-indigo-400 transition cursor-pointer block mx-auto"
           >
             Back to Login Screen
           </button>
+          
+          <div className="flex items-center justify-center space-x-2 text-[11px] text-slate-500 bg-slate-950/40 py-2 px-3 rounded-xl border border-slate-800/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Support & Contact:</span>
+            <a href="https://wa.me/201507881974" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline font-bold">
+              01507881974
+            </a>
+          </div>
         </div>
       </div>
     </div>

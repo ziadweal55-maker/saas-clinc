@@ -65,7 +65,7 @@ export default function App() {
     // Always base domain on localhost
     if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
     // Treat hosting platform domains as base unless ?tenant= is present
-    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com', 'clinicmanger-pt.com'];
     const isHostingBase = HOSTING_DOMAINS.some(d => hostname.endsWith(d));
     if (isHostingBase) {
       const params = new URLSearchParams(window.location.search);

@@ -59,7 +59,7 @@ export const TenantProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const getTenantId = useCallback(() => {
     // Known hosting domains that are NOT tenant subdomains
-    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com'];
+    const HOSTING_DOMAINS = ['vercel.app', 'railway.app', 'netlify.app', 'onrender.com', 'clinicmanger-pt.com'];
 
     // 1. Check ?tenant= query parameter (e.g. saas-clinc.vercel.app?tenant=revive)
     if (typeof window !== 'undefined' && window.location) {

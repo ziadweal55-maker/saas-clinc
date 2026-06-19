@@ -138,3 +138,37 @@ exports.sendSuspendedEmail = async (clinicEmail, clinicName) => {
     console.log(`[EMAIL] Suspension notice sent to ${clinicEmail}`);
   } catch (e) { console.error('[EMAIL] Failed to send suspension email:', e.message); }
 };
+
+exports.sendNewClinicRegistrationAdminNotification = async (tenantId, clinicName, email, whatsappNumber) => {
+  const adminEmail = 'ziadweal55@gmail.com';
+  if (!resend) {
+    console.warn(`[EMAIL] Resend is not configured. Skipping admin notification email to ${adminEmail}`);
+    return;
+  }
+  const content = `
+    <h2 style="color:#6366f1;margin:0 0 16px;">🏥 New Clinic Registration Request</h2>
+    <p style="color:#94a3b8;line-height:1.6;">A new clinic has registered and is pending approval in the admin dashboard.</p>
+    <div style="background:#12151f;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #1e2333;">
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Clinic Name</p>
+      <p style="margin:0 0 16px;color:#f1f5f9;font-size:16px;font-weight:700;">${clinicName}</p>
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Subdomain (Tenant ID)</p>
+      <p style="margin:0 0 16px;color:#6366f1;font-size:16px;font-weight:700;">${tenantId}</p>
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Contact Email</p>
+      <p style="margin:0 0 16px;color:#f1f5f9;font-size:16px;font-weight:700;">${email}</p>
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">WhatsApp Number</p>
+      <p style="margin:0;color:#f1f5f9;font-size:16px;font-weight:700;">${whatsappNumber || '—'}</p>
+    </div>
+    <p style="color:#94a3b8;line-height:1.6;">Please log in to your admin dashboard to accept or decline this application.</p>
+  `;
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: adminEmail,
+      subject: `🏥 New Clinic Registration: ${clinicName} (${tenantId})`,
+      html: baseTemplate(content)
+    });
+    console.log(`[EMAIL] New registration admin notification email sent to ${adminEmail}`);
+  } catch (e) {
+    console.error('[EMAIL] Failed to send registration admin notification email:', e.message);
+  }
+};

@@ -1,6 +1,7 @@
 const { pool } = require('../config/db');
 const { createTenantSchema } = require('../scripts/migrate');
 const bcrypt = require('bcryptjs');
+const emailService = require('../utils/emailService');
 
 const hashPassword = (password) => {
   const salt = bcrypt.genSaltSync(10);
@@ -61,6 +62,11 @@ exports.registerTenant = async (req, res) => {
 
     // Note: schema provisioning and admin user creation happen on admin approval, not here.
     console.log(`[TENANT REGISTRATION] Clinic '${cleanTenantId}' registered — pending admin approval.`);
+
+    // Send notification email to admin
+    emailService.sendNewClinicRegistrationAdminNotification(cleanTenantId, clinicName, email, whatsappNumber).catch(err => {
+      console.error('[EMAIL ERROR] Admin registration notification failed:', err);
+    });
 
     return res.json({
       success: true,
