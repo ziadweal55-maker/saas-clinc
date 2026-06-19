@@ -496,7 +496,7 @@ router.get('/daily-summary', authMiddleware, async (req, res) => {
       `SELECT l.*, u.username, u.role 
        FROM Loans l 
        JOIN Users u ON l.user_id = u.id 
-       WHERE l.loan_date = $1 AND l.branch_id = $2
+       WHERE l.loan_date::date = $1 AND l.branch_id = $2
        ORDER BY l.loan_date DESC`,
       [date, branchId]
     );
@@ -662,10 +662,16 @@ router.post('/waste-item', authMiddleware, async (req, res) => {
   const { waste_date, item_name, quantity, unit_cost, total_cost } = req.body;
   const branchId = req.user.branchId || 1;
   try {
+    const qtyParsed = parseFloat(quantity) || 0;
+    const unitCostParsed = parseFloat(unit_cost) || 0;
+    const totalCostParsed = (total_cost !== undefined && total_cost !== null)
+      ? parseFloat(total_cost)
+      : (qtyParsed * unitCostParsed);
+
     await req.db.query(
       `INSERT INTO WasteItems (waste_date, item_name, quantity, unit_cost, total_cost, branch_id)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [waste_date, item_name, parseFloat(quantity), parseFloat(unit_cost), parseFloat(total_cost), branchId]
+      [waste_date, item_name, qtyParsed, unitCostParsed, totalCostParsed, branchId]
     );
     return res.json({ success: true });
   } catch (error) {
