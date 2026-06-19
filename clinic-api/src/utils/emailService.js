@@ -54,6 +54,12 @@ exports.sendApprovalEmail = async (clinicEmail, clinicName, subdomain, loginUrl,
       <p style="margin:0;color:#6366f1;font-size:18px;font-weight:700;font-family:monospace;">${tempPassword}</p>
       ` : ''}
     </div>
+    <div style="background:#12151f;border-radius:12px;padding:20px;margin:24px 0;border:1px solid #1e2333;">
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Help & Instruction Manual</p>
+      <p style="margin:0 0 16px;line-height:1.5;"><a href="https://drive.google.com/file/d/1FHsldlwVFfGr7L8-bKQQXArccJiTdPXU/view?usp=sharing" target="_blank" style="color:#10b981;font-weight:700;text-decoration:underline;">Download Registrar Manual Guide →</a></p>
+      <p style="margin:0 0 8px;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Support Calls</p>
+      <p style="margin:0;color:#f1f5f9;font-size:16px;font-weight:700;">📞 01507881974</p>
+    </div>
     <a href="${loginUrl || '#'}" style="display:inline-block;background:#6366f1;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;margin-top:8px;">Log In to Your Clinic →</a>
     <p style="margin-top:24px;color:#64748b;font-size:13px;">If you have any questions, reply to this email and our team will help you get started.</p>`;
   try {
