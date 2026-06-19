@@ -3,7 +3,7 @@ const router = express.Router();
 const { authMiddleware, authorize } = require('../middlewares/auth');
 
 // Get active branches for general selectors — public so registration can list branches
-router.get('/', authMiddleware, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const result = await req.db.query('SELECT * FROM Branches WHERE is_active = 1 ORDER BY name ASC');
     return res.json(result.rows);
