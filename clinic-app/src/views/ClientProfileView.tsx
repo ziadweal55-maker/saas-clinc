@@ -1215,7 +1215,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                   </td>
                                   <td className="px-8 py-5 text-right font-bold text-primary tabular-nums text-lg">
                                     <div className="flex items-center justify-end gap-3.5">
-                                      <span>${p.amount.toLocaleString()}</span>
+                                      <span>${(p.amount ?? 0).toLocaleString()}</span>
                                       {isAdmin && (
                                         <button 
                                           onClick={() => {
@@ -1242,7 +1242,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             <div key={i} className="p-4 space-y-3 hover:bg-primary/5 transition-colors">
                               <div className="flex justify-between items-center">
                                 <div className="font-bold text-sm text-foreground">{p.payment_type}</div>
-                                <div className="font-black text-primary tabular-nums text-base">${p.amount.toLocaleString()}</div>
+                                <div className="font-black text-primary tabular-nums text-base">${(p.amount ?? 0).toLocaleString()}</div>
                               </div>
                               {p.notes && <div className="text-xs text-muted-foreground font-medium italic mt-0.5">{p.notes}</div>}
                               <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider">

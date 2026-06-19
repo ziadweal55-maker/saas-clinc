@@ -298,7 +298,7 @@ export function ReportsView() {
             <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg shrink-0"><DollarSign size={20} /></div>
             <div>
               <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block font-mono">Revenue Realized</span>
-              <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">${stats.totalIncome.toLocaleString()}</span>
+              <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">${(stats.totalIncome ?? 0).toLocaleString()}</span>
             </div>
           </div>
 
@@ -308,7 +308,7 @@ export function ReportsView() {
             </div>
             <div>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">Net Revenue</span>
-              <span className={`text-xl sm:text-2xl font-bold tabular-nums ${netRevenue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>${netRevenue.toLocaleString()}</span>
+              <span className={`text-xl sm:text-2xl font-bold tabular-nums ${netRevenue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>${(netRevenue ?? 0).toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -407,7 +407,7 @@ export function ReportsView() {
                         {c.package_sessions_total ? `Prepaid Package (${c.package_sessions_total} Sessions Block)` : 'Per-session Clinical Treatment'}
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600 text-sm tabular-nums">
-                        ${c.amount.toLocaleString()}
+                        ${(c.amount ?? 0).toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -461,7 +461,7 @@ export function ReportsView() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-rose-500 tabular-nums">
-                        ${l.amount.toLocaleString()}
+                        ${(l.amount ?? 0).toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -513,9 +513,9 @@ export function ReportsView() {
                       </td>
                       <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">{w.item_name}</td>
                       <td className="px-4 py-3 border-r border-border/80 text-center font-mono">{w.quantity}</td>
-                      <td className="px-4 py-3 border-r border-border/80 text-right font-mono">${w.unit_cost.toLocaleString()}</td>
+                      <td className="px-4 py-3 border-r border-border/80 text-right font-mono">${(w.unit_cost ?? 0).toLocaleString()}</td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-amber-500 tabular-nums">
-                        ${w.total_cost.toLocaleString()}
+                        ${(w.total_cost ?? 0).toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -646,7 +646,7 @@ export function ReportsView() {
                         {c.sessions} {c.sessions === 1 ? 'Session' : 'Sessions'}
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-bold text-primary">
-                        ${c.income.toLocaleString()}
+                        ${(c.income ?? 0).toLocaleString()}
                       </td>
                     </tr>
                   ))}

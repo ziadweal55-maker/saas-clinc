@@ -481,7 +481,7 @@ export function DashboardView({ onNavigate, currentUser }: DashboardViewProps) {
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl md:text-2xl font-black text-orange-600 italic tracking-tighter">$</span>
-                <p className="text-3xl md:text-4xl font-black text-foreground tabular-nums tracking-tighter">{stats.totalIncome.toLocaleString()}</p>
+                <p className="text-3xl md:text-4xl font-black text-foreground tabular-nums tracking-tighter">{(stats.totalIncome ?? 0).toLocaleString()}</p>
               </div>
             </div>
           )}

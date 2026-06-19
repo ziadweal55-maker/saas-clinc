@@ -470,7 +470,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                 <TrendingUp size={80} />
               </div>
               <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Total Revenue</p>
-              <p className="text-4xl font-black mt-2 text-foreground font-heading italic">${revenue.toLocaleString()}</p>
+              <p className="text-4xl font-black mt-2 text-foreground font-heading italic">${(revenue ?? 0).toLocaleString()}</p>
               <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-500 bg-emerald-500/10 w-fit px-2 py-1 rounded-lg">MONTHLY GROSS</div>
             </div>
 
@@ -479,7 +479,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                 <Users size={80} />
               </div>
               <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Total Salaries</p>
-              <p className="text-4xl font-black mt-2 text-foreground font-heading italic">${totalSalaries.toLocaleString()}</p>
+              <p className="text-4xl font-black mt-2 text-foreground font-heading italic">${(totalSalaries ?? 0).toLocaleString()}</p>
               <div className="mt-4 flex items-center gap-2 text-xs font-bold text-amber-500 bg-amber-500/10 w-fit px-2 py-1 rounded-lg">STAFF & DOCTORS</div>
             </div>
 
@@ -489,7 +489,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
               </div>
               <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Net Profit</p>
               <p className={`text-4xl font-black mt-2 font-heading italic ${netProfit >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                ${netProfit.toLocaleString()}
+                ${(netProfit ?? 0).toLocaleString()}
               </p>
               <div className={`mt-4 flex items-center gap-2 text-xs font-bold w-fit px-2 py-1 rounded-lg ${netProfit >= 0 ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
                 {netProfit >= 0 ? 'NET GAIN' : 'NET LOSS'}
@@ -569,7 +569,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                         </td>
                         <td className="px-6 py-4">
                           {record ? (
-                            <span className="font-black text-primary italic">${record.total_salary.toLocaleString()}</span>
+                            <span className="font-black text-primary italic">${(record.total_salary ?? 0).toLocaleString()}</span>
                           ) : (
                             <span className="text-muted-foreground italic text-xs">Not calculated</span>
                           )}
@@ -623,7 +623,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-bold text-muted-foreground">Fixed Base Salary</span>
-                      <span className="font-black">${selectedUser.base_salary.toLocaleString()}</span>
+                      <span className="font-black">${(selectedUser.base_salary ?? 0).toLocaleString()}</span>
                     </div>
 
                     {selectedUser.role === 'doctor' && (
@@ -678,7 +678,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-black italic">Final Total</span>
                         <span className="text-3xl font-black text-primary italic font-heading">
-                          ${(selectedUser.base_salary + calcData.dynamic_salary).toLocaleString()}
+                          ${((selectedUser.base_salary ?? 0) + (calcData.dynamic_salary ?? 0)).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -735,7 +735,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
             <div className="flex items-center gap-3">
               <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl px-4 py-2 text-center">
                 <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Active Loans</p>
-                <p className="text-xl font-black text-rose-500">${totalActiveLoans.toLocaleString()}</p>
+                <p className="text-xl font-black text-rose-500">${(totalActiveLoans ?? 0).toLocaleString()}</p>
               </div>
               <button
                 onClick={handleResetLoans}
@@ -774,7 +774,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                       {userTotal > 0 && (
                         <div className="text-right">
                           <p className="text-[10px] font-bold text-muted-foreground uppercase">Total Loaned</p>
-                          <p className="font-black text-rose-500 text-lg">${userTotal.toLocaleString()}</p>
+                          <p className="font-black text-rose-500 text-lg">${(userTotal ?? 0).toLocaleString()}</p>
                         </div>
                       )}
                       <button
@@ -843,7 +843,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                             )}
                             <div>
                               <p className={`font-black ${loan.is_settled === 1 ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                                ${loan.amount.toLocaleString()}
+                                ${(loan.amount ?? 0).toLocaleString()}
                               </p>
                               {loan.note && <p className="text-xs text-muted-foreground italic">{loan.note}</p>}
                             </div>
@@ -958,7 +958,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                     {new Date(wasteDate + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                   </h2>
                   {wasteTotal > 0 && (
-                    <p className="text-sm text-rose-500 font-bold mt-0.5">Daily Total: ${wasteTotal.toLocaleString()}</p>
+                    <p className="text-sm text-rose-500 font-bold mt-0.5">Daily Total: ${(wasteTotal ?? 0).toLocaleString()}</p>
                   )}
                 </div>
                 <button
@@ -1008,7 +1008,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                     </div>
                     <div className="flex flex-col gap-1">
                       {previewWasteCost > 0 && (
-                        <p className="text-xs text-primary font-bold text-right">= ${previewWasteCost.toLocaleString()}</p>
+                        <p className="text-xs text-primary font-bold text-right">= ${(previewWasteCost ?? 0).toLocaleString()}</p>
                       )}
                       <div className="flex gap-2">
                         <button
@@ -1049,8 +1049,8 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                           <tr key={item.id} className="hover:bg-muted/10 transition-colors group">
                             <td className="px-5 py-3.5 font-bold text-foreground">{item.item_name}</td>
                             <td className="px-5 py-3.5 text-center text-muted-foreground font-mono">{item.quantity}</td>
-                            <td className="px-5 py-3.5 text-right text-muted-foreground font-mono">${item.unit_cost.toLocaleString()}</td>
-                            <td className="px-5 py-3.5 text-right font-black text-foreground">${item.total_cost.toLocaleString()}</td>
+                            <td className="px-5 py-3.5 text-right text-muted-foreground font-mono">${(item.unit_cost ?? 0).toLocaleString()}</td>
+                            <td className="px-5 py-3.5 text-right font-black text-foreground">${(item.total_cost ?? 0).toLocaleString()}</td>
                             <td className="px-5 py-3.5">
                               <button
                                 onClick={() => handleDeleteWaste(item.id)}
@@ -1066,7 +1066,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                   </div>
                   <div className="px-5 py-4 border-t border-border bg-muted/20 flex justify-between items-center">
                     <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Day Total</span>
-                    <span className="text-2xl font-black text-rose-500">${wasteTotal.toLocaleString()}</span>
+                    <span className="text-2xl font-black text-rose-500">${(wasteTotal ?? 0).toLocaleString()}</span>
                   </div>
                 </>
               ) : (
@@ -1107,7 +1107,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                     <TrendingUp size={70} />
                   </div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gross Revenue</p>
-                  <p className="text-3xl font-black mt-1 text-emerald-500 font-heading italic">${dailySummary.revenue.toLocaleString()}</p>
+                  <p className="text-3xl font-black mt-1 text-emerald-500 font-heading italic">${(dailySummary.revenue ?? 0).toLocaleString()}</p>
                   <div className="mt-3 text-[10px] font-bold text-emerald-500 bg-emerald-500/10 w-fit px-2 py-1 rounded-lg">FROM PAYMENTS</div>
                 </div>
 
@@ -1117,7 +1117,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                     <CreditCard size={70} />
                   </div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Loans</p>
-                  <p className="text-3xl font-black mt-1 text-rose-500 font-heading italic">-${dailySummary.totalLoans.toLocaleString()}</p>
+                  <p className="text-3xl font-black mt-1 text-rose-500 font-heading italic">-${(dailySummary.totalLoans ?? 0).toLocaleString()}</p>
                   <div className="mt-3 text-[10px] font-bold text-rose-500 bg-rose-500/10 w-fit px-2 py-1 rounded-lg">
                     {dailySummary.loans.length} RECORD{dailySummary.loans.length !== 1 ? 'S' : ''}
                   </div>
@@ -1129,7 +1129,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                     <Package size={70} />
                   </div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Wastes</p>
-                  <p className="text-3xl font-black mt-1 text-amber-500 font-heading italic">-${dailySummary.totalWastes.toLocaleString()}</p>
+                  <p className="text-3xl font-black mt-1 text-amber-500 font-heading italic">-${(dailySummary.totalWastes ?? 0).toLocaleString()}</p>
                   <div className="mt-3 text-[10px] font-bold text-amber-500 bg-amber-500/10 w-fit px-2 py-1 rounded-lg">
                     {dailySummary.wastes.length} ITEM{dailySummary.wastes.length !== 1 ? 'S' : ''}
                   </div>
@@ -1142,7 +1142,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                   </div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Net Revenue</p>
                   <p className={`text-3xl font-black mt-1 font-heading italic ${dailySummary.netRevenue >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    ${dailySummary.netRevenue.toLocaleString()}
+                    ${(dailySummary.netRevenue ?? 0).toLocaleString()}
                   </p>
                   <div className={`mt-3 text-[10px] font-bold w-fit px-2 py-1 rounded-lg ${dailySummary.netRevenue >= 0 ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
                     {dailySummary.netRevenue >= 0 ? 'NET GAIN' : 'NET LOSS'}
@@ -1162,26 +1162,26 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                       <TrendingUp size={16} />
                       <span className="font-bold">Gross Revenue</span>
                     </div>
-                    <span className="font-black text-emerald-600 text-lg">+${dailySummary.revenue.toLocaleString()}</span>
+                    <span className="font-black text-emerald-600 text-lg">+${(dailySummary.revenue ?? 0).toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between py-2.5 border-b border-border">
                     <div className="flex items-center gap-2 text-rose-500">
                       <Minus size={16} />
                       <span className="font-bold">Loans Issued</span>
                     </div>
-                    <span className="font-black text-rose-500 text-lg">-${dailySummary.totalLoans.toLocaleString()}</span>
+                    <span className="font-black text-rose-500 text-lg">-${(dailySummary.totalLoans ?? 0).toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between py-2.5 border-b border-border">
                     <div className="flex items-center gap-2 text-amber-500">
                       <Minus size={16} />
                       <span className="font-bold">Clinic Wastes</span>
                     </div>
-                    <span className="font-black text-amber-500 text-lg">-${dailySummary.totalWastes.toLocaleString()}</span>
+                    <span className="font-black text-amber-500 text-lg">-${(dailySummary.totalWastes ?? 0).toLocaleString()}</span>
                   </div>
                   <div className="flex items-center justify-between py-3 bg-muted/30 rounded-2xl px-4">
                     <span className="font-black text-lg">Net Clear Revenue</span>
                     <span className={`font-black text-2xl font-heading italic ${dailySummary.netRevenue >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                      ${dailySummary.netRevenue.toLocaleString()}
+                      ${(dailySummary.netRevenue ?? 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -1226,7 +1226,7 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                           </div>
                         </div>
                         <span className={`font-black ${loan.is_settled ? 'text-muted-foreground line-through' : 'text-rose-500'}`}>
-                          ${loan.amount.toLocaleString()}
+                          ${(loan.amount ?? 0).toLocaleString()}
                         </span>
                       </div>
                     ))}
@@ -1251,13 +1251,13 @@ export function FinanceManagementView({ currentUser }: FinanceManagementViewProp
                           <p className="font-bold text-foreground">{item.item_name}</p>
                           <p className="text-xs text-muted-foreground">{item.quantity} × ${item.unit_cost}</p>
                         </div>
-                        <span className="font-black text-amber-500">${item.total_cost.toLocaleString()}</span>
+                        <span className="font-black text-amber-500">${(item.total_cost ?? 0).toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
                   <div className="px-6 py-3.5 border-t border-border bg-muted/20 flex justify-between">
                     <span className="font-bold text-muted-foreground">Total</span>
-                    <span className="font-black text-amber-500">${dailySummary.totalWastes.toLocaleString()}</span>
+                    <span className="font-black text-amber-500">${(dailySummary.totalWastes ?? 0).toLocaleString()}</span>
                   </div>
                 </div>
               )}
