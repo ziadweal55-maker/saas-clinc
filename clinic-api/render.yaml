@@ -1,0 +1,43 @@
+# Render Blueprint Specification for clinic-api
+services:
+  - type: web
+    name: clinic-api
+    env: node
+    plan: free # Free tier plan selected
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000 # Render defaults port to 10000
+      - key: DATABASE_URL
+        sync: false # Set this in Render Dashboard or link to database below
+      - key: DB_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true # Render will automatically generate a secure random secret
+      - key: ADMIN_JWT_SECRET
+        generateValue: true # Render will automatically generate a secure random secret
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: CLINIC_BASE_DOMAIN
+        sync: false
+      - key: PAYMOB_HMAC_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: RESEND_FROM_NAME
+        value: "SaaS Clinic"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: TZ
+        value: "Africa/Cairo"
