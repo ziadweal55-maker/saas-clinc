@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { request, getTenantId } from '../lib/api';
 import { KeyRound, Loader2, AlertCircle } from 'lucide-react';
 
 interface PinEntryProps {
@@ -34,23 +34,22 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
 
     try {
       console.log('Attempting login with:', { token, pin });
-      const { data, error: fetchError } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('sync_token', token)
-        .eq('pin', pin)
-        .single();
-
-
-      if (fetchError || !data) {
-        setError(`Login failed: ${fetchError ? fetchError.message + ' (Code: ' + fetchError.code + ')' : 'No matching record found'}`);
-      } else {
-        localStorage.setItem('patientId', data.id);
-        localStorage.setItem('syncToken', token);
-        onSuccess(data.id, token);
+      const tenantId = getTenantId();
+      if (!tenantId) {
+        setError('Missing workspace configuration (tenant) in URL.');
+        return;
       }
-    } catch {
-      setError('An error occurred during verification.');
+
+      const res = await request('POST', '/patient-portal/login', { token, pin });
+      if (res.success && res.patient) {
+        localStorage.setItem('patientId', res.patient.id.toString());
+        localStorage.setItem('syncToken', token);
+        onSuccess(res.patient.id.toString(), token);
+      } else {
+        setError('Login failed: Invalid credentials or record not found.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during verification.');
     } finally {
       setLoading(false);
     }

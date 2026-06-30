@@ -111,6 +111,7 @@ app.use('/api/v1/attendance', require('./routes/attendance'));
 app.use('/api/v1/exercises', require('./routes/exercises'));
 app.use('/api/v1/profiles', require('./routes/profiles'));
 app.use('/api/v1/finance', require('./routes/finance'));
+app.use('/api/v1/patient-portal', require('./routes/patientPortal'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { request } from '../lib/api';
 import { Thermometer, CheckCircle, Loader2, AlertCircle, X, MessageSquare } from 'lucide-react';
 
 interface DailyCheckInProps {
@@ -9,14 +9,14 @@ interface DailyCheckInProps {
 }
 
 export function DailyCheckIn({ patientId, onClose, onSuccess }: DailyCheckInProps) {
-  const [painLevel, setPainLevel] = useState<number | null>(null);
+  const [painLevel, setPainLevel] = useState<number>(5);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
-    if (painLevel === null) return;
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     // Validate UUID
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId);
     if (!isUuid) {
@@ -28,29 +28,10 @@ export function DailyCheckIn({ patientId, onClose, onSuccess }: DailyCheckInProp
     setError(null);
 
     try {
-      // 1. Log to the activity feed (Legacy table)
-      const logPromise = supabase
-        .from('patientlogs')
-        .insert({
-          patient_id: patientId,
-          pain_level: painLevel,
-          status: 'Completed'
-        });
-
-      // 2. Log to the Detailed Pain Analysis table (New table)
-      const testPromise = supabase
-        .from('paintests')
-        .insert({
-          patient_id: patientId,
-          test_type: 'Daily Recovery Check-in',
-          pain_score: painLevel,
-          notes: notes.trim() || 'No specific observations provided.'
-        });
-
-      const [logRes, testRes] = await Promise.all([logPromise, testPromise]);
-
-      if (logRes.error) throw logRes.error;
-      if (testRes.error) throw testRes.error;
+      await request('POST', '/patient-portal/checkin', {
+        painLevel,
+        notes: notes.trim() || 'No specific observations provided.'
+      });
 
       onSuccess();
     } catch (err: unknown) {

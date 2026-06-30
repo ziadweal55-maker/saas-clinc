@@ -586,6 +586,7 @@ if (!isElectron) {
     getTodayAppointments: () => request('GET', '/finance/today-appointments'),
     getHighPainAlerts: () => request('GET', '/finance/high-pain-alerts'),
     getPainTestResults: () => request('GET', '/finance/pain-test-results'),
+    getPatientFeedbacks: (syncToken: string) => request('GET', `/clients/feedbacks/by-token/${syncToken}`),
     getActiveSessions: () => request('GET', '/finance/active-sessions'),
     getDoctorsList: () => request('GET', '/doctors'),
     getReportStats: (data: any) => request('GET', `/finance/report-stats?startDate=${data.startDate}&endDate=${data.endDate}${data.doctorId ? `&doctorId=${data.doctorId}` : ''}`),

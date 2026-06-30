@@ -183,4 +183,64 @@ router.delete('/:id', authMiddleware, authorize('admin'), async (req, res) => {
   }
 });
 
+// Get patient feedbacks by sync token
+router.get('/feedbacks/by-token/:syncToken', authMiddleware, async (req, res) => {
+  const { syncToken } = req.params;
+
+  try {
+    const clientCheck = await req.db.query('SELECT id FROM Clients WHERE sync_token = $1', [syncToken.trim()]);
+    if (clientCheck.rowCount === 0) {
+      return res.json({ success: true, paintests: [], patientlogs: [] });
+    }
+    const patientId = clientCheck.rows[0].id;
+
+    // 1. Fetch pain tests
+    const tests = await req.db.query(
+      'SELECT id, test_type as type, pain_score as score, notes, created_at as date FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
+      [patientId]
+    );
+
+    // 2. Fetch legacy patient check-in logs
+    const logs = await req.db.query(
+      'SELECT id, \'Daily Check-in\' as type, pain_level as score, \'Check-in completed\' as notes, created_at as date FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
+      [patientId]
+    );
+
+    return res.json({
+      success: true,
+      paintests: tests.rows,
+      patientlogs: logs.rows
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// Get patient feedbacks (pain tests and check-in logs)
+router.get('/:id/feedbacks', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1. Fetch pain tests
+    const tests = await req.db.query(
+      'SELECT id, test_type as type, pain_score as score, notes, created_at as date FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
+      [parseInt(id)]
+    );
+
+    // 2. Fetch legacy patient check-in logs
+    const logs = await req.db.query(
+      'SELECT id, \'Daily Check-in\' as type, pain_level as score, \'Check-in completed\' as notes, created_at as date FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
+      [parseInt(id)]
+    );
+
+    return res.json({
+      success: true,
+      paintests: tests.rows,
+      patientlogs: logs.rows
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

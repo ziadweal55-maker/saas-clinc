@@ -1,0 +1,15 @@
+{
+  "plan": ".asw/plans/activate-patient-portal.md",
+  "activeTask": "Done",
+  "completed": [
+    "Task 1: Add Feedback Tables & Run Auto-Migrations",
+    "Task 2: Implement Patient Portal REST Endpoints",
+    "Task 3: Implement Feedbacks Retrieval Endpoint for Clinicians",
+    "Task 4: Connect Main App Client Profile Feedbacks",
+    "Task 5: Refactor Patient Portal Web Project",
+    "Final Verification Wave"
+  ],
+  "artifacts": [],
+  "cleanup": [],
+  "blockers": []
+}

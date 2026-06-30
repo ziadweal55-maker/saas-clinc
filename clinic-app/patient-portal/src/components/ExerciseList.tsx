@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Dumbbell, CheckCircle2, Circle, PlayCircle, Loader2, AlertCircle, Activity } from 'lucide-react';
+import { request } from '../lib/api';
+import { Loader2, AlertCircle, Dumbbell, Activity, PlayCircle, Circle, CheckCircle2 } from 'lucide-react';
 
 interface Exercise {
   exercise_name: string;
-  type: string;
   sets: string;
   reps: string;
   frequency: string;
-  notes: string;
   instructions: string;
-  video_url: string;
+  notes?: string;
+  video_url?: string;
+  doctors?: {
+    name: string;
+  } | null;
 }
 
 interface ExerciseListProps {
@@ -20,15 +22,15 @@ interface ExerciseListProps {
 
 export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) {
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [completed, setCompleted] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completed, setCompleted] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     let isMounted = true;
     const timeout = setTimeout(() => {
       if (loading && isMounted) {
-        setError('Connection timed out. Please check your internet or Supabase configuration.');
+        setError('Connection timed out. Please check your internet or server configuration.');
         setLoading(false);
       }
     }, 10000); // 10 second timeout
@@ -43,15 +45,10 @@ export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) 
       }
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('exercises')
-          .select('*, doctors(name)')
-          .eq('patient_id', patientId)
+        const data = await request('GET', '/patient-portal/exercises');
 
         if (!isMounted) return;
 
-        if (fetchError) throw fetchError;
-        
         if (!data || data.length === 0) {
           setError('No exercise plan found for this patient. Please contact your clinician.');
         } else {

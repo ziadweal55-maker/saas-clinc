@@ -164,6 +164,17 @@ async function createGlobalSchema() {
 
     await client.query('COMMIT');
     console.log('[MIGRATION] Global schema initialized successfully');
+
+    // Auto-run migrations for all existing tenants on startup (idempotent)
+    const { rows: tenants } = await client.query("SELECT id FROM public.tenants");
+    console.log(`[MIGRATION] Found ${tenants.length} tenants. Running migrations...`);
+    for (const tenant of tenants) {
+      try {
+        await createTenantSchema(tenant.id);
+      } catch (err) {
+        console.error(`[MIGRATION ERROR] Failed to migrate tenant ${tenant.id}:`, err);
+      }
+    }
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[MIGRATION] Error creating global schema:', err);
@@ -660,6 +671,27 @@ async function createTenantSchema(tenantId) {
       );
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS PatientPainTests (
+        id SERIAL PRIMARY KEY,
+        patient_id INTEGER NOT NULL REFERENCES Clients(id) ON DELETE CASCADE,
+        test_type TEXT,
+        pain_score INTEGER,
+        notes TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS PatientLogs (
+        id SERIAL PRIMARY KEY,
+        patient_id INTEGER NOT NULL REFERENCES Clients(id) ON DELETE CASCADE,
+        pain_level INTEGER,
+        status TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+    `);
+
     // Seed defaults for AssessmentRegions & AssessmentTests inside this schema
     await client.query(`
       INSERT INTO AssessmentRegions (id, name, sort_order) VALUES
@@ -740,6 +772,8 @@ async function createTenantSchema(tenantId) {
       CREATE INDEX IF NOT EXISTS idx_salary_records_month ON SalaryRecords(month);
       CREATE INDEX IF NOT EXISTS idx_attendance_logs_date ON AttendanceLogs(log_date);
       CREATE INDEX IF NOT EXISTS idx_attendance_logs_branch ON AttendanceLogs(branch_id);
+      CREATE INDEX IF NOT EXISTS idx_patient_pain_tests_patient ON PatientPainTests(patient_id);
+      CREATE INDEX IF NOT EXISTS idx_patient_logs_patient ON PatientLogs(patient_id);
     `);
 
     await client.query('COMMIT');
