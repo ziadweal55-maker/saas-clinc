@@ -697,8 +697,9 @@ if (!isElectron) {
           // If it failed with success: false (API error or 429)
           if (res && res.success === false) {
             console.error(`[API BRIDGE FAIL] window.api.${key} failed:`, res.error);
-            if (key === 'loginUser' || !key.startsWith('get')) {
-              return res; // Propagate the actual error instead of returning mock success
+            const propagateKeys = ['loginUser', 'getPatientFeedbacks', 'getPainTestResults'];
+            if (propagateKeys.includes(key) || !key.startsWith('get')) {
+              return res;
             }
             return defaultMock(key)(...args);
           }
@@ -709,7 +710,8 @@ if (!isElectron) {
           return res;
         } catch (err: any) {
           console.error(`[API BRIDGE CRITICAL] window.api.${key} crashed:`, err);
-          if (key === 'loginUser' || !key.startsWith('get')) {
+          const propagateKeys = ['loginUser', 'getPatientFeedbacks', 'getPainTestResults'];
+          if (propagateKeys.includes(key) || !key.startsWith('get')) {
             return { success: false, error: err.message || 'System connection error.' };
           }
           return defaultMock(key)(...args);

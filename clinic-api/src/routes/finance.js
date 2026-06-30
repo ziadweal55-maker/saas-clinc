@@ -83,11 +83,19 @@ router.get('/pain-test-results', authMiddleware, async (req, res) => {
   const branchId = req.user.branchId || 1;
   try {
     const result = await req.db.query(
-      `SELECT pain_scale, COUNT(*)::int as count 
-       FROM Assessments 
-       WHERE pain_scale IS NOT NULL AND branch_id = $1
-       GROUP BY pain_scale 
-       ORDER BY pain_scale ASC`,
+      `SELECT 
+         pt.id,
+         pt.patient_id,
+         pt.test_type,
+         pt.pain_score,
+         pt.notes,
+         pt.created_at,
+         json_build_object('first_name', c.first_name, 'last_name', c.last_name) as patients
+       FROM PatientPainTests pt
+       JOIN Clients c ON c.id = pt.patient_id
+       WHERE c.branch_id = $1
+       ORDER BY pt.created_at DESC
+       LIMIT 200`,
       [branchId]
     );
     return res.json({ success: true, data: result.rows });
