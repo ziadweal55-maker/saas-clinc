@@ -9,26 +9,39 @@ const getApiBaseUrl = () => {
     return 'http://127.0.0.1:3000/api/v1';
   }
   
-  // Dynamically resolve base API domain from hostname
-  // Example: portal.clinicmanger-pt.com -> api.clinicmanger-pt.com
+  // Dynamically resolve base API domain from hostname if on the main app domain
   const hostParts = window.location.hostname.split('.');
   if (hostParts.length >= 2) {
     const baseDomain = hostParts.slice(-2).join('.');
-    return `https://api.${baseDomain}/api/v1`;
+    if (baseDomain.includes('clinicmanger-pt') || baseDomain.includes('clinicmanager-pt')) {
+      return `https://api.${baseDomain}/api/v1`;
+    }
   }
   
-  return '/api/v1';
+  // Default production API endpoint fallback
+  return 'https://api.clinicmanger-pt.com/api/v1';
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 export const getTenantId = () => {
   if (typeof window !== 'undefined' && window.location) {
+    // 1. Check URL query parameters (highest priority for QR code scans)
     const params = new URLSearchParams(window.location.search);
     const queryTenant = params.get('tenant');
     if (queryTenant) {
       localStorage.setItem('tenantId', queryTenant);
       return queryTenant;
+    }
+
+    // 2. Extract from subdomain (e.g. tenant-id.portal.com)
+    const hostParts = window.location.hostname.split('.');
+    if (hostParts.length >= 3) {
+      const firstSub = hostParts[0];
+      if (firstSub !== 'www' && firstSub !== 'localhost' && firstSub !== 'api') {
+        localStorage.setItem('tenantId', firstSub);
+        return firstSub;
+      }
     }
   }
   return localStorage.getItem('tenantId');
