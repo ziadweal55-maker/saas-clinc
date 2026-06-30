@@ -697,7 +697,9 @@ if (!isElectron) {
           // If it failed with success: false (API error or 429)
           if (res && res.success === false) {
             console.error(`[API BRIDGE FAIL] window.api.${key} failed:`, res.error);
-            // Return safe fallback
+            if (key === 'loginUser' || !key.startsWith('get')) {
+              return res; // Propagate the actual error instead of returning mock success
+            }
             return defaultMock(key)(...args);
           }
           // Special case for getClients: extract .data if it's paginated
@@ -705,8 +707,11 @@ if (!isElectron) {
             return (res && res.data) || res || [];
           }
           return res;
-        } catch (err) {
+        } catch (err: any) {
           console.error(`[API BRIDGE CRITICAL] window.api.${key} crashed:`, err);
+          if (key === 'loginUser' || !key.startsWith('get')) {
+            return { success: false, error: err.message || 'System connection error.' };
+          }
           return defaultMock(key)(...args);
         }
       };

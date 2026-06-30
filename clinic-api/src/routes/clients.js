@@ -196,13 +196,13 @@ router.get('/feedbacks/by-token/:syncToken', authMiddleware, async (req, res) =>
 
     // 1. Fetch pain tests
     const tests = await req.db.query(
-      'SELECT id, test_type as type, pain_score as score, notes, created_at as date FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
+      'SELECT id, test_type, pain_score, notes, created_at FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
       [patientId]
     );
 
     // 2. Fetch legacy patient check-in logs
     const logs = await req.db.query(
-      'SELECT id, \'Daily Check-in\' as type, pain_level as score, \'Check-in completed\' as notes, created_at as date FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
+      'SELECT id, pain_level, status as notes, created_at FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
       [patientId]
     );
 
@@ -223,13 +223,13 @@ router.get('/:id/feedbacks', authMiddleware, async (req, res) => {
   try {
     // 1. Fetch pain tests
     const tests = await req.db.query(
-      'SELECT id, test_type as type, pain_score as score, notes, created_at as date FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
+      'SELECT id, test_type, pain_score, notes, created_at FROM PatientPainTests WHERE patient_id = $1 ORDER BY created_at DESC',
       [parseInt(id)]
     );
 
     // 2. Fetch legacy patient check-in logs
     const logs = await req.db.query(
-      'SELECT id, \'Daily Check-in\' as type, pain_level as score, \'Check-in completed\' as notes, created_at as date FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
+      'SELECT id, pain_level, status as notes, created_at FROM PatientLogs WHERE patient_id = $1 ORDER BY created_at DESC',
       [parseInt(id)]
     );
 

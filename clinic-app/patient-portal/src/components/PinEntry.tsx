@@ -4,9 +4,10 @@ import { KeyRound, Loader2, AlertCircle } from 'lucide-react';
 
 interface PinEntryProps {
   onSuccess: (patientId: string, token: string) => void;
+  branding?: any;
 }
 
-export function PinEntry({ onSuccess }: PinEntryProps) {
+export function PinEntry({ onSuccess, branding }: PinEntryProps) {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,9 +72,15 @@ export function PinEntry({ onSuccess }: PinEntryProps) {
       <div className="w-full max-w-md bg-card rounded-3xl border border-border shadow-xl p-8 space-y-8">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center p-4 bg-primary/10 text-primary rounded-2xl mb-2">
-            <KeyRound size={40} />
+            {branding?.logo_url ? (
+              <img src={branding.logo_url} alt={branding.name} className="h-10 w-auto object-contain" />
+            ) : (
+              <KeyRound size={40} />
+            )}
           </div>
-          <h1 className="text-2xl font-bold text-foreground font-heading italic">REVIVE</h1>
+          <h1 className="text-2xl font-bold text-foreground font-heading italic uppercase">
+            {branding?.name || 'REVIVE'}
+          </h1>
           <p className="text-muted-foreground font-medium">Enter your 4-digit PIN to access your recovery plan.</p>
         </div>
 
