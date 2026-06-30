@@ -428,10 +428,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
       if (res.success) {
         // Generate the URL for the patient portal
         const tenantId = tenantSettings?.id || 'revive';
-        const baseUrl = window.location.hostname.includes('clinicmanger-pt.com') || window.location.hostname.includes('clinicmanager-pt.com')
-          ? 'https://portal.clinicmanger-pt.com'
-          : 'https://saas-clinc-xktx.vercel.app';
-        const portalUrl = `${baseUrl}/?token=${currentToken}&tenant=${tenantId}`;
+        const portalUrl = `https://saas-clinc-xktx.vercel.app/?token=${currentToken}&tenant=${tenantId}`;
         setSyncUrl(portalUrl);
         setShowQr(true);
       } else {
@@ -1431,10 +1428,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                         <button 
                           onClick={() => {
                             const tenantId = tenantSettings?.id || 'revive';
-                            const baseUrl = window.location.hostname.includes('clinicmanger-pt.com') || window.location.hostname.includes('clinicmanager-pt.com')
-                              ? 'https://portal.clinicmanger-pt.com'
-                              : 'https://saas-clinc-xktx.vercel.app';
-                            const portalUrl = `${baseUrl}/?token=${localClient.sync_token || ''}&tenant=${tenantId}`;
+                            const portalUrl = `https://saas-clinc-xktx.vercel.app/?token=${localClient.sync_token || ''}&tenant=${tenantId}`;
                             setSyncUrl(portalUrl);
                             setShowQr(true);
                           }}
