@@ -13,8 +13,10 @@ import {
   ShieldCheck,
   Sparkles
 } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 export function AccountRequestsView() {
+  const { t, isAr } = useLanguage();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,7 +32,7 @@ export function AccountRequestsView() {
     } catch (err) {
       console.error('Error loading account requests:', err);
       if ((window as any).showToast) {
-        (window as any).showToast('Failed to load registration requests.', 'error');
+        (window as any).showToast(t('toast_failed_load_requests'), 'error');
       }
     } finally {
       setLoading(false);
@@ -43,8 +45,8 @@ export function AccountRequestsView() {
 
   const handleApprove = async (userId: number, username: string) => {
     const confirmed = window.api.confirm 
-      ? window.api.confirm(`Are you sure you want to approve the account for "${username}"?`)
-      : window.confirm(`Are you sure you want to approve the account for "${username}"?`);
+      ? window.api.confirm(t('confirm_approve_request').replace('{username}', username))
+      : window.confirm(t('confirm_approve_request').replace('{username}', username));
       
     if (!confirmed) return;
 
@@ -53,26 +55,26 @@ export function AccountRequestsView() {
         const res = await (window.api as any).approveAccountRequest(userId);
         if (res.success) {
           if ((window as any).showToast) {
-            (window as any).showToast(`Account "${username}" approved successfully!`, 'success');
+            (window as any).showToast(t('toast_request_approved').replace('{username}', username), 'success');
           }
           loadRequests();
         } else {
           if ((window as any).showToast) {
-            (window as any).showToast(`Error approving account: ${res.error}`, 'error');
+            (window as any).showToast(t('toast_request_approved_error').replace('{error}', res.error), 'error');
           }
         }
       }
     } catch (err: any) {
       if ((window as any).showToast) {
-        (window as any).showToast(`System Error: ${err.message}`, 'error');
+        (window as any).showToast(t('toast_sys_error', 'System Error: ') + err.message, 'error');
       }
     }
   };
 
   const handleDeny = async (userId: number, username: string) => {
     const confirmed = window.api.confirm 
-      ? window.api.confirm(`Are you sure you want to deny the account request for "${username}"?`)
-      : window.confirm(`Are you sure you want to deny the account request for "${username}"?`);
+      ? window.api.confirm(t('confirm_deny_request').replace('{username}', username))
+      : window.confirm(t('confirm_deny_request').replace('{username}', username));
       
     if (!confirmed) return;
 
@@ -81,18 +83,18 @@ export function AccountRequestsView() {
         const res = await (window.api as any).denyAccountRequest(userId);
         if (res.success) {
           if ((window as any).showToast) {
-            (window as any).showToast(`Account request for "${username}" denied.`, 'warning');
+            (window as any).showToast(t('toast_request_denied').replace('{username}', username), 'warning');
           }
           loadRequests();
         } else {
           if ((window as any).showToast) {
-            (window as any).showToast(`Error denying request: ${res.error}`, 'error');
+            (window as any).showToast(t('toast_request_denied_error').replace('{error}', res.error), 'error');
           }
         }
       }
     } catch (err: any) {
       if ((window as any).showToast) {
-        (window as any).showToast(`System Error: ${err.message}`, 'error');
+        (window as any).showToast(t('toast_sys_error', 'System Error: ') + err.message, 'error');
       }
     }
   };
@@ -146,23 +148,23 @@ export function AccountRequestsView() {
     <div className="p-8 max-w-7xl mx-auto space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6">
+      <div className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-6`}>
         <div className="space-y-1">
           <h2 className="text-2xl font-black tracking-tight text-foreground font-heading uppercase italic flex items-center gap-2">
             <ShieldCheck className="text-primary shrink-0 animate-pulse" size={26} /> 
-            Credentials & Approvals
+            {t('credentials_approvals')}
           </h2>
-          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-            Review and authorize access requests for clinical staff and doctors
+          <p className={`text-[10px] text-muted-foreground uppercase font-bold tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>
+            {t('credentials_approvals_desc')}
           </p>
         </div>
         <button
           onClick={loadRequests}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider bg-secondary/20 hover:bg-secondary/40 text-primary border border-primary/20 rounded-xl transition-all disabled:opacity-50 active:scale-95 shrink-0"
+          className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider bg-secondary/20 hover:bg-secondary/40 text-primary border border-primary/20 rounded-xl transition-all disabled:opacity-50 active:scale-95 shrink-0 cursor-pointer"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          Refresh Requests
+          {t('refresh_requests')}
         </button>
       </div>
 
@@ -170,28 +172,28 @@ export function AccountRequestsView() {
       <div className="flex flex-col md:flex-row gap-3 items-center bg-card p-4 rounded-2xl border border-border shadow-sm">
         {/* Search */}
         <div className="relative w-full md:flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <Search className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-muted-foreground`} size={16} />
           <input
             type="text"
-            placeholder="Search by Username, Doctor Name, Role, or Branch..."
+            placeholder={t('search_account_requests_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/20 border border-border focus:outline-none focus:ring-1 focus:ring-primary text-xs font-medium text-foreground"
+            className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 rounded-xl bg-muted/20 border border-border focus:outline-none focus:ring-1 focus:ring-primary text-xs font-medium text-foreground`}
           />
         </div>
 
         {/* Status Filter Tabs */}
         <div className="flex bg-muted/30 p-1 rounded-xl border border-border w-full md:w-auto overflow-x-auto shrink-0">
           {[
-            { id: 'all', label: 'All Requests' },
-            { id: 'pending', label: 'Pending' },
-            { id: 'approved', label: 'Approved' },
-            { id: 'denied', label: 'Denied' }
+            { id: 'all', label: t('all_requests_filter') },
+            { id: 'pending', label: isAr ? 'قيد الانتظار' : 'Pending' },
+            { id: 'approved', label: isAr ? 'تمت الموافقة' : 'Approved' },
+            { id: 'denied', label: isAr ? 'مرفوض' : 'Denied' }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
+              className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
                 statusFilter === tab.id
                   ? 'bg-background text-primary shadow-sm font-black'
                   : 'text-muted-foreground hover:bg-background/20 hover:text-foreground'
@@ -209,7 +211,7 @@ export function AccountRequestsView() {
           <div className="py-20 flex flex-col items-center justify-center space-y-4">
             <RefreshCw size={36} className="animate-spin text-primary" />
             <p className="text-xs uppercase font-bold text-muted-foreground animate-pulse tracking-widest font-heading">
-              Loading requests...
+              {t('loading_path', 'Loading requests...')}
             </p>
           </div>
         ) : filteredRequests.length === 0 ? (
@@ -217,23 +219,23 @@ export function AccountRequestsView() {
             <div className="inline-flex p-4 bg-muted/30 rounded-full text-muted-foreground mb-1">
               <User size={32} />
             </div>
-            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">No Requests Found</h3>
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">{t('no_requests_found')}</h3>
             <p className="text-xs text-muted-foreground font-medium max-w-sm mx-auto px-4">
-              There are no registration requests matching your current filters. New signups will appear here automatically.
+              {t('no_requests_found_desc')}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+            <table className={`w-full border-collapse ${isAr ? 'text-right' : 'text-left'}`}>
               <thead>
                 <tr className="border-b border-border bg-muted/30 text-[9px] uppercase tracking-widest font-bold text-muted-foreground">
-                  <th className="px-6 py-4">Branch</th>
-                  <th className="px-6 py-4">Role</th>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Username</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">{t('branch_header')}</th>
+                  <th className="px-6 py-4">{t('role_header')}</th>
+                  <th className="px-6 py-4">{t('name_header')}</th>
+                  <th className="px-6 py-4">{t('username_header')}</th>
+                  <th className="px-6 py-4">{t('date_header')}</th>
+                  <th className="px-6 py-4">{t('status_header')}</th>
+                  <th className={`px-6 py-4 ${isAr ? 'text-left' : 'text-right'}`}>{t('actions_header')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60 text-xs font-semibold text-foreground">
@@ -245,13 +247,13 @@ export function AccountRequestsView() {
 
                   // Status styling
                   let statusStyle = 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400';
-                  let statusLabel = 'Pending';
+                  let statusLabel = isAr ? 'قيد الانتظار' : 'Pending';
                   if (req.status === 'active') {
                     statusStyle = 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400';
-                    statusLabel = 'Approved';
+                    statusLabel = isAr ? 'تمت الموافقة' : 'Approved';
                   } else if (req.status === 'denied') {
                     statusStyle = 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400';
-                    statusLabel = 'Denied';
+                    statusLabel = isAr ? 'مرفوض' : 'Denied';
                   }
 
                   return (
@@ -260,7 +262,7 @@ export function AccountRequestsView() {
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-1.5 font-bold text-foreground">
                           <Building2 size={13} className="text-muted-foreground" />
-                          {req.branch_name || `Branch ${req.branch_id}`}
+                          {req.branch_name || `${t('branch')} ${req.branch_id}`}
                         </span>
                       </td>
 
@@ -268,7 +270,7 @@ export function AccountRequestsView() {
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[9px] uppercase tracking-wider font-extrabold ${roleStyle}`}>
                           {req.role === 'doctor' ? <Activity size={10} /> : <User size={10} />}
-                          {req.role}
+                          {req.role === 'doctor' ? t('doctor_account') : t('staff_account')}
                         </span>
                       </td>
 
@@ -309,29 +311,29 @@ export function AccountRequestsView() {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-4 text-right">
+                      <td className={`px-6 py-4 ${isAr ? 'text-left' : 'text-right'}`}>
                         {req.status === 'pending' ? (
                           <div className="inline-flex items-center gap-2">
                             <button
                               onClick={() => handleApprove(req.id, req.username)}
-                              className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-xl transition-all active:scale-90 flex items-center gap-1"
-                              title="Approve Request"
+                              className="p-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-xl transition-all active:scale-90 flex items-center gap-1 cursor-pointer"
+                              title={t('approve_btn')}
                             >
                               <Check size={14} />
-                              <span className="text-[9px] uppercase tracking-wider font-black px-1">Approve</span>
+                              <span className="text-[9px] uppercase tracking-wider font-black px-1">{t('approve_btn')}</span>
                             </button>
                             <button
                               onClick={() => handleDeny(req.id, req.username)}
-                              className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-xl transition-all active:scale-90 flex items-center gap-1"
-                              title="Deny Request"
+                              className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-xl transition-all active:scale-90 flex items-center gap-1 cursor-pointer"
+                              title={t('deny_btn')}
                             >
                               <X size={14} />
-                              <span className="text-[9px] uppercase tracking-wider font-black px-1">Deny</span>
+                              <span className="text-[9px] uppercase tracking-wider font-black px-1">{t('deny_btn')}</span>
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest italic pr-4">
-                            Processed
+                          <span className={`text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest italic ${isAr ? 'pl-4' : 'pr-4'}`}>
+                            {t('processed_status')}
                           </span>
                         )}
                       </td>

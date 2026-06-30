@@ -28,3 +28,7 @@ export function generateWhatsAppLink(template: string, details: AppointmentDetai
 
 export const DEFAULT_WHATSAPP_TEMPLATE = 
   `مرحباً يا [PatientName]، بنفكرك بميعاد حجوزاتك في عيادتنا ([BranchName]) يوم [Date] الساعة [Time] مع دكتور [DoctorName]. شرفنا في الميعاد.`;
+
+export const DEFAULT_WHATSAPP_REVIEW_TEMPLATE = 
+  `مرحباً يا [PatientName]، حابين نعرف رأيك في جلستك اليوم في عيادتنا ([BranchName]) مع دكتور [DoctorName]. تقييمك يهمنا جداً لتحسين خدمتنا!`;
+

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FileText, Calendar, TrendingUp, Users, Activity, Printer, FileSpreadsheet, DollarSign, CreditCard, Package, Stethoscope, Clock } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface Doctor {
   id: number;
@@ -8,6 +9,7 @@ interface Doctor {
 }
 
 export function ReportsView() {
+  const { language, t, isAr } = useLanguage();
   const [range, setRange] = useState('daily');
   const [referenceDate, setReferenceDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [customStartDate, setCustomStartDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -128,24 +130,25 @@ export function ReportsView() {
   };
 
   const rangeOptions = [
-    { id: 'daily', label: 'Day' },
-    { id: 'weekly', label: 'Week' },
-    { id: '2weeks', label: '2 Weeks' },
-    { id: '3weeks', label: '3 Weeks' },
-    { id: 'monthly', label: 'Month' },
-    { id: 'custom', label: 'Custom Range' },
-    { id: 'month', label: 'Select Month' },
+    { id: 'daily', label: t('day_opt') },
+    { id: 'weekly', label: t('week_opt') },
+    { id: '2weeks', label: t('2weeks_opt') },
+    { id: '3weeks', label: t('3weeks_opt') },
+    { id: 'monthly', label: t('month_opt') },
+    { id: 'custom', label: t('custom_range_opt') },
+    { id: 'month', label: t('select_month_opt') },
   ];
 
   const periodLabel = () => {
-    if (range === 'custom') return `${formatDate(customStartDate)} to ${formatDate(customEndDate)}`;
+    const localeStr = language === 'ar' ? 'ar-EG' : 'en-US';
+    if (range === 'custom') return `${formatDate(customStartDate)} ${t('to_date_connector')} ${formatDate(customEndDate)}`;
     if (range === 'month') {
       const [yr, mo] = selectedMonth.split('-').map(Number);
-      return new Date(yr, mo - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+      return new Date(yr, mo - 1, 1).toLocaleDateString(localeStr, { month: 'long', year: 'numeric' });
     }
     if (range === 'daily') return formatDate(referenceDate);
     const last = stats.dailyBreakdown[stats.dailyBreakdown.length - 1];
-    return `${formatDate(last?.date || referenceDate)} to ${formatDate(referenceDate)}`;
+    return `${formatDate(last?.date || referenceDate)} ${t('to_date_connector')} ${formatDate(referenceDate)}`;
   };
 
   const netRevenue = stats.totalIncome - (stats.totalLoans || 0) - (stats.totalWastes || 0);
@@ -156,10 +159,10 @@ export function ReportsView() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print bg-card p-4 sm:p-6 rounded-2xl border border-border shadow-sm">
         <div className="space-y-1">
           <h1 className="text-xl sm:text-2xl font-black text-foreground font-heading tracking-tight flex items-center gap-2">
-            <FileSpreadsheet className="text-primary" size={24} /> Clinic Audit Report
+            <FileSpreadsheet className="text-primary" size={24} /> {t('clinic_audit_report')}
           </h1>
           <p className="text-muted-foreground text-xs font-medium">
-            Flat spreadsheet view of sessions, billing, loans and wastes.
+            {t('flat_spreadsheet_view')}
           </p>
         </div>
 
@@ -180,13 +183,13 @@ export function ReportsView() {
 
           {/* Doctor filter */}
           <div className="relative flex items-center w-full sm:w-auto">
-            <Stethoscope size={14} className="absolute left-3 text-muted-foreground pointer-events-none" />
+            <Stethoscope size={14} className={`absolute ${isAr ? 'right-3' : 'left-3'} text-muted-foreground pointer-events-none`} />
             <select
               value={selectedDoctorId}
               onChange={e => setSelectedDoctorId(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-              className="pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer w-full appearance-none"
+              className={`${isAr ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer w-full appearance-none`}
             >
-              <option value="all">All Doctors</option>
+              <option value="all">{t('all_doctors')}</option>
               {doctors.map(d => (
                 <option key={d.id} value={d.id}>{d.name}</option>
               ))}
@@ -197,43 +200,43 @@ export function ReportsView() {
           {range === 'custom' ? (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="relative flex items-center">
-                <Calendar size={14} className="absolute left-3.5 text-muted-foreground pointer-events-none" />
+                <Calendar size={14} className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} text-muted-foreground pointer-events-none`} />
                 <input
                   type="date"
                   value={customStartDate}
                   onChange={e => setCustomStartDate(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer"
+                  className={`${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer`}
                 />
               </div>
-              <span className="text-muted-foreground text-xs font-bold">to</span>
+              <span className="text-muted-foreground text-xs font-bold">{t('to_date_connector')}</span>
               <div className="relative flex items-center">
-                <Calendar size={14} className="absolute left-3.5 text-muted-foreground pointer-events-none" />
+                <Calendar size={14} className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} text-muted-foreground pointer-events-none`} />
                 <input
                   type="date"
                   value={customEndDate}
                   onChange={e => setCustomEndDate(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer"
+                  className={`${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer`}
                 />
               </div>
             </div>
           ) : range === 'month' ? (
             <div className="relative w-full sm:w-auto flex items-center">
-              <Calendar size={14} className="absolute left-3.5 text-muted-foreground pointer-events-none" />
+              <Calendar size={14} className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} text-muted-foreground pointer-events-none`} />
               <input
                 type="month"
                 value={selectedMonth}
                 onChange={e => setSelectedMonth(e.target.value)}
-                className="w-full sm:w-auto pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer"
+                className={`w-full sm:w-auto ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer`}
               />
             </div>
           ) : (
             <div className="relative w-full sm:w-auto flex items-center">
-              <Calendar size={14} className="absolute left-3.5 text-muted-foreground pointer-events-none" />
+              <Calendar size={14} className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} text-muted-foreground pointer-events-none`} />
               <input
                 type="date"
                 value={referenceDate}
                 onChange={e => setReferenceDate(e.target.value)}
-                className="w-full sm:w-auto pl-10 pr-4 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer"
+                className={`w-full sm:w-auto ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs outline-none focus:ring-2 focus:ring-primary shadow-sm cursor-pointer`}
               />
             </div>
           )}
@@ -244,7 +247,7 @@ export function ReportsView() {
             onClick={() => window.print()}
             className="w-full sm:w-auto bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest shadow-md hover:opacity-90 active:scale-98 flex items-center justify-center gap-2 transition-all"
           >
-            <Printer size={14} /> Print Sheet
+            <Printer size={14} /> {t('print_sheet')}
           </button>
         </div>
       </div>
@@ -254,24 +257,24 @@ export function ReportsView() {
         {/* Header */}
         <div className="border-b border-border/80 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-xs font-bold text-primary uppercase tracking-[0.25em] mb-1 font-mono">Evolve Clinical Management Suite</h2>
+            <h2 className="text-xs font-bold text-primary uppercase tracking-[0.25em] mb-1 font-mono">{t('evolve_clinical_suite')}</h2>
             <h1 className="text-xl sm:text-2xl font-black text-foreground tracking-tight uppercase">
-              {range === 'daily' ? 'DAILY PRACTICE REPORT'
-                : range === 'weekly' ? 'WEEKLY PRACTICE REPORT'
-                : range === '2weeks' ? 'BI-WEEKLY PRACTICE REPORT'
-                : range === '3weeks' ? 'TRI-WEEKLY PRACTICE REPORT'
-                : range === 'custom' ? 'CUSTOM RANGE REPORT'
-                : range === 'month' ? 'MONTHLY REPORT'
-                : 'MONTHLY PRACTICE REPORT'}
+              {range === 'daily' ? t('daily_practice_report')
+                : range === 'weekly' ? t('weekly_practice_report')
+                : range === '2weeks' ? t('bi_weekly_practice_report')
+                : range === '3weeks' ? t('tri_weekly_practice_report')
+                : range === 'custom' ? t('custom_range_report')
+                : range === 'month' ? t('monthly_practice_report')
+                : t('monthly_practice_report')}
             </h1>
             <p className="text-muted-foreground text-xs font-medium font-mono mt-1">
-              Period: {periodLabel()}
-              {selectedDoctorId !== 'all' && ` · Doctor: ${doctors.find(d => d.id === selectedDoctorId)?.name || ''}`}
+              {t('period')} {periodLabel()}
+              {selectedDoctorId !== 'all' && ` · ${t('doctor_label')} ${doctors.find(d => d.id === selectedDoctorId)?.name || ''}`}
             </p>
           </div>
-          <div className="text-left sm:text-right space-y-1">
-            <span className="font-mono text-[9px] bg-muted px-2 py-1 rounded border border-border/60 text-muted-foreground block w-fit sm:ml-auto">
-              Generated: {new Date().toLocaleString()}
+          <div className="text-start sm:text-end space-y-1">
+            <span className={`font-mono text-[9px] bg-muted px-2 py-1 rounded border border-border/60 text-muted-foreground block w-fit ${isAr ? 'sm:mr-auto' : 'sm:ml-auto'}`}>
+              {t('generated_label')} {new Date().toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US')}
             </span>
           </div>
         </div>
@@ -281,7 +284,7 @@ export function ReportsView() {
           <div className="p-4 sm:p-5 flex items-center gap-4 border border-border/80 rounded-xl bg-card">
             <div className="p-2 bg-primary/10 text-primary rounded-lg shrink-0"><Users size={20} /></div>
             <div>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">Patients Treated</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">{t('patients_treated')}</span>
               <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">{stats.clientsInPeriod}</span>
             </div>
           </div>
@@ -289,7 +292,7 @@ export function ReportsView() {
           <div className="p-4 sm:p-5 flex items-center gap-4 border border-border/80 rounded-xl bg-card">
             <div className="p-2 bg-primary/10 text-primary rounded-lg shrink-0"><FileText size={20} /></div>
             <div>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">Sessions Logged</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">{t('sessions_logged')}</span>
               <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">{stats.sessionsCount}</span>
             </div>
           </div>
@@ -297,8 +300,8 @@ export function ReportsView() {
           <div className="p-4 sm:p-5 flex items-center gap-4 border border-border/80 rounded-xl bg-card">
             <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg shrink-0"><DollarSign size={20} /></div>
             <div>
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block font-mono">Revenue Realized</span>
-              <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">${(stats.totalIncome ?? 0).toLocaleString()}</span>
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest block font-mono">{t('revenue_realized')}</span>
+              <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">${stats.totalIncome.toLocaleString()}</span>
             </div>
           </div>
 
@@ -307,8 +310,8 @@ export function ReportsView() {
               <TrendingUp size={20} />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">Net Revenue</span>
-              <span className={`text-xl sm:text-2xl font-bold tabular-nums ${netRevenue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>${(netRevenue ?? 0).toLocaleString()}</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block font-mono">{t('net_revenue')}</span>
+              <span className={`text-xl sm:text-2xl font-bold tabular-nums ${netRevenue >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>${netRevenue.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -317,52 +320,52 @@ export function ReportsView() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Activity className="text-primary" size={16} />
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">1. Clinical Treatment & Sessions Sheet</h3>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('treatment_sessions_sheet')}</h3>
           </div>
           <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-            <table className="w-full text-left border-collapse min-w-[900px] text-xs font-sans">
+            <table className="w-full text-start border-collapse min-w-[900px] text-xs font-sans">
               <thead>
-                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Time / Date</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-36">Patient Name</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-36">Doctor</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-32">Session Type</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-28 text-center">Session No.</th>
-                  <th className="px-4 py-3 border-r border-border/80">Treatment & Rehabilitation Protocols</th>
-                  <th className="px-4 py-3">Progress Observations</th>
+                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{t('time_date')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-36 text-start">{t('patient_name')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-36 text-start">{t('doctor_label').replace(':', '')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-32 text-start">{t('session_type', 'Session Type')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-28 text-center">{t('session_no')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-start">{t('treatment_rehab_protocols')}</th>
+                  <th className="px-4 py-3 text-start">{t('progress_observations')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
                 {stats.detailedSessions && stats.detailedSessions.length > 0 ? (
                   stats.detailedSessions.map(c => (
                     <tr key={c.id} className="hover:bg-muted/15 transition-colors">
-                      <td className="px-4 py-3 border-r border-border/80 font-mono whitespace-nowrap">
+                      <td className="px-4 py-3 border-e border-border/80 font-mono whitespace-nowrap text-start">
                         {range === 'daily' ? formatTime(c.session_date) : formatDate(c.session_date)}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">
+                      <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">
                         {c.first_name} {c.last_name}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">
+                      <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">
                         {c.doctor_name || '—'}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-semibold text-foreground">
+                      <td className="px-4 py-3 border-e border-border/80 font-semibold text-foreground text-start">
                         {c.session_type || '—'}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-center font-mono font-bold text-primary">
-                        Session #{c.session_number || 1}
+                      <td className="px-4 py-3 border-e border-border/80 text-center font-mono font-bold text-primary">
+                        {isAr ? `جلسة رقم ${c.session_number || 1}` : `Session #${c.session_number || 1}`}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-foreground/90 font-medium">
+                      <td className="px-4 py-3 border-e border-border/80 text-foreground/90 font-medium text-start">
                         {c.treatment_notes}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground font-medium italic">
+                      <td className="px-4 py-3 text-muted-foreground font-medium italic text-start">
                         {c.progress_notes || '—'}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
-                      No clinical rehabilitation sessions logged during this period.
+                    <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
+                      {t('no_rehab_sessions_logged')}
                     </td>
                   </tr>
                 )}
@@ -375,46 +378,46 @@ export function ReportsView() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <DollarSign className="text-emerald-600" size={16} />
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">2. Realized Revenue & Receipts Sheet</h3>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('realized_revenue_sheet')}</h3>
           </div>
           <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-            <table className="w-full text-left border-collapse min-w-[700px] text-xs font-sans">
+            <table className="w-full text-start border-collapse min-w-[700px] text-xs font-sans">
               <thead>
-                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Time / Date</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-44">Patient Name</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-36">Payment Type</th>
-                  <th className="px-4 py-3 border-r border-border/80">Acquisition Details</th>
-                  <th className="px-4 py-3 text-right w-36">Net Paid</th>
+                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{t('time_date')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-44 text-start">{t('patient_name')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-36 text-start">{t('payment_type')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-start">{t('acquisition_details')}</th>
+                  <th className={`px-4 py-3 w-36 ${isAr ? 'text-left' : 'text-right'}`}>{t('net_paid')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
                 {stats.detailedPayments && stats.detailedPayments.length > 0 ? (
                   stats.detailedPayments.map(c => (
                     <tr key={c.id} className="hover:bg-muted/15 transition-colors">
-                      <td className="px-4 py-3 border-r border-border/80 font-mono whitespace-nowrap">
+                      <td className="px-4 py-3 border-e border-border/80 font-mono whitespace-nowrap text-start">
                         {range === 'daily' ? formatTime(c.payment_date) : formatDate(c.payment_date)}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">
+                      <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">
                         {c.first_name} {c.last_name}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-mono">
+                      <td className="px-4 py-3 border-e border-border/80 font-mono text-start">
                         <span className="px-2 py-0.5 bg-muted border border-border/60 rounded text-[10px] font-bold text-foreground uppercase">
                           {c.payment_type}
                         </span>
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-muted-foreground font-medium">
-                        {c.package_sessions_total ? `Prepaid Package (${c.package_sessions_total} Sessions Block)` : 'Per-session Clinical Treatment'}
+                      <td className="px-4 py-3 border-e border-border/80 text-muted-foreground font-medium text-start">
+                        {c.package_sessions_total ? t('prepaid_package').replace('{count}', c.package_sessions_total.toString()) : t('per_session_treatment')}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-emerald-600 text-sm tabular-nums">
-                        ${(c.amount ?? 0).toLocaleString()}
+                      <td className={`px-4 py-3 font-mono font-bold text-emerald-600 text-sm tabular-nums ${isAr ? 'text-left' : 'text-right'}`}>
+                        ${c.amount.toLocaleString()}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
-                      No billing receipts or payments recorded during this period.
+                      {t('no_billing_receipts')}
                     </td>
                   </tr>
                 )}
@@ -427,48 +430,48 @@ export function ReportsView() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <CreditCard className="text-rose-500" size={16} />
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">3. Staff & Doctor Loans Sheet</h3>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('staff_doctor_loans')}</h3>
           </div>
           <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-            <table className="w-full text-left border-collapse min-w-[500px] text-xs font-sans">
+            <table className="w-full text-start border-collapse min-w-[500px] text-xs font-sans">
               <thead>
-                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Date</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-40">Staff / Doctor</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Role</th>
-                  <th className="px-4 py-3 border-r border-border/80">Note</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Status</th>
-                  <th className="px-4 py-3 text-right w-28">Amount</th>
+                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{isAr ? 'التاريخ' : 'Date'}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-40 text-start">{isAr ? 'الموظف / الطبيب' : 'Staff / Doctor'}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{t('role')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-start">{t('note')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{t('status')}</th>
+                  <th className={`px-4 py-3 w-28 ${isAr ? 'text-left' : 'text-right'}`}>{t('amount')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
                 {stats.loanDetails && stats.loanDetails.length > 0 ? (
                   stats.loanDetails.map((l: any) => (
                     <tr key={l.id} className="hover:bg-muted/15 transition-colors">
-                      <td className="px-4 py-3 border-r border-border/80 font-mono whitespace-nowrap">
+                      <td className="px-4 py-3 border-e border-border/80 font-mono whitespace-nowrap text-start">
                         {formatDate(l.loan_date)}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">{l.username}</td>
-                      <td className="px-4 py-3 border-r border-border/80">
+                      <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">{l.username}</td>
+                      <td className="px-4 py-3 border-e border-border/80 text-start">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${l.role === 'doctor' ? 'bg-blue-500/10 text-blue-500' : 'bg-orange-500/10 text-orange-500'}`}>
                           {l.role}
                         </span>
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-muted-foreground italic">{l.note || '—'}</td>
-                      <td className="px-4 py-3 border-r border-border/80">
+                      <td className="px-4 py-3 border-e border-border/80 text-muted-foreground italic text-start">{l.note || '—'}</td>
+                      <td className="px-4 py-3 border-e border-border/80 text-start">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${l.is_settled ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
-                          {l.is_settled ? 'Settled' : 'Active'}
+                          {l.is_settled ? t('settled') : t('active')}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-rose-500 tabular-nums">
-                        ${(l.amount ?? 0).toLocaleString()}
+                      <td className={`px-4 py-3 font-mono font-bold text-rose-500 tabular-nums ${isAr ? 'text-left' : 'text-right'}`}>
+                        ${l.amount.toLocaleString()}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
-                      No loans recorded during this period.
+                      {t('no_loans_recorded')}
                     </td>
                   </tr>
                 )}
@@ -476,8 +479,8 @@ export function ReportsView() {
               {stats.loanDetails && stats.loanDetails.length > 0 && (
                 <tfoot>
                   <tr className="bg-muted/30 font-bold">
-                    <td colSpan={5} className="px-4 py-3 text-right text-xs uppercase tracking-widest text-muted-foreground font-mono border-t border-border/80">Total Loans</td>
-                    <td className="px-4 py-3 text-right font-mono font-black text-rose-500 border-t border-border/80">
+                    <td colSpan={5} className={`px-4 py-3 text-xs uppercase tracking-widest text-muted-foreground font-mono border-t border-border/80 ${isAr ? 'text-left' : 'text-right'}`}>{t('total_loans')}</td>
+                    <td className={`px-4 py-3 font-mono font-black text-rose-500 border-t border-border/80 ${isAr ? 'text-left' : 'text-right'}`}>
                       ${(stats.totalLoans || 0).toLocaleString()}
                     </td>
                   </tr>
@@ -491,38 +494,38 @@ export function ReportsView() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Package className="text-amber-500" size={16} />
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">4. Clinic Wastes & Consumables Sheet</h3>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('clinic_wastes_sheet')}</h3>
           </div>
           <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-            <table className="w-full text-left border-collapse min-w-[500px] text-xs font-sans">
+            <table className="w-full text-start border-collapse min-w-[500px] text-xs font-sans">
               <thead>
-                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                  <th className="px-4 py-3 border-r border-border/80 w-24">Date</th>
-                  <th className="px-4 py-3 border-r border-border/80">Item</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-20 text-center">Qty</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-28 text-right">Unit Cost</th>
-                  <th className="px-4 py-3 text-right w-28">Total</th>
+                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                  <th className="px-4 py-3 border-e border-border/80 w-24 text-start">{isAr ? 'التاريخ' : 'Date'}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-start">{t('item')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-20 text-center">{t('qty')}</th>
+                  <th className={`px-4 py-3 border-e border-border/80 w-28 ${isAr ? 'text-left' : 'text-right'}`}>{t('unit_cost')}</th>
+                  <th className={`px-4 py-3 w-28 ${isAr ? 'text-left' : 'text-right'}`}>{t('total')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
                 {stats.wasteDetails && stats.wasteDetails.length > 0 ? (
                   stats.wasteDetails.map((w: any) => (
                     <tr key={w.id} className="hover:bg-muted/15 transition-colors">
-                      <td className="px-4 py-3 border-r border-border/80 font-mono whitespace-nowrap">
+                      <td className="px-4 py-3 border-e border-border/80 font-mono whitespace-nowrap text-start">
                         {formatDate(w.waste_date)}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">{w.item_name}</td>
-                      <td className="px-4 py-3 border-r border-border/80 text-center font-mono">{w.quantity}</td>
-                      <td className="px-4 py-3 border-r border-border/80 text-right font-mono">${(w.unit_cost ?? 0).toLocaleString()}</td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-amber-500 tabular-nums">
-                        ${(w.total_cost ?? 0).toLocaleString()}
+                      <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">{w.item_name}</td>
+                      <td className="px-4 py-3 border-e border-border/80 text-center font-mono">{w.quantity}</td>
+                      <td className={`px-4 py-3 border-e border-border/80 font-mono ${isAr ? 'text-left' : 'text-right'}`}>${w.unit_cost.toLocaleString()}</td>
+                      <td className={`px-4 py-3 font-mono font-bold text-amber-500 tabular-nums ${isAr ? 'text-left' : 'text-right'}`}>
+                        ${w.total_cost.toLocaleString()}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
-                      No waste items recorded during this period.
+                      {t('no_waste_items')}
                     </td>
                   </tr>
                 )}
@@ -530,8 +533,8 @@ export function ReportsView() {
               {stats.wasteDetails && stats.wasteDetails.length > 0 && (
                 <tfoot>
                   <tr className="bg-muted/30 font-bold">
-                    <td colSpan={4} className="px-4 py-3 text-right text-xs uppercase tracking-widest text-muted-foreground font-mono border-t border-border/80">Total Wastes</td>
-                    <td className="px-4 py-3 text-right font-mono font-black text-amber-500 border-t border-border/80">
+                    <td colSpan={4} className={`px-4 py-3 text-xs uppercase tracking-widest text-muted-foreground font-mono border-t border-border/80 ${isAr ? 'text-left' : 'text-right'}`}>{t('total_wastes')}</td>
+                    <td className={`px-4 py-3 font-mono font-black text-amber-500 border-t border-border/80 ${isAr ? 'text-left' : 'text-right'}`}>
                       ${(stats.totalWastes || 0).toLocaleString()}
                     </td>
                   </tr>
@@ -545,18 +548,18 @@ export function ReportsView() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Clock className="text-primary" size={16} />
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">5. Shift Attendance & Check-In Log Sheet</h3>
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('shift_attendance_log')}</h3>
           </div>
           <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-            <table className="w-full text-left border-collapse min-w-[700px] text-xs font-sans">
+            <table className="w-full text-start border-collapse min-w-[700px] text-xs font-sans">
               <thead>
-                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                  <th className="px-4 py-3 border-r border-border/80 w-28">Date</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-44">User / Practitioner</th>
-                  <th className="px-4 py-3 border-r border-border/80 w-32">Classification</th>
-                  <th className="px-4 py-3 border-r border-border/80 text-center w-36">Check-In</th>
-                  <th className="px-4 py-3 border-r border-border/80 text-center w-36">Check-Out</th>
-                  <th className="px-4 py-3 text-center">Hours Worked</th>
+                <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                  <th className="px-4 py-3 border-e border-border/80 w-28 text-start">{isAr ? 'التاريخ' : 'Date'}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-44 text-start">{isAr ? 'المستخدم / المعالج' : 'User / Practitioner'}</th>
+                  <th className="px-4 py-3 border-e border-border/80 w-32 text-start">{t('classification')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-center w-36">{t('check_in')}</th>
+                  <th className="px-4 py-3 border-e border-border/80 text-center w-36">{t('check_out')}</th>
+                  <th className="px-4 py-3 text-center">{t('hours_worked')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/80">
@@ -572,7 +575,7 @@ export function ReportsView() {
                         const diffMs = outDate.getTime() - inDate.getTime();
                         if (diffMs > 0) {
                           const diffHrs = diffMs / (1000 * 60 * 60);
-                          hoursWorked = `${diffHrs.toFixed(2)} hrs`;
+                          hoursWorked = `${diffHrs.toFixed(2)} ${isAr ? 'ساعة' : 'hrs'}`;
                         }
                       } catch (e) {
                         console.error('Error calculating work hours', e);
@@ -581,21 +584,21 @@ export function ReportsView() {
                     
                     return (
                       <tr key={log.id} className="hover:bg-muted/15 transition-colors">
-                        <td className="px-4 py-3 border-r border-border/80 font-mono whitespace-nowrap">
+                        <td className="px-4 py-3 border-e border-border/80 font-mono whitespace-nowrap text-start">
                           {formatDate(log.log_date)}
                         </td>
-                        <td className="px-4 py-3 border-r border-border/80 font-bold text-foreground">
+                        <td className="px-4 py-3 border-e border-border/80 font-bold text-foreground text-start">
                           {log.username}
                         </td>
-                        <td className="px-4 py-3 border-r border-border/80">
+                        <td className="px-4 py-3 border-e border-border/80 text-start">
                           <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border">
                             {log.role}
                           </span>
                         </td>
-                        <td className="px-4 py-3 border-r border-border/80 text-center font-mono font-bold text-emerald-500">
+                        <td className="px-4 py-3 border-e border-border/80 text-center font-mono font-bold text-emerald-500">
                           {formatTimeAmPm(log.check_in_time)}
                         </td>
-                        <td className="px-4 py-3 border-r border-border/80 text-center font-mono font-bold text-purple-500">
+                        <td className="px-4 py-3 border-e border-border/80 text-center font-mono font-bold text-purple-500">
                           {formatTimeAmPm(log.check_out_time)}
                         </td>
                         <td className="px-4 py-3 text-center font-mono font-bold text-primary">
@@ -607,7 +610,7 @@ export function ReportsView() {
                 ) : (
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground italic font-medium font-mono">
-                      No shift attendance logs recorded during this period.
+                      {t('no_attendance_logs')}
                     </td>
                   </tr>
                 )}
@@ -621,32 +624,32 @@ export function ReportsView() {
           <div className="space-y-3 pt-2">
             <div className="flex items-center gap-2">
               <Activity className="text-primary" size={16} />
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">6. Daily Log Consolidated Sheet</h3>
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono">{t('daily_consolidated_log')}</h3>
             </div>
             <div className="border border-border/90 rounded-xl overflow-x-auto bg-card">
-              <table className="w-full text-left border-collapse min-w-[700px] text-xs font-sans">
+              <table className="w-full text-start border-collapse min-w-[700px] text-xs font-sans">
                 <thead>
-                  <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold">
-                    <th className="px-4 py-3 border-r border-border/80">Date</th>
-                    <th className="px-4 py-3 border-r border-border/80 text-center">Patient Volume</th>
-                    <th className="px-4 py-3 border-r border-border/80 text-center">Sessions Logged</th>
-                    <th className="px-4 py-3 text-right">Aggregate Revenue</th>
+                  <tr className="bg-muted border-b border-border/80 font-mono text-muted-foreground text-[10px] uppercase font-bold text-start">
+                    <th className="px-4 py-3 border-e border-border/80 text-start">{isAr ? 'التاريخ' : 'Date'}</th>
+                    <th className="px-4 py-3 border-e border-border/80 text-center">{t('patient_volume')}</th>
+                    <th className="px-4 py-3 border-e border-border/80 text-center">{t('sessions_logged')}</th>
+                    <th className={`px-4 py-3 ${isAr ? 'text-left' : 'text-right'}`}>{t('aggregate_revenue')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/80">
                   {stats.dailyBreakdown.map(c => (
                     <tr key={c.date} className="hover:bg-muted/15 transition-colors">
-                      <td className="px-4 py-3 border-r border-border/80 font-bold font-mono">
-                        {new Date(c.date + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                      <td className="px-4 py-3 border-e border-border/80 font-bold font-mono text-start">
+                        {new Date(c.date + 'T12:00:00').toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-center font-medium text-foreground">
-                        {c.clients} {c.clients === 1 ? 'Patient' : 'Patients'}
+                      <td className="px-4 py-3 border-e border-border/80 text-center font-medium text-foreground">
+                        {c.clients} {c.clients === 1 ? (isAr ? 'مريض' : 'Patient') : (isAr ? 'مرضى' : 'Patients')}
                       </td>
-                      <td className="px-4 py-3 border-r border-border/80 text-center font-medium text-foreground">
-                        {c.sessions} {c.sessions === 1 ? 'Session' : 'Sessions'}
+                      <td className="px-4 py-3 border-e border-border/80 text-center font-medium text-foreground">
+                        {c.sessions} {c.sessions === 1 ? (isAr ? 'جلسة' : 'Session') : (isAr ? 'جلسات' : 'Sessions')}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-primary">
-                        ${(c.income ?? 0).toLocaleString()}
+                      <td className={`px-4 py-3 font-mono font-bold text-primary ${isAr ? 'text-left' : 'text-right'}`}>
+                        ${c.income.toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -657,19 +660,20 @@ export function ReportsView() {
         )}
 
         {/* Footer */}
-        <div className="pt-8 border-t border-border/80 flex flex-col sm:flex-row justify-between items-end gap-6 font-mono text-[10px] text-muted-foreground">
-          <div className="space-y-1.5 max-w-md">
-            <div className="font-bold text-foreground">Biometric System Isolated Pass Verification</div>
+        <div className={`pt-8 border-t border-border/80 flex flex-col sm:flex-row justify-between items-end gap-6 font-mono text-[10px] text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>
+          <div className="space-y-1.5 max-w-md text-start">
+            <div className="font-bold text-foreground">{t('biometric_system_isolated')}</div>
             <div className="leading-relaxed">
-              This summary is extracted from local encrypted database records. Privacy and compliance checks: PASS.
-              Authorized by generating physical therapist.
+              {t('summary_extracted_local')}
+              <br />
+              {t('authorized_physiotherapist')}
             </div>
           </div>
-          <div className="text-center sm:text-right space-y-2 min-w-[220px]">
-            <div className="border-b border-border/80 h-10 w-full flex items-end justify-center sm:justify-end pb-1 italic font-sans text-xs">
-              Practitioner Clinician Signature
+          <div className={`text-center sm:text-end space-y-2 min-w-[220px] ${isAr ? 'sm:mr-auto' : 'sm:ml-auto'}`}>
+            <div className={`border-b border-border/80 h-10 w-full flex items-end justify-center ${isAr ? 'sm:justify-start' : 'sm:justify-end'} pb-1 italic font-sans text-xs`}>
+              {t('practitioner_clinician_signature')}
             </div>
-            <div className="font-bold uppercase tracking-wider text-[8px]">Verification Stamp Log</div>
+            <div className="font-bold uppercase tracking-wider text-[8px]">{t('verification_stamp_log')}</div>
           </div>
         </div>
       </div>

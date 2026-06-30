@@ -82,14 +82,14 @@ declare global {
       checkUsersExist: () => Promise<boolean>;
       setupAdmin: (data: any) => Promise<{ success: boolean; error?: string }>;
       loginUser: (data: any) => Promise<{ success: boolean; user?: any; error?: string }>;
-      changePassword: (data: { currentPassword: string; newPassword: string }) => Promise<{ success: boolean; message?: string; error?: string }>;
       registerPendingUser: (data: any) => Promise<{ success: boolean; error?: string }>;
       getPendingAccounts: () => Promise<any[]>;
       approveAccountRequest: (userId: number) => Promise<{ success: boolean; error?: string }>;
       denyAccountRequest: (userId: number) => Promise<{ success: boolean; error?: string }>;
-      getAllUsers: () => Promise<any[]>;
+      getAllUsers: (isRoot?: boolean) => Promise<any[]>;
       resetUserPassword: (data: { userId: number; newPassword: string }) => Promise<{ success: boolean; error?: string }>;
       deleteUserAccount: (userId: number) => Promise<{ success: boolean; error?: string }>;
+      updateUserBranches: (data: { userId: number; branchIds: string }) => Promise<{ success: boolean; error?: string }>;
       getDbPath: () => Promise<string>;
       selectDbPath: () => Promise<string | null>;
       reloadDatabase: () => Promise<{ success: boolean; error?: string }>;
@@ -173,6 +173,12 @@ declare global {
       renameBranch: (data: { branchId: number; newName: string }) => Promise<{ success: boolean; error?: string }>;
       deactivateBranch: (branchId: number) => Promise<{ success: boolean; error?: string }>;
       reactivateBranch: (branchId: number) => Promise<{ success: boolean; error?: string }>;
+      getPatientFeedbacks: (syncToken: string) => Promise<{
+        success: boolean;
+        paintests: any[];
+        patientlogs: any[];
+        error?: string;
+      }>;
     };
   }
 }

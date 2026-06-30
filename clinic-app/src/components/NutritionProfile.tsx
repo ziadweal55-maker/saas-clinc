@@ -1,43 +1,10 @@
-// TODO(security): Role-based access control is enforced via the readOnly prop passed from the parent.
-// All data is rendered via React JSX (framework-native auto-escaping) — no dangerouslySetInnerHTML used.
-// File paths for InBody images come from the backend (local_file_path) and are only used as `file://` src attributes, not executed.
-
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Plus, Trash2, Edit3, Save, X, Upload, FlaskConical,
-  FileText, Camera, Loader2, CheckCircle2,
-  AlertCircle, BookOpen, Microscope, Image as ImageIcon, Ruler
+  Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle,
+  Ruler, Activity, Minus, BarChart2, X, FileText, Camera, Upload, BookOpen, Microscope, Edit3, Image as ImageIcon,
+  FlaskConical
 } from 'lucide-react';
-
-function resolveInbodyImageUrl(localPath: string) {
-  if (!localPath) return '';
-  if (localPath.startsWith('http://') || localPath.startsWith('https://')) {
-    return localPath;
-  }
-  const parts = localPath.split(/[\\/]/);
-  const fileName = parts[parts.length - 1];
-
-  if ((window as any).isMobilePortal) {
-    return '/files/' + fileName;
-  }
-
-  const apiBase = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3000/api/v1';
-  const apiServer = apiBase.replace('/api/v1', '');
-  const isRunningInBrowser = typeof navigator !== 'undefined' && !navigator.userAgent.includes('Electron');
-  
-  if (isRunningInBrowser) {
-    return apiServer + localPath;
-  }
-  return 'file://' + localPath;
-}
-
-function formatDate(dateStr: string | null | undefined) {
-  if (!dateStr) return '';
-  const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-  const d = new Date(isoStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString();
-}
+import { useLanguage } from '../hooks/useLanguage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,15 +12,17 @@ interface NutritionHistoryEntry {
   id: number;
   content: string;
   session_date: string;
+  weight: number | null;
+  doctor_id: number | null;
+  doctor_name: string | null;
   created_at: string;
-  weight?: number | string | null;
-  doctor_id?: number | null;
-  doctor_name?: string | null;
 }
 
-interface InvestigationLibraryItem {
+interface InbodyUpload {
   id: number;
-  name: string;
+  file_name: string;
+  local_file_path: string;
+  session_date: string;
 }
 
 interface ClientInvestigation {
@@ -64,12 +33,9 @@ interface ClientInvestigation {
   result_date: string;
 }
 
-interface InbodyUpload {
+interface InvestigationLibraryItem {
   id: number;
-  file_name: string;
-  local_file_path: string;
-  session_date: string;
-  upload_date: string;
+  name: string;
 }
 
 interface NutritionProfileProps {
@@ -80,12 +46,19 @@ interface NutritionProfileProps {
 
 type TabId = 'basic' | 'investigations' | 'inbody';
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function resolveInbodyImageUrl(localPath: string) {
+  if (!localPath) return '';
+  return `safe-file://${localPath}`;
+}
+
 // ─── Feedback Banner ──────────────────────────────────────────────────────────
 
 function FeedbackBanner({ message, type }: { message: string; type: 'success' | 'error' }) {
   return (
     <div
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium animate-in fade-in duration-300
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
         ${type === 'success'
           ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
           : 'bg-red-500/15 text-red-400 border border-red-500/20'
@@ -97,9 +70,10 @@ function FeedbackBanner({ message, type }: { message: string; type: 'success' | 
   );
 }
 
-// ─── Height Banner (one-time profile input) ───────────────────────────────────
+// ─── Height Banner (One-time record) ──────────────────────────────────────────
 
 function HeightBanner({ profileId, readOnly }: { profileId: number; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [height, setHeight] = useState<string>('');
   const [editingHeight, setEditingHeight] = useState(false);
   const [newHeight, setNewHeight] = useState('');
@@ -145,7 +119,7 @@ function HeightBanner({ profileId, readOnly }: { profileId: number; readOnly?: b
         <Ruler size={16} className="text-blue-400" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest">Patient Height (One-time record)</p>
+        <p className="text-[9px] font-black text-blue-400 uppercase tracking-widest">{t('patient_height_title', 'Patient Height (One-time record)')}</p>
         {editingHeight ? (
           <div className="flex items-center gap-2 mt-1">
             <input
@@ -161,25 +135,25 @@ function HeightBanner({ profileId, readOnly }: { profileId: number; readOnly?: b
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 transition-all"
+              className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold bg-blue-500 text-white hover:opacity-90 disabled:opacity-50 transition-all cursor-pointer"
             >
               {saving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}
-              Save
+              {t('save')}
             </button>
-            <button onClick={() => setEditingHeight(false)} className="p-1 rounded-lg hover:bg-muted transition-all">
+            <button onClick={() => setEditingHeight(false)} className="p-1 rounded-lg hover:bg-muted transition-all cursor-pointer">
               <X size={14} className="text-muted-foreground" />
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-base font-black text-foreground">
-              {height ? `${height} cm` : <span className="text-muted-foreground text-xs font-medium italic">Not recorded yet</span>}
+              {height ? `${height} cm` : <span className="text-muted-foreground text-xs font-medium italic">{t('height_not_recorded', 'Not recorded yet')}</span>}
             </span>
             {!readOnly && (
               <button
                 onClick={() => { setNewHeight(height); setEditingHeight(true); }}
-                className="p-1 rounded-lg hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-                title="Set height"
+                className="p-1 rounded-lg hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all cursor-pointer"
+                title={t('edit', 'Set height')}
               >
                 <Edit3 size={12} />
               </button>
@@ -194,6 +168,7 @@ function HeightBanner({ profileId, readOnly }: { profileId: number; readOnly?: b
 // ─── Tab 1: Basic Data (Nutrition History) ───────────────────────────────────
 
 function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number; currentUser: any; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [entries, setEntries] = useState<NutritionHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
@@ -228,18 +203,18 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
         setEditDoctorId(currentUser.doctor_id.toString());
       }
     } catch {
-      showFeedback('Failed to load history', 'error');
+      showFeedback(t('toast_failed_load_attendance', 'Failed to load history'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [profileId, currentUser]);
+  }, [profileId, currentUser, t]);
 
   useEffect(() => { load(); }, [load]);
 
   const handleAdd = async () => {
     if (!newContent.trim()) return;
     if (!selectedDoctorId) {
-      showFeedback('Doctor signature is required.', 'error');
+      showFeedback(t('doctor_signature_req_error', 'Doctor signature is required.'), 'error');
       return;
     }
     setSaving(true);
@@ -254,10 +229,10 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
       setNewWeight('');
       setNewDate(new Date().toISOString().slice(0, 10));
       setShowNewForm(false);
-      showFeedback('Session note added', 'success');
+      showFeedback(t('toast_test_registered_success', 'Session note added'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to save note', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to save note'), 'error');
     } finally {
       setSaving(false);
     }
@@ -266,7 +241,7 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
   const handleUpdate = async (id: number) => {
     if (!editContent.trim()) return;
     if (!editDoctorId) {
-      showFeedback('Doctor signature is required.', 'error');
+      showFeedback(t('doctor_signature_req_error', 'Doctor signature is required.'), 'error');
       return;
     }
     setSaving(true);
@@ -277,29 +252,30 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
         doctor_id: parseInt(editDoctorId)
       });
       setEditingId(null);
-      showFeedback('Note updated', 'success');
+      showFeedback(t('toast_test_registered_success', 'Note updated'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to update note', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to update note'), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: number) => {
+    if (!confirm(t('delete_apt_confirm', 'Delete permanently?'))) return;
     try {
       await (window.api as any).deleteNutritionHistory(id);
-      showFeedback('Note deleted', 'success');
+      showFeedback(t('toast_request_denied', 'Note deleted'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to delete note', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to delete note'), 'error');
     }
   };
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
       <Loader2 size={20} className="animate-spin text-primary" />
-      <span className="text-sm">Loading session notes…</span>
+      <span className="text-sm">{t('loading_measurements', 'Loading session notes…')}</span>
     </div>
   );
 
@@ -308,14 +284,14 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
       {/* Header row */}
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-          <BookOpen size={14} /> Session Notes
+          <BookOpen size={14} /> {t('session_notes_tab', 'Session Notes')}
         </h3>
         {!readOnly && (
           <button
             onClick={() => setShowNewForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md cursor-pointer"
           >
-            <Plus size={14} /> Add New Session Note
+            <Plus size={14} /> {t('add_session_note_btn', 'Add New Session Note')}
           </button>
         )}
       </div>
@@ -326,23 +302,23 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
       {showNewForm && (
         <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">New Session Note</span>
-            <button onClick={() => setShowNewForm(false)} className="text-muted-foreground hover:text-foreground">
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('new_session_note_title', 'New Session Note')}</span>
+            <button onClick={() => setShowNewForm(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
               <X size={16} />
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Date</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('date_header', 'Date')}</label>
               <input
                 type="date"
                 value={newDate}
                 onChange={e => setNewDate(e.target.value)}
-                className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Weight (kg)</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('weight_kg_lbl', 'Weight (kg)')}</label>
               <input
                 type="number"
                 step="0.1"
@@ -356,20 +332,20 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
           <textarea
             value={newContent}
             onChange={e => setNewContent(e.target.value)}
-            placeholder="Enter session notes, dietary observations, recommendations…"
+            placeholder={t('session_notes_placeholder', 'Enter session notes, dietary observations, recommendations…')}
             rows={5}
             className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
           
           <div className="space-y-1 bg-background/50 border border-border p-4 rounded-xl">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
             <select 
               disabled={readOnly || currentUser?.role === 'doctor'}
               value={selectedDoctorId} 
               onChange={e => setSelectedDoctorId(e.target.value)} 
-              className="w-full px-3 py-2 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+              className="w-full px-3 py-2 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             >
-              <option value="">Select Doctor...</option>
+              <option value="">{t('select_doctor', 'Select Doctor...')}</option>
               {doctors.map(d => (
                 <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
               ))}
@@ -379,17 +355,17 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => setShowNewForm(false)}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all cursor-pointer"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleAdd}
               disabled={saving || !newContent.trim()}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
               {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-              Save Note
+              {t('save_note_btn', 'Save Note')}
             </button>
           </div>
         </div>
@@ -397,9 +373,9 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
 
       {/* Entry list */}
       {entries.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">
+        <div className="text-center py-16 text-muted-foreground text-sm bg-card border border-border rounded-2xl shadow-sm">
           <FileText size={36} className="mx-auto mb-3 opacity-30" />
-          No session notes yet. Add the first one.
+          {t('no_notes_logged_yet', 'No session notes yet. Add the first one.')}
         </div>
       ) : (
         <div className="space-y-3">
@@ -410,9 +386,9 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-                  <span className="font-bold text-primary">{formatDate(entry.session_date)}</span>
+                  <span className="font-bold text-primary">{entry.session_date}</span>
                   <span>·</span>
-                  <span>Added {new Date(entry.created_at).toLocaleDateString()}</span>
+                  <span>{t('added_at_lbl', 'Added')} {new Date(entry.created_at).toLocaleDateString()}</span>
                   {entry.weight && (
                     <>
                       <span>·</span>
@@ -425,7 +401,7 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
                     <>
                       <span>·</span>
                       <span className="text-[10px] text-muted-foreground italic">
-                        Signed by: {entry.doctor_name}
+                        {t('signed_by', 'Signed by:')} {entry.doctor_name}
                       </span>
                     </>
                   )}
@@ -439,13 +415,13 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
                         setEditWeight(entry.weight !== undefined && entry.weight !== null ? entry.weight.toString() : '');
                         setEditDoctorId(entry.doctor_id ? entry.doctor_id.toString() : (currentUser?.doctor_id ? currentUser.doctor_id.toString() : ''));
                       }}
-                      className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                      className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
                     >
                       <Edit3 size={14} />
                     </button>
                     <button
                       onClick={() => handleDelete(entry.id)}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
+                      className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -456,7 +432,7 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
               {editingId === entry.id ? (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Weight (kg)</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('weight_kg_lbl', 'Weight (kg)')}</label>
                     <input
                       type="number"
                       step="0.1"
@@ -474,14 +450,14 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
                   />
 
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
                     <select 
                       disabled={readOnly || currentUser?.role === 'doctor'}
                       value={editDoctorId} 
                       onChange={e => setEditDoctorId(e.target.value)} 
-                      className="w-full px-3 py-2 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+                      className="w-full px-3 py-2 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                     >
-                      <option value="">Select Doctor...</option>
+                      <option value="">{t('select_doctor', 'Select Doctor...')}</option>
                       {doctors.map(d => (
                         <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
                       ))}
@@ -491,17 +467,17 @@ function BasicDataTab({ profileId, currentUser, readOnly }: { profileId: number;
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => setEditingId(null)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all"
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all cursor-pointer"
                     >
-                      Cancel
+                      {t('cancel')}
                     </button>
                     <button
                       onClick={() => handleUpdate(entry.id)}
                       disabled={saving}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
                     >
                       {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-                      Save
+                      {t('save')}
                     </button>
                   </div>
                 </div>
@@ -531,6 +507,7 @@ function AddResultForm({
   currentUser,
   onSave
 }: AddResultFormProps) {
+  const { t, isAr } = useLanguage();
   const [showForm, setShowForm] = useState(false);
   const [resultText, setResultText] = useState('');
   const [resultDate, setResultDate] = useState(new Date().toISOString().slice(0, 10));
@@ -564,9 +541,9 @@ function AddResultForm({
     return (
       <button
         onClick={() => setShowForm(true)}
-        className="w-full py-2 bg-primary/5 hover:bg-primary/10 border border-dashed border-primary/20 hover:border-primary/40 rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition-all mt-1"
+        className="w-full py-2 bg-primary/5 hover:bg-primary/10 border border-dashed border-primary/20 hover:border-primary/40 rounded-xl text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition-all mt-1 cursor-pointer"
       >
-        <Plus size={14} /> Add New Result Entry
+        <Plus size={14} /> {t('add_new_result_btn', 'Add New Result Entry')}
       </button>
     );
   }
@@ -574,32 +551,32 @@ function AddResultForm({
   return (
     <div className="bg-muted/30 border border-border/80 rounded-xl p-4 space-y-3 mt-1">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">New Result Entry</span>
-        <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground">
+        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('new_result_entry_title', 'New Result Entry')}</span>
+        <button onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground cursor-pointer">
           <X size={14} />
         </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Result Date</label>
+          <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{t('result_date_lbl', 'Result Date')}</label>
           <input
             type="date"
             value={resultDate}
             onChange={e => setResultDate(e.target.value)}
-            className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+          <label className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
           <select
             disabled={currentUser?.role === 'doctor'}
             value={doctorId}
             onChange={e => setDoctorId(e.target.value)}
-            className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-semibold"
+            className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-semibold cursor-pointer"
           >
-            <option value="">Select Doctor...</option>
+            <option value="">{t('select_doctor', 'Select Doctor...')}</option>
             {doctors.map(d => (
               <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
             ))}
@@ -610,7 +587,7 @@ function AddResultForm({
       <textarea
         value={resultText}
         onChange={e => setResultText(e.target.value)}
-        placeholder="Enter result text, findings, or metrics..."
+        placeholder={t('result_notes_placeholder', 'Enter result text, findings, or metrics...')}
         rows={3}
         className="w-full bg-background border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
       />
@@ -618,17 +595,17 @@ function AddResultForm({
       <div className="flex gap-2 justify-end">
         <button
           onClick={() => setShowForm(false)}
-          className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all"
+          className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all cursor-pointer"
         >
-          Cancel
+          {t('cancel')}
         </button>
         <button
           onClick={handleAdd}
           disabled={saving || !resultText.trim() || !doctorId}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all shadow-sm"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all shadow-sm cursor-pointer"
         >
           {saving ? <Loader2 size={11} className="animate-spin" /> : <Save size={11} />}
-          Add Result
+          {t('add_result_btn_text', 'Add Result')}
         </button>
       </div>
     </div>
@@ -636,6 +613,7 @@ function AddResultForm({
 }
 
 function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: number; currentUser: any; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [library, setLibrary] = useState<InvestigationLibraryItem[]>([]);
   const [clientInvestigations, setClientInvestigations] = useState<ClientInvestigation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -665,48 +643,49 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
         setSelectedDoctorId(currentUser.doctor_id.toString());
       }
     } catch {
-      showFeedback('Failed to load investigations', 'error');
+      showFeedback(t('toast_failed_load_investigations', 'Failed to load investigations'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [profileId, currentUser]);
+  }, [profileId, currentUser, t]);
 
   useEffect(() => { load(); }, [load]);
 
   const handleAssign = async (investigationId: number) => {
     if (readOnly) return;
     const alreadyAssigned = clientInvestigations.some(ci => ci.investigation_id === investigationId);
-    if (alreadyAssigned) { showFeedback('Already assigned to this patient', 'error'); return; }
+    if (alreadyAssigned) { showFeedback(t('measurement_exists_error', 'Already assigned to this patient'), 'error'); return; }
     if (!selectedDoctorId) {
-      showFeedback('Doctor signature is required.', 'error');
+      showFeedback(t('doctor_signature_req_error', 'Doctor signature is required.'), 'error');
       return;
     }
     setSaving(true);
     try {
       await (window.api as any).assignInvestigation(profileId, investigationId, parseInt(selectedDoctorId));
-      showFeedback('Investigation assigned', 'success');
+      showFeedback(t('toast_test_registered_success', 'Investigation assigned'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to assign', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to assign'), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const handleRemove = async (id: number) => {
+    if (!confirm(t('delete_apt_confirm', 'Delete permanently?'))) return;
     try {
       await (window.api as any).removeClientInvestigation(id);
-      showFeedback('Investigation removed', 'success');
+      showFeedback(t('toast_request_denied', 'Investigation removed'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to remove', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to remove'), 'error');
     }
   };
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
       <Loader2 size={20} className="animate-spin text-primary" />
-      <span className="text-sm">Loading investigations…</span>
+      <span className="text-sm">{t('loading_measurements', 'Loading investigations…')}</span>
     </div>
   );
 
@@ -718,23 +697,23 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
             <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
               <Plus size={15} className="text-primary" />
             </div>
-            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Assign Diagnostic Test</span>
+            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('assign_diagnostic_test', 'Assign Diagnostic Test')}</span>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Select Test from Library</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('select_test_library_lbl', 'Select Test from Library')}</label>
               <select
                 value={selectedInvestigationId}
                 onChange={e => setSelectedInvestigationId(e.target.value)}
                 className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
               >
-                <option value="">Select test...</option>
+                <option value="">{t('select_test_prompt', 'Select test...')}</option>
                 {library.map(item => {
                   const assigned = clientInvestigations.some(ci => ci.investigation_id === item.id);
                   return (
                     <option key={item.id} value={item.id} disabled={assigned}>
-                      {item.name} {assigned ? '(Assigned)' : ''}
+                      {item.name} {assigned ? `(${t('processed_status', 'Assigned')})` : ''}
                     </option>
                   );
                 })}
@@ -742,14 +721,14 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
               <select 
                 disabled={readOnly || currentUser?.role === 'doctor'}
                 value={selectedDoctorId} 
                 onChange={e => setSelectedDoctorId(e.target.value)} 
-                className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary cursor-pointer"
               >
-                <option value="">Select Doctor...</option>
+                <option value="">{t('select_doctor', 'Select Doctor...')}</option>
                 {doctors.map(d => (
                   <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
                 ))}
@@ -766,9 +745,9 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                 }
               }}
               disabled={saving || !selectedInvestigationId}
-              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
-              Assign Test
+              {t('assign_test_btn', 'Assign Test')}
             </button>
           </div>
         </div>
@@ -776,15 +755,15 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
 
       <div className="space-y-3 min-w-0">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-          <Microscope size={14} /> Assigned Investigations
+          <Microscope size={14} /> {t('assigned_investigations_title', 'Assigned Investigations')}
         </h3>
 
         {feedback && <FeedbackBanner message={feedback.msg} type={feedback.type} />}
 
         {clientInvestigations.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground text-sm">
+          <div className="text-center py-16 text-muted-foreground text-sm bg-card border border-border rounded-2xl shadow-sm">
             <FlaskConical size={36} className="mx-auto mb-3 opacity-30" />
-            No investigations assigned yet. Select and assign a test above.
+            {t('no_investigations_assigned_yet', 'No investigations assigned yet. Select and assign a test above.')}
           </div>
         ) : (
           <div className="space-y-3">
@@ -830,8 +809,8 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                     {!readOnly && (
                       <button
                         onClick={() => handleRemove(inv.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
-                        title="Remove Test Assignment"
+                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all cursor-pointer"
+                        title={t('delete', 'Remove Test Assignment')}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -853,16 +832,16 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                           result_text: JSON.stringify(updatedEntries),
                           result_date: latest ? latest.result_date : null
                         });
-                        showFeedback('Investigation results updated', 'success');
+                        showFeedback(t('toast_test_registered_success', 'Investigation results updated'), 'success');
                         await load();
                       }}
                     />
                   )}
 
                   <div className="space-y-3 mt-4">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Results History ({sortedEntries.length})</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('results_history_count', 'Results History ({count})').replace('{count}', sortedEntries.length.toString())}</p>
                     {sortedEntries.length === 0 ? (
-                      <p className="text-xs text-muted-foreground italic pl-2">No results recorded yet.</p>
+                      <p className="text-xs text-muted-foreground italic pl-2">{t('no_results_recorded_yet', 'No results recorded yet.')}</p>
                     ) : (
                       <div className="relative pl-4 border-l border-border/80 space-y-4">
                         {sortedEntries.map((entry, idx) => (
@@ -873,7 +852,7 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                               <span className="text-xs font-bold text-primary font-mono">{entry.result_date}</span>
                               {entry.doctor_name && (
                                 <span className="text-[9px] text-muted-foreground italic bg-muted px-2 py-0.5 rounded-full">
-                                  Signed: {entry.doctor_name}
+                                  {t('signed_by_short', 'Signed:')} {entry.doctor_name}
                                 </span>
                               )}
                             </div>
@@ -885,6 +864,7 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                               {!readOnly && (
                                 <button
                                   onClick={async () => {
+                                    if (!confirm(t('delete_apt_confirm', 'Delete permanently?'))) return;
                                     const filtered = entries.filter(e => e.id !== entry.id);
                                     const latest = filtered.reduce((latestOpt: any, current: any) => {
                                       if (!latestOpt) return current;
@@ -895,11 +875,11 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
                                       result_text: filtered.length > 0 ? JSON.stringify(filtered) : '',
                                       result_date: latest ? latest.result_date : null
                                     });
-                                    showFeedback('Result entry deleted', 'success');
+                                    showFeedback(t('toast_request_denied', 'Result entry deleted'), 'success');
                                     await load();
                                   }}
-                                  className="text-muted-foreground hover:text-red-400 p-0.5 rounded transition-colors"
-                                  title="Delete this entry"
+                                  className="text-muted-foreground hover:text-red-400 p-0.5 rounded transition-colors cursor-pointer"
+                                  title={t('delete', 'Delete this entry')}
                                 >
                                   <Trash2 size={12} />
                                 </button>
@@ -923,6 +903,7 @@ function InvestigationsTab({ profileId, currentUser, readOnly }: { profileId: nu
 // ─── Tab 3: InBody ─────────────────────────────────────────────────────────────
 
 function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [uploads, setUploads] = useState<InbodyUpload[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -940,11 +921,11 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
       const data = await (window.api as any).getInbodyUploads(profileId);
       setUploads(Array.isArray(data) ? data : []);
     } catch {
-      showFeedback('Failed to load InBody scans', 'error');
+      showFeedback(t('toast_inbody_load_failed', 'Failed to load InBody scans'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [profileId]);
+  }, [profileId, t]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -953,13 +934,13 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
     try {
       const result = await (window.api as any).uploadInbodyPhoto(profileId);
       if (result?.success) {
-        showFeedback('InBody scan uploaded successfully', 'success');
+        showFeedback(t('toast_inbody_upload_success', 'InBody scan uploaded successfully'), 'success');
         await load();
       } else {
-        showFeedback('Upload cancelled or failed', 'error');
+        showFeedback(t('toast_inbody_upload_failed', 'Upload cancelled or failed'), 'error');
       }
     } catch {
-      showFeedback('Upload failed', 'error');
+      showFeedback(t('toast_inbody_upload_failed', 'Upload failed'), 'error');
     } finally {
       setUploading(false);
     }
@@ -992,20 +973,20 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
           }
 
           if (res?.success) {
-            showFeedback('InBody scan uploaded successfully', 'success');
+            showFeedback(t('toast_inbody_upload_success', 'InBody scan uploaded successfully'), 'success');
             await load();
           } else {
-            showFeedback(res?.error || 'Upload failed', 'error');
+            showFeedback(res?.error || t('toast_inbody_upload_failed', 'Upload failed'), 'error');
           }
         } catch (err: any) {
-          showFeedback(`Upload error: ${err.message}`, 'error');
+          showFeedback(`${t('toast_inbody_upload_failed', 'Upload failed')}: ${err.message}`, 'error');
         } finally {
           setUploading(false);
         }
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
-      showFeedback(`Error reading file: ${err.message}`, 'error');
+      showFeedback(`${t('toast_sys_error_occurred', 'Error reading file')}: ${err.message}`, 'error');
       setUploading(false);
     }
   };
@@ -1019,19 +1000,20 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
   };
 
   const handleDelete = async (id: number) => {
+    if (!confirm(t('delete_apt_confirm', 'Delete permanently?'))) return;
     try {
       await (window.api as any).deleteInbodyUpload(id);
-      showFeedback('Scan deleted', 'success');
+      showFeedback(t('toast_inbody_delete_success', 'Scan deleted'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to delete scan', 'error');
+      showFeedback(t('toast_inbody_delete_failed', 'Failed to delete scan'), 'error');
     }
   };
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
       <Loader2 size={20} className="animate-spin text-primary" />
-      <span className="text-sm">Loading InBody scans…</span>
+      <span className="text-sm">{t('loading_measurements', 'Loading InBody scans…')}</span>
     </div>
   );
 
@@ -1049,16 +1031,16 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-          <Camera size={14} /> InBody Scan Gallery
+          <Camera size={14} /> {t('inbody_scan_gallery', 'InBody Scan Gallery')}
         </h3>
         {!readOnly && (
           <button
             onClick={handleUploadClick}
             disabled={uploading}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md disabled:opacity-50 cursor-pointer"
           >
             {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-            Upload InBody Scan
+            {t('upload_inbody_scan_btn', 'Upload InBody Scan')}
           </button>
         )}
       </div>
@@ -1067,9 +1049,9 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
 
       {/* Gallery */}
       {uploadsList.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground text-sm">
+        <div className="text-center py-16 text-muted-foreground text-sm bg-card border border-border rounded-2xl shadow-sm">
           <ImageIcon size={36} className="mx-auto mb-3 opacity-30" />
-          No InBody scans uploaded yet.
+          {t('no_inbody_scans_yet', 'No InBody scans uploaded yet.')}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -1085,7 +1067,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
               >
                 <img
                   src={resolveInbodyImageUrl(item.local_file_path)}
-                  alt={`InBody scan ${formatDate(item.session_date)}`}
+                  alt={`InBody scan ${item.session_date}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
@@ -1093,7 +1075,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
 
               {/* Meta */}
               <div className="p-2.5">
-                <p className="text-xs font-bold text-primary">{formatDate(item.session_date)}</p>
+                <p className="text-xs font-bold text-primary">{item.session_date}</p>
                 <p className="text-[10px] text-muted-foreground truncate" title={item.file_name}>{item.file_name}</p>
               </div>
 
@@ -1101,7 +1083,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
               {!readOnly && (
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/80"
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/80 cursor-pointer"
                 >
                   <Trash2 size={12} />
                 </button>
@@ -1118,7 +1100,7 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
           onClick={() => setLightboxSrc(null)}
         >
           <button
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all cursor-pointer"
             onClick={() => setLightboxSrc(null)}
           >
             <X size={20} />
@@ -1138,12 +1120,13 @@ function InBodyTab({ profileId, readOnly }: { profileId: number; readOnly?: bool
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function NutritionProfile({ profileId, currentUser, readOnly = false }: NutritionProfileProps) {
+  const { t, isAr } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabId>('basic');
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-    { id: 'basic', label: 'Session Notes', icon: <FileText size={14} /> },
-    { id: 'investigations', label: 'Investigations', icon: <FlaskConical size={14} /> },
-    { id: 'inbody', label: 'InBody', icon: <Camera size={14} /> },
+    { id: 'basic', label: t('session_notes_tab', 'Session Notes'), icon: <FileText size={14} /> },
+    { id: 'investigations', label: t('investigations', 'Investigations'), icon: <FlaskConical size={14} /> },
+    { id: 'inbody', label: t('inbody', 'InBody'), icon: <Camera size={14} /> },
   ];
 
   return (
@@ -1157,7 +1140,7 @@ export function NutritionProfile({ profileId, currentUser, readOnly = false }: N
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer
               ${activeTab === tab.id
                 ? 'bg-primary text-primary-foreground shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'

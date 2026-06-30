@@ -4,6 +4,7 @@ import {
   ChevronDown, ChevronRight, Plus, Trash2, Save,
   CheckCircle, XCircle, Zap, Hand, Wrench
 } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 function formatPTDate(dateStr: string | null | undefined, includeTime = false) {
   if (!dateStr) return '';
@@ -87,6 +88,7 @@ function FeedbackBanner({ feedback }: { feedback: { type: 'success' | 'error'; m
 
 // Save button
 function SaveBtn({ onClick, loading }: { onClick: () => void; loading?: boolean }) {
+  const { t } = useLanguage();
   return (
     <button
       onClick={onClick}
@@ -94,7 +96,7 @@ function SaveBtn({ onClick, loading }: { onClick: () => void; loading?: boolean 
       className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-black text-xs uppercase tracking-widest shadow-md hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-60"
     >
       <Save size={14} />
-      {loading ? 'Saving...' : 'Save'}
+      {loading ? t('saving_lbl', 'Saving...') : t('save', 'Save')}
     </button>
   );
 }
@@ -115,6 +117,7 @@ function SectionLabel({ label }: { label: string }) {
 const RED_FLAG_OPTIONS = ['Myelopathy', 'Cauda Equina', 'Drop Foot', 'Urinary Incontinence', 'Motor Weakness', 'Other', 'No'];
 
 function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; currentUser: any; readOnly?: boolean }) {
+  const { t } = useLanguage();
   const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
   const [otherText, setOtherText] = useState('');
   const [loading, setLoading] = useState(true);
@@ -166,7 +169,7 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
   const handleSave = async () => {
     if (!window.api) return;
     if (!selectedDoctorId) {
-      flash('error', 'Doctor signature is required.');
+      flash('error', t('doctor_signature_req_error', 'Doctor signature is required.'));
       return;
     }
     setSaving(true);
@@ -176,8 +179,8 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
         other_text: otherText,
         doctor_id: parseInt(selectedDoctorId),
       });
-      flash(res?.success ? 'success' : 'error', res?.success ? 'Red flags saved.' : 'Save failed.');
-    } catch { flash('error', 'Save failed.'); }
+      flash(res?.success ? 'success' : 'error', res?.success ? t('red_flags_saved', 'Red flags saved.') : t('save_failed', 'Save failed.'));
+    } catch { flash('error', t('save_failed', 'Save failed.')); }
     setSaving(false);
   };
 
@@ -192,11 +195,11 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle size={16} className="text-destructive" />
           <h3 className="text-sm font-black text-destructive uppercase tracking-wider italic">
-            Neurological Red Flags Screening
+            {t('neuro_red_flags_screening', 'Neurological Red Flags Screening')}
           </h3>
         </div>
         <p className="text-xs text-muted-foreground font-medium leading-relaxed">
-          Select all applicable neurological red flags. Selecting <strong>No</strong> clears all others.
+          {t('neuro_red_flags_desc', 'Select all applicable neurological red flags. Selecting No clears all others.')}
         </p>
       </div>
 
@@ -225,7 +228,9 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
                 }`}>
                 {isSelected && <CheckCircle size={12} className="text-white" />}
               </span>
-              <span className="uppercase tracking-tight text-xs font-black">{flag}</span>
+              <span className="uppercase tracking-tight text-xs font-black">
+                {t('red_flag_' + flag.toLowerCase().replace(/ /g, '_'), flag)}
+              </span>
             </button>
           );
         })}
@@ -233,13 +238,13 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
 
       {isOtherSelected && (
         <div className="space-y-2">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Other — Describe</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('other_describe_lbl', 'Other — Describe')}</label>
           <textarea
             value={otherText}
             onChange={e => setOtherText(e.target.value)}
             disabled={readOnly}
             rows={3}
-            placeholder="Describe the other red flag..."
+            placeholder={t('describe_other_red_flag_placeholder', 'Describe the other red flag...')}
             className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
           />
         </div>
@@ -247,14 +252,14 @@ function RedFlagsTab({ profileId, currentUser, readOnly }: { profileId: number; 
 
       <div className="bg-card border border-border rounded-2xl p-5 space-y-3 shadow-sm">
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
           <select 
             disabled={readOnly || currentUser?.role === 'doctor'}
             value={selectedDoctorId} 
             onChange={e => setSelectedDoctorId(e.target.value)} 
             className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="">Select Assigning Clinician...</option>
+            <option value="">{t('select_assigning_clinician', 'Select Assigning Clinician...')}</option>
             {doctors.map(d => (
               <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
             ))}
@@ -278,6 +283,7 @@ const IRRITABILITY_OPTIONS = ['High', 'Mod', 'Low'] as const;
 const NATURE_OPTIONS = ['Inflammatory', 'Mechanical', 'Neural'] as const;
 
 function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onAssessmentSaved }: { profileId: number; assessmentId: number | null; currentUser: any; readOnly?: boolean; onAssessmentSaved: (id: number) => void }) {
+  const { t } = useLanguage();
   const [data, setData] = useState({
     chief_complaint: '',
     aggravating: '',
@@ -351,7 +357,7 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
   const handleSave = async () => {
     if (!window.api) return;
     if (!selectedDoctorId) {
-      flash('error', 'Doctor signature is required.');
+      flash('error', t('doctor_signature_req_error', 'Doctor signature is required.'));
       return;
     }
     setSaving(true);
@@ -362,12 +368,12 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
         doctor_id: parseInt(selectedDoctorId),
       });
       if (res?.success && res.id) {
-        flash('success', assessmentId ? 'Subjective updated.' : 'New physical assessment subjective saved.');
+        flash('success', assessmentId ? t('subjective_updated', 'Subjective updated.') : t('new_assessment_saved', 'New physical assessment subjective saved.'));
         onAssessmentSaved(res.id);
       } else {
-        flash('error', 'Save failed.');
+        flash('error', t('save_failed', 'Save failed.'));
       }
-    } catch { flash('error', 'Save failed.'); }
+    } catch { flash('error', t('save_failed', 'Save failed.')); }
     setSaving(false);
   };
 
@@ -375,13 +381,13 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
 
   return (
     <div className="space-y-6">
-      <SectionLabel label="Subjective Assessment" />
+      <SectionLabel label={t('subjective_assessment_title', 'Subjective Assessment')} />
 
       {[
-        { key: 'chief_complaint', label: 'Chief Complaint' },
-        { key: 'aggravating', label: 'Aggravating Factors' },
-        { key: 'easing', label: 'Easing Factors' },
-      ].map(({ key, label }) => (
+        { key: 'chief_complaint', label: t('chief_complaint_lbl', 'Chief Complaint'), placeholder: t('enter_chief_complaint_placeholder', 'Enter chief complaint...') },
+        { key: 'aggravating', label: t('aggravating_factors_lbl', 'Aggravating Factors'), placeholder: t('enter_aggravating_placeholder', 'Enter aggravating factors...') },
+        { key: 'easing', label: t('easing_factors_lbl', 'Easing Factors'), placeholder: t('enter_easing_placeholder', 'Enter easing factors...') },
+      ].map(({ key, label, placeholder }) => (
         <div key={key} className="space-y-1.5">
           <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</label>
           <textarea
@@ -389,7 +395,7 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
             onChange={e => set(key, e.target.value)}
             disabled={readOnly}
             rows={3}
-            placeholder={`Enter ${label.toLowerCase()}...`}
+            placeholder={placeholder}
             className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary outline-none transition-all resize-y min-h-[80px]"
           />
         </div>
@@ -397,7 +403,7 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
 
       {/* Pain Scale (VAS) */}
       <div className="space-y-2 bg-card border border-border rounded-2xl p-5 shadow-sm">
-        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Pain Scale (VAS 0-10)</label>
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('pain_scale_vas', 'Pain Scale (VAS 0-10)')}</label>
         <div className="flex items-center gap-4">
           <input
             type="range"
@@ -416,15 +422,15 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
           }`}>{data.pain_scale || '0'}</div>
         </div>
         <div className="flex justify-between text-[9px] text-muted-foreground font-bold uppercase tracking-wider">
-          <span>No Pain (0)</span>
-          <span>Moderate (5)</span>
-          <span>Worst Pain (10)</span>
+          <span>{t('no_pain_0', 'No Pain (0)')}</span>
+          <span>{t('moderate_5', 'Moderate (5)')}</span>
+          <span>{t('worst_pain_10', 'Worst Pain (10)')}</span>
         </div>
       </div>
 
       {/* Irritability */}
       <div className="space-y-2">
-        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Irritability</label>
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('irritability_lbl', 'Irritability')}</label>
         <div className="flex gap-2 flex-wrap">
           {IRRITABILITY_OPTIONS.map(opt => (
             <button
@@ -438,7 +444,7 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
                     : 'bg-accent border-accent text-white shadow-md'
                   : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                 } ${readOnly ? 'cursor-not-allowed opacity-60' : ''}`}
-            >{opt}</button>
+            >{t('irritability_' + opt.toLowerCase(), opt)}</button>
           ))}
         </div>
         <textarea
@@ -446,14 +452,14 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
           onChange={e => set('irritability_notes', e.target.value)}
           disabled={readOnly}
           rows={2}
-          placeholder="Irritability notes..."
+          placeholder={t('irritability_notes_placeholder', 'Irritability notes...')}
           className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary outline-none transition-all resize-y min-h-[60px]"
         />
       </div>
 
       {/* Nature */}
       <div className="space-y-2">
-        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nature</label>
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('nature_lbl', 'Nature')}</label>
         <div className="flex gap-2 flex-wrap">
           {NATURE_OPTIONS.map(opt => {
             const isSelected = data.nature.split(',').map(s => s.trim()).includes(opt);
@@ -471,7 +477,7 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
                     ? 'bg-primary border-primary text-primary-foreground shadow-md'
                     : 'bg-card border-border text-muted-foreground hover:border-primary/40'
                   } ${readOnly ? 'cursor-not-allowed opacity-60' : ''}`}
-              >{opt}</button>
+              >{t('nature_' + opt.toLowerCase(), opt)}</button>
             );
           })}
         </div>
@@ -480,21 +486,21 @@ function SubjectiveSection({ profileId, assessmentId, currentUser, readOnly, onA
           onChange={e => set('nature_notes', e.target.value)}
           disabled={readOnly}
           rows={2}
-          placeholder="Nature notes..."
+          placeholder={t('nature_notes_placeholder', 'Nature notes...')}
           className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary outline-none transition-all resize-y min-h-[60px]"
         />
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-5 space-y-3 shadow-sm">
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
           <select 
             disabled={readOnly || currentUser?.role === 'doctor'}
             value={selectedDoctorId} 
             onChange={e => setSelectedDoctorId(e.target.value)} 
             className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="">Select Assigning Clinician...</option>
+            <option value="">{t('select_assigning_clinician', 'Select Assigning Clinician...')}</option>
             {doctors.map(d => (
               <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
             ))}
@@ -518,6 +524,7 @@ let _rowCounter = 1000;
 function nextTempId() { return `temp_${_rowCounter++}`; }
 
 function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { profileId: number; assessmentId: number; currentUser: any; readOnly?: boolean }) {
+  const { t } = useLanguage();
   const [rows, setRows] = useState<ObjectiveRow[]>([]);
   const [palpation, setPalpation] = useState('');
   const [positiveTests, setPositiveTests] = useState<SpecialTestResult[]>([]);
@@ -540,7 +547,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
         ]);
         setRows(rowData || []);
         setPalpation(palpData?.notes || '');
-        setPositiveTests((testData || []).filter((t: SpecialTestResult) => t.result === 'Positive'));
+        setPositiveTests((testData || []).filter((tItem: SpecialTestResult) => tItem.result === 'Positive'));
         setDoctors(docs || []);
         if (palpData) {
           if (palpData.doctor_id) {
@@ -581,7 +588,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
   const handleSave = async () => {
     if (!window.api) return;
     if (!selectedDoctorId) {
-      flash('error', 'Doctor signature is required.');
+      flash('error', t('doctor_signature_req_error', 'Doctor signature is required.'));
       return;
     }
     setSaving(true);
@@ -591,8 +598,8 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
         (window.api as any).savePTPalpation(profileId, { subjectiveId: assessmentId, notes: palpation, doctor_id: parseInt(selectedDoctorId) }),
       ]);
       const ok = rowRes?.success && palRes?.success;
-      flash(ok ? 'success' : 'error', ok ? 'Objective data saved.' : 'Save failed.');
-    } catch { flash('error', 'Save failed.'); }
+      flash(ok ? 'success' : 'error', ok ? t('objective_saved', 'Objective data saved.') : t('save_failed', 'Save failed.'));
+    } catch { flash('error', t('save_failed', 'Save failed.')); }
     setSaving(false);
   };
 
@@ -605,21 +612,21 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
         <div className="flex items-center justify-between pb-2 border-b border-border/60">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-5 rounded-full ${type === 'AROM' ? 'bg-primary' : 'bg-accent'}`} />
-            <span className="text-sm font-black text-foreground uppercase tracking-widest italic">{type} (Range of Motion)</span>
+            <span className="text-sm font-black text-foreground uppercase tracking-widest italic">{type} ({t('range_of_motion_title', 'Range of Motion')})</span>
           </div>
           {!readOnly && (
             <button
               onClick={() => addRow(type)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 shadow-sm"
             >
-              <Plus size={12} /> Add Joint
+              <Plus size={12} /> {t('add_joint_btn', 'Add Joint')}
             </button>
           )}
         </div>
 
         {typeRows.length === 0 && (
           <div className="text-center py-10 text-muted-foreground text-xs font-bold uppercase tracking-widest italic opacity-60 bg-muted/20 rounded-2xl border border-dashed border-border/80">
-            No joint assessments added
+            {t('no_joint_assessments', 'No joint assessments added')}
           </div>
         )}
 
@@ -628,10 +635,10 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
             <table className="w-full text-xs">
               <thead className="bg-muted/40">
                 <tr>
-                  <th className="px-3.5 py-3 text-left font-black text-muted-foreground uppercase tracking-widest text-[9px]">Joint</th>
-                  <th className="px-2 py-3 text-center font-black text-rose-500 uppercase tracking-widest text-[9px]">Pain</th>
-                  <th className="px-2 py-3 text-center font-black text-primary uppercase tracking-widest text-[9px]">Limitation</th>
-                  <th className="px-3.5 py-3 text-left font-black text-muted-foreground uppercase tracking-widest text-[9px]">Angle</th>
+                  <th className="px-3.5 py-3 text-left font-black text-muted-foreground uppercase tracking-widest text-[9px]">{t('joint_tbl_hdr', 'Joint')}</th>
+                  <th className="px-2 py-3 text-center font-black text-rose-500 uppercase tracking-widest text-[9px]">{t('pain_tbl_hdr', 'Pain')}</th>
+                  <th className="px-2 py-3 text-center font-black text-primary uppercase tracking-widest text-[9px]">{t('limitation_tbl_hdr', 'Limitation')}</th>
+                  <th className="px-3.5 py-3 text-left font-black text-muted-foreground uppercase tracking-widest text-[9px]">{t('angle_tbl_hdr', 'Angle')}</th>
                   {!readOnly && <th className="px-2 py-3" />}
                 </tr>
               </thead>
@@ -644,7 +651,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
                         value={row.joint_name}
                         onChange={e => updateRow(row.id, 'joint_name', e.target.value)}
                         disabled={readOnly}
-                        placeholder="e.g. Knee"
+                        placeholder={t('joint_name_placeholder_eg', 'e.g. Knee')}
                         className="w-full px-2.5 py-1.5 bg-background border border-border rounded-xl text-xs font-bold text-foreground focus:ring-1 focus:ring-primary outline-none transition-all min-w-[90px]"
                       />
                     </td>
@@ -676,7 +683,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
                         value={row.angle}
                         onChange={e => updateRow(row.id, 'angle', e.target.value)}
                         disabled={readOnly}
-                        placeholder="e.g. 120°"
+                        placeholder={t('angle_placeholder_eg', 'e.g. 120°')}
                         className="w-full px-2.5 py-1.5 bg-background border border-border rounded-xl text-xs font-semibold text-foreground focus:ring-1 focus:ring-primary outline-none transition-all min-w-[50px]"
                       />
                     </td>
@@ -702,7 +709,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
 
   return (
     <div className="space-y-6">
-      <SectionLabel label="Objective Assessment" />
+      <SectionLabel label={t('objective_assessment_title', 'Objective Assessment')} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {renderTable('AROM')}
@@ -711,16 +718,16 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
 
       {/* Positive Special Tests (read-only from special tests tab) */}
       <div className="space-y-2">
-        <SectionLabel label="Positive Special Tests (from Special Tests tab)" />
+        <SectionLabel label={t('positive_special_tests_lbl', 'Positive Special Tests (from Special Tests tab)')} />
         {positiveTests.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic font-medium opacity-70">No positive findings recorded.</p>
+          <p className="text-xs text-muted-foreground italic font-medium opacity-70">{t('no_positive_findings_recorded', 'No positive findings recorded.')}</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {positiveTests.map((t, i) => (
+            {positiveTests.map((tItem, i) => (
               <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-black uppercase tracking-widest">
                 <Activity size={11} />
-                {t.test_name || `Test #${i + 1}`}
-                {t.region_name && <span className="opacity-60 normal-case">— {t.region_name}</span>}
+                {tItem.test_name ? t(tItem.test_name.toLowerCase(), tItem.test_name) : `${t('special_tests_tab', 'Test')} #${i + 1}`}
+                {tItem.region_name && <span className="opacity-60 normal-case">— {t(tItem.region_name.toLowerCase(), tItem.region_name)}</span>}
               </span>
             ))}
           </div>
@@ -729,27 +736,27 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
 
       {/* Palpation */}
       <div className="space-y-1.5">
-        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Palpation Notes</label>
+        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('palpation_notes_lbl', 'Palpation Notes')}</label>
         <textarea
           value={palpation}
           onChange={e => setPalpation(e.target.value)}
           disabled={readOnly}
           rows={4}
-          placeholder="Palpation findings..."
+          placeholder={t('palpation_findings_placeholder', 'Palpation findings...')}
           className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm font-medium text-foreground focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
         />
       </div>
 
       <div className="bg-card border border-border rounded-2xl p-5 space-y-3 shadow-sm">
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
           <select 
             disabled={readOnly || currentUser?.role === 'doctor'}
             value={selectedDoctorId} 
             onChange={e => setSelectedDoctorId(e.target.value)} 
             className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="">Select Assigning Clinician...</option>
+            <option value="">{t('select_assigning_clinician', 'Select Assigning Clinician...')}</option>
             {doctors.map(d => (
               <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
             ))}
@@ -770,6 +777,7 @@ function ObjectiveSection({ profileId, assessmentId, currentUser, readOnly }: { 
 // ─── TAB 2: Physical Assessment (container) ────────────────────────────────────
 
 function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId: number; currentUser: any; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [assessments, setAssessments] = useState<any[]>([]);
   const [activeAssessmentId, setActiveAssessmentId] = useState<number | null>(null);
   const [section, setSection] = useState<AssessmentSection>('subjective');
@@ -821,7 +829,7 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
   const handleAssessmentSaved = async (id: number) => {
     setActiveAssessmentId(id);
     await loadAssessments();
-    flash('success', 'Assessment saved successfully.');
+    flash('success', t('red_flags_saved', 'Assessment saved successfully.'));
   };
 
   const handleTabClick = async (tabId: AssessmentSection) => {
@@ -844,11 +852,11 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
           await loadAssessments();
           setSection('objective');
         } else {
-          flash('error', 'Could not initialize assessment draft.');
+          flash('error', t('could_not_init_draft', 'Could not initialize assessment draft.'));
         }
       } catch (err) {
         console.error(err);
-        flash('error', 'Could not initialize assessment draft.');
+        flash('error', t('could_not_init_draft', 'Could not initialize assessment draft.'));
       } finally {
         setLoading(false);
       }
@@ -860,11 +868,11 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
   const handleDelete = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!window.api) return;
-    if (!window.confirm("Are you sure you want to delete this physical assessment?")) return;
+    if (!window.confirm(t('confirm_delete_assessment', "Are you sure you want to delete this physical assessment?"))) return;
     try {
       const res = await (window.api as any).deletePTAssessment(id);
       if (res?.success) {
-        flash('success', 'Assessment deleted.');
+        flash('success', t('assessment_deleted', 'Assessment deleted.'));
         const assessmentsList = Array.isArray(assessments) ? assessments : [];
         const updated = assessmentsList.filter(a => a.id !== id);
         setAssessments(updated);
@@ -876,18 +884,18 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
           }
         }
       } else {
-        flash('error', 'Failed to delete.');
+        flash('error', t('failed_to_delete', 'Failed to delete.'));
       }
     } catch {
-      flash('error', 'Failed to delete.');
+      flash('error', t('failed_to_delete', 'Failed to delete.'));
     }
   };
 
   if (loading) return <Spinner />;
 
   const sections: { id: AssessmentSection; label: string }[] = [
-    { id: 'subjective', label: 'Subjective' },
-    { id: 'objective', label: 'Objective' },
+    { id: 'subjective', label: t('subjective_assessment_title', 'Subjective') },
+    { id: 'objective', label: t('objective_assessment_title', 'Objective') },
   ];
 
   const assessmentsList = Array.isArray(assessments) ? assessments : [];
@@ -897,14 +905,14 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
       {/* Sidebar history */}
       <div className="w-full lg:w-64 shrink-0 space-y-4 border-b lg:border-b-0 lg:border-r border-border pb-6 lg:pb-0 lg:pr-6">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Assessments History</span>
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('assessments_history_title', 'Assessments History')}</span>
           {!readOnly && (
             <button
               onClick={startNewAssessment}
               className="flex items-center gap-1 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-primary bg-primary/10 hover:bg-primary/20 border border-primary/25 rounded-lg transition-all active:scale-95 cursor-pointer"
             >
               <Plus size={10} />
-              New
+              {t('new_btn', 'New')}
             </button>
           )}
         </div>
@@ -912,12 +920,12 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
         <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
           {assessmentsList.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-xs italic opacity-60">
-              No assessments recorded yet.
+              {t('no_assessments_recorded', 'No assessments recorded yet.')}
             </div>
           ) : (
             assessmentsList.map((item, idx) => {
               const isSelected = activeAssessmentId === item.id;
-              const dateStr = item.updated_at ? formatPTDate(item.updated_at) : 'Draft';
+              const dateStr = item.updated_at ? formatPTDate(item.updated_at) : t('draft_status', 'Draft');
               return (
                 <div
                   key={item.id}
@@ -929,11 +937,11 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
                 >
                   <div className="min-w-0 flex-1">
                     <p className={`text-xs font-black uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-                      Assessment #{assessmentsList.length - idx}
+                      {t('assessment_suffix', 'Assessment')} #{assessmentsList.length - idx}
                     </p>
                     <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{dateStr}</p>
                     <p className="text-[9px] text-muted-foreground font-medium truncate italic mt-0.5">
-                      By: {item.doctor_name || 'Unsigned'}
+                      {t('by_clinician', 'By:')} {item.doctor_name || t('unsigned_lbl', 'Unsigned')}
                     </p>
                   </div>
                   {!readOnly && (
@@ -956,12 +964,12 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest text-foreground">
-              {activeAssessmentId ? `Editing Physical Assessment` : 'New Physical Assessment'}
+              {activeAssessmentId ? t('editing_physical_assessment', 'Editing Physical Assessment') : t('new_physical_assessment', 'New Physical Assessment')}
             </h4>
             <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
               {activeAssessmentId 
-                ? `Saved on ${formatPTDate(assessmentsList.find(a => a.id === activeAssessmentId)?.updated_at, true)}` 
-                : 'Fill out the subjective assessment first'
+                ? `${t('saved_on_lbl', 'Saved on')} ${formatPTDate(assessmentsList.find(a => a.id === activeAssessmentId)?.updated_at, true)}` 
+                : t('fill_subjective_first', 'Fill out the subjective assessment first')
               }
             </p>
           </div>
@@ -1013,6 +1021,7 @@ function PhysicalAssessmentTab({ profileId, currentUser, readOnly }: { profileId
 // ─── TAB 3: Special Tests ─────────────────────────────────────────────────────
 
 function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [structure, setStructure] = useState<{ regions: any[]; tests: any[] }>({ regions: [], tests: [] });
   const [results, setResults] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(true);
@@ -1052,8 +1061,8 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
   // Find all regions that match the search query OR have tests matching the query
   const filteredRegions = structure.regions.filter(r => {
     const matchesRegion = r.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const regionTests = structure.tests.filter(t => t.region_id === r.id);
-    const matchesTests = regionTests.some(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const regionTests = structure.tests.filter(tItem => tItem.region_id === r.id);
+    const matchesTests = regionTests.some(tItem => tItem.name.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesRegion || matchesTests;
   });
 
@@ -1062,14 +1071,14 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-2">
           <Target size={16} className="text-primary" />
-          <span className="text-sm font-black text-foreground uppercase tracking-tight italic">Clinical Assessment Library</span>
+          <span className="text-sm font-black text-foreground uppercase tracking-tight italic">{t('clinical_assessment_library', 'Clinical Assessment Library')}</span>
           <span className="px-2 py-0.5 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest border border-primary/10">
-            {positiveCount} Positive
+            {positiveCount} {t('positive_finding_title', 'Positive')}
           </span>
         </div>
         <input
           type="text"
-          placeholder="Search region or test name..."
+          placeholder={t('search_region_test_placeholder', 'Search region or test name...')}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           className="w-full sm:w-64 px-4 py-2 rounded-xl border border-border bg-card text-foreground font-medium focus:ring-2 focus:ring-primary outline-none transition-all text-xs"
@@ -1080,11 +1089,11 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
         {filteredRegions.map(region => {
           // If the region matches the query, show all tests; otherwise, filter tests by query
           const isRegionMatched = region.name.toLowerCase().includes(searchQuery.toLowerCase());
-          const regionTests = structure.tests.filter(t => {
-            const isCorrectRegion = t.region_id === region.id;
+          const regionTests = structure.tests.filter(tItem => {
+            const isCorrectRegion = tItem.region_id === region.id;
             if (!isCorrectRegion) return false;
             if (isRegionMatched || !searchQuery) return true;
-            return t.name.toLowerCase().includes(searchQuery.toLowerCase());
+            return tItem.name.toLowerCase().includes(searchQuery.toLowerCase());
           });
           
           if (regionTests.length === 0) return null;
@@ -1093,7 +1102,9 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
               <div className="flex items-center gap-3 px-1">
                 <div className="h-px flex-1 bg-border" />
                 <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest italic">
-                  {region.name} Assessment
+                  {isAr 
+                    ? `${t('assessment_suffix', 'Assessment')} ${t(region.name.toLowerCase(), region.name)}` 
+                    : `${t(region.name.toLowerCase(), region.name)} ${t('assessment_suffix', 'Assessment')}`}
                 </h4>
                 <div className="h-px flex-1 bg-border" />
               </div>
@@ -1114,7 +1125,7 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
                         </div>
                         <p className={`font-black text-xs uppercase tracking-tight italic truncate transition-colors
                           ${isPositive ? 'text-primary' : 'text-foreground'}`}>
-                          {test.name}
+                          {t(test.name.toLowerCase(), test.name)}
                         </p>
                       </div>
                       {!readOnly ? (
@@ -1127,7 +1138,7 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
                                 : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
                               }`}
                           >
-                            {isPositive ? 'Positive ✓' : 'Positive'}
+                            {isPositive ? `${t('positive_finding_btn', 'Positive')} ✓` : t('positive_finding_btn', 'Positive')}
                           </button>
                           <button
                             onClick={() => !isPositive && handleToggle(test.id, 'Positive')}
@@ -1138,13 +1149,13 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
                               }`}
                             disabled={!isPositive}
                           >
-                            Negative
+                            {t('negative_cleared_btn', 'Negative')}
                           </button>
                         </div>
                       ) : (
                         <span className={`px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest
                           ${isPositive ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-muted border-border text-muted-foreground'}`}>
-                          {result}
+                          {result === 'Positive' ? t('positive_finding_title', 'Positive') : t('negative_cleared_title', 'Negative')}
                         </span>
                       )}
                     </div>
@@ -1157,7 +1168,7 @@ function SpecialTestsTab({ profileId, readOnly }: { profileId: number; readOnly?
 
         {filteredRegions.length === 0 && (
           <div className="text-center py-16 text-muted-foreground text-xs font-bold uppercase tracking-widest italic opacity-60">
-            No regions found
+            {t('no_regions_found_lbl', 'No regions found')}
           </div>
         )}
       </div>
@@ -1242,6 +1253,7 @@ function parseSectionData(jsonStr: string, items: { key: string }[]): SectionDat
 }
 
 function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: number; currentUser: any; readOnly?: boolean }) {
+  const { t, isAr } = useLanguage();
   const [plans, setPlans] = useState<any[]>([]);
   const [activePlanId, setActivePlanId] = useState<number | null>(null);
   const [sectionData, setSectionData] = useState<AllSectionData>({
@@ -1340,7 +1352,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
     if (currentUser?.role === 'doctor' && currentUser.doctor_id) {
       setSelectedDoctorId(currentUser.doctor_id.toString());
     }
-    flash('success', 'Cloned from latest session plan.');
+    flash('success', t('cloned_from_latest_success', 'Cloned from latest session plan.'));
   };
 
   const toggleItem = (sectionId: string, key: string) => {
@@ -1376,7 +1388,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
   const handleSave = async () => {
     if (!window.api) return;
     if (!selectedDoctorId) {
-      flash('error', 'Doctor signature is required.');
+      flash('error', t('doctor_signature_req_error', 'Doctor signature is required.'));
       return;
     }
     setSaving(true);
@@ -1389,26 +1401,26 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
         doctor_id: parseInt(selectedDoctorId),
       });
       if (res?.success) {
-        flash('success', activePlanId ? 'Session plan updated.' : 'New session plan saved.');
+        flash('success', activePlanId ? t('session_plan_updated', 'Session plan updated.') : t('new_session_plan_saved', 'New session plan saved.'));
         const resList = await (window.api as any).getPTSessionPlans(profileId);
         setPlans(resList || []);
         if (!activePlanId && resList && resList.length > 0) {
           setActivePlanId(resList[0].id);
         }
       } else {
-        flash('error', 'Save failed.');
+        flash('error', t('save_failed', 'Save failed.'));
       }
-    } catch { flash('error', 'Save failed.'); }
+    } catch { flash('error', t('save_failed', 'Save failed.')); }
     setSaving(false);
   };
 
   const handleDelete = async (planId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this session plan?")) return;
+    if (!window.confirm(t('confirm_delete_session_plan', "Are you sure you want to delete this session plan?"))) return;
     try {
       const res = await (window.api as any).deletePTSessionPlan(planId);
       if (res?.success) {
-        flash('success', 'Session plan deleted.');
+        flash('success', t('session_plan_deleted', 'Session plan deleted.'));
         const updated = plans.filter(p => p.id !== planId);
         setPlans(updated);
         if (activePlanId === planId) {
@@ -1420,7 +1432,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
         }
       }
     } catch {
-      flash('error', 'Failed to delete.');
+      flash('error', t('failed_to_delete', 'Failed to delete.'));
     }
   };
 
@@ -1434,14 +1446,14 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
       {/* History Sidebar */}
       <div className="w-full lg:w-64 shrink-0 space-y-4 border-b lg:border-b-0 lg:border-r border-border pb-6 lg:pb-0 lg:pr-6">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Sessions History</span>
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('session_history_lbl', 'Sessions History')}</span>
           {!readOnly && (
             <button
               onClick={startNewPlan}
               className="flex items-center gap-1 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-primary bg-primary/10 hover:bg-primary/20 border border-primary/25 rounded-lg transition-all active:scale-95 cursor-pointer"
             >
               <Plus size={10} />
-              New
+              {t('new_btn', 'New')}
             </button>
           )}
         </div>
@@ -1449,12 +1461,12 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
         <div className="space-y-2 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
           {plansList.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-xs italic opacity-60">
-              No session plans recorded yet.
+              {t('no_assessments_recorded', 'No session plans recorded yet.')}
             </div>
           ) : (
             plansList.map((plan, idx) => {
               const isSelected = activePlanId === plan.id;
-              const dateStr = plan.updated_at ? formatPTDate(plan.updated_at) : 'Draft';
+              const dateStr = plan.updated_at ? formatPTDate(plan.updated_at) : t('draft_status', 'Draft');
               return (
                 <div
                   key={plan.id}
@@ -1466,11 +1478,11 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
                 >
                   <div className="min-w-0 flex-1">
                     <p className={`text-xs font-black uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-foreground'}`}>
-                      Session #{plansList.length - idx}
+                      {t('session', 'Session')} #{plansList.length - idx}
                     </p>
                     <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{dateStr}</p>
                     <p className="text-[9px] text-muted-foreground font-medium truncate italic mt-0.5">
-                      By: {plan.doctor_name || 'Unsigned'}
+                      {t('by_clinician', 'By:')} {plan.doctor_name || t('unsigned_lbl', 'Unsigned')}
                     </p>
                   </div>
                   {!readOnly && (
@@ -1493,12 +1505,12 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div>
             <h4 className="text-xs font-black uppercase tracking-widest text-foreground">
-              {activePlanId ? `Editing Session Plan` : 'New Session Plan'}
+              {activePlanId ? t('editing_session_plan', 'Editing Session Plan') : t('new_session_plan', 'New Session Plan')}
             </h4>
             <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
               {activePlanId 
-                ? `Modify details for this previously recorded session.` 
-                : 'Select treatments and options to document this clinical session.'}
+                ? t('modify_session_plan_desc', 'Modify details for this previously recorded session.')
+                : t('new_session_plan_desc', 'Select treatments and options to document this clinical session.')}
             </p>
           </div>
           {!activePlanId && plans.length > 0 && !readOnly && (
@@ -1506,7 +1518,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
               onClick={cloneFromLatest}
               className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 rounded-xl transition-all cursor-pointer"
             >
-              Clone From Latest
+              {t('clone_from_latest_btn', 'Clone From Latest')}
             </button>
           )}
         </div>
@@ -1527,15 +1539,20 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
                     <div className="p-2 bg-primary/10 text-primary rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                       {section.icon}
                     </div>
-                    <span className="font-black text-sm text-foreground uppercase tracking-tight italic">{section.label}</span>
+                    <span className="font-black text-sm text-foreground uppercase tracking-tight italic">
+                      {t('session_plan_sec_' + section.id, section.label)}
+                    </span>
                     {selectedCount > 0 && (
                       <span className="px-2 py-0.5 bg-primary text-primary-foreground rounded-full text-[9px] font-black uppercase tracking-widest">
-                        {selectedCount} selected
+                        {selectedCount} {t('selected_unit', 'selected')}
                       </span>
                     )}
                   </div>
                   <div className="text-muted-foreground">
-                    {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                    {isCollapsed 
+                      ? (isAr ? <ChevronRight style={{ transform: 'scaleX(-1)' }} size={16} /> : <ChevronRight size={16} />) 
+                      : <ChevronDown size={16} />
+                    }
                   </div>
                 </button>
 
@@ -1565,7 +1582,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
                                 ${itemData.selected ? 'text-primary' : 'text-foreground'}`}
                               onClick={() => !readOnly && toggleItem(section.id, item.key)}
                             >
-                              {item.label}
+                              {t('session_plan_item_' + item.key, item.label)}
                             </span>
                           </div>
                           {itemData.selected && (
@@ -1576,7 +1593,7 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
                                   value={itemData.custom_name || ''}
                                   onChange={e => updateCustomName(section.id, item.key, e.target.value)}
                                   disabled={readOnly}
-                                  placeholder="Specify other treatment..."
+                                  placeholder={t('specify_other_treatment_placeholder', 'Specify other treatment...')}
                                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs font-semibold text-foreground focus:ring-1 focus:ring-primary outline-none transition-all mb-1"
                                 />
                               )}
@@ -1585,7 +1602,12 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
                                 value={itemData.notes}
                                 onChange={e => updateNotes(section.id, item.key, e.target.value)}
                                 disabled={readOnly}
-                                placeholder={`${isOther ? (itemData.custom_name || 'Other') : item.label} notes...`}
+                                placeholder={t('session_item_notes_placeholder', '{itemName} notes...').replace(
+                                  '{itemName}',
+                                  isOther 
+                                    ? (itemData.custom_name || t('other', 'Other')) 
+                                    : t('session_plan_item_' + item.key, item.label)
+                                )}
                                 className="w-full px-3 py-2 bg-background border border-border rounded-lg text-xs font-medium text-foreground focus:ring-1 focus:ring-primary outline-none transition-all"
                               />
                             </div>
@@ -1601,14 +1623,14 @@ function SessionPlanTab({ profileId, currentUser, readOnly }: { profileId: numbe
 
           <div className="bg-card border border-border rounded-2xl p-5 space-y-3 shadow-sm">
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
               <select 
                 disabled={readOnly || currentUser?.role === 'doctor'}
                 value={selectedDoctorId} 
                 onChange={e => setSelectedDoctorId(e.target.value)} 
                 className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
               >
-                <option value="">Select Assigning Clinician...</option>
+                <option value="">{t('select_assigning_clinician', 'Select Assigning Clinician...')}</option>
                 {doctorsList.map(d => (
                   <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
                 ))}
@@ -1638,6 +1660,7 @@ const PT_TABS: { id: PTTab; label: string; icon: React.ReactNode }[] = [
 ];
 
 export function PhysicalTherapyProfile({ profileId, currentUser, readOnly }: PhysicalTherapyProfileProps) {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<PTTab>('red-flags');
 
   return (
@@ -1657,7 +1680,7 @@ export function PhysicalTherapyProfile({ profileId, currentUser, readOnly }: Phy
             <span className={activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'}>
               {tab.icon}
             </span>
-            {tab.label}
+            {t(tab.id.replace('-', '_') + '_tab', tab.label)}
           </button>
         ))}
       </div>

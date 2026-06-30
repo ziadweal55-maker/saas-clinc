@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle, Lock, User, ShieldCheck, ChevronLeft, CheckCircle, Building2, Activity, Sparkles, Loader2 } from 'lucide-react';
 import { useTenant } from '../hooks/useTenant';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface LoginViewProps {
   onLogin: (user: any) => void;
@@ -9,6 +10,7 @@ interface LoginViewProps {
 
 export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
   const { tenantSettings, changeTenant } = useTenant();
+  const { language, setLanguage, t } = useLanguage();
   // Login State
   const [workspaceId, setWorkspaceId] = useState(() => {
     const stored = localStorage.getItem('tenantId');
@@ -165,7 +167,18 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
   // Render Login Panel
   if (!isRegistering) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+      <div className="min-h-screen flex items-center justify-center bg-background p-6 relative">
+        {/* Floating Language Toggler */}
+        <div className="absolute top-6 end-6 z-50">
+          <button 
+            type="button"
+            onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+            className="p-2 px-3.5 rounded-xl bg-card border border-border text-primary hover:bg-secondary/20 transition-all active:scale-95 text-xs font-bold font-sans cursor-pointer shadow-sm"
+          >
+            {language === 'ar' ? 'English' : 'العربية'}
+          </button>
+        </div>
+
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
@@ -212,22 +225,22 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                  <User size={12} /> Username
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5 font-sans">
+                  <User size={12} /> {t('username')}
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-4 py-4 rounded-2xl bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium text-foreground placeholder:text-muted-foreground/50"
-                  placeholder="Clinical identifier"
+                  placeholder="e.g. zyad_weal"
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                  <Lock size={12} /> Password
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5 font-sans">
+                  <Lock size={12} /> {t('password')}
                 </label>
                 <input
                   type="password"
@@ -250,11 +263,11 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isLoading ? (
-                    <><div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" /> Authenticating...</>
-                  ) : 'Secure Sign In'}
+                    <><div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" /> {t('authenticating')}</>
+                  ) : t('secure_sign_in')}
                 </button>
               </div>
 
@@ -264,7 +277,7 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
                   onClick={() => setIsRegistering(true)}
                   className="text-xs font-bold text-primary hover:text-primary/80 transition-colors uppercase tracking-widest cursor-pointer"
                 >
-                  Create new account
+                  {t('create_new_account')}
                 </button>
                 {onRegisterTenant && (
                   <button
@@ -280,7 +293,7 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
             
             <div className="text-center">
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Protected by Enterprise-Grade Encryption
+                {t('protected_encryption')}
               </p>
             </div>
           </div>
@@ -295,7 +308,18 @@ export function LoginView({ onLogin, onRegisterTenant }: LoginViewProps) {
 
   // Render Registration Wizard
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6 relative">
+      {/* Floating Language Toggler */}
+      <div className="absolute top-6 end-6 z-50">
+        <button 
+          type="button"
+          onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+          className="p-2 px-3.5 rounded-xl bg-card border border-border text-primary hover:bg-secondary/20 transition-all active:scale-95 text-xs font-bold font-sans cursor-pointer shadow-sm"
+        >
+          {language === 'ar' ? 'English' : 'العربية'}
+        </button>
+      </div>
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>

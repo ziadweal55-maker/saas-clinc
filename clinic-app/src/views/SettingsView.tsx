@@ -5,8 +5,9 @@ import { ExerciseAdmin } from '../components/Exercises';
 import { UserManagement } from '../components/UserManagement';
 import { InvestigationAdmin } from '../components/InvestigationAdmin';
 import { BranchManagement } from '../components/BranchManagement';
-import { DEFAULT_WHATSAPP_TEMPLATE } from '../utils/whatsapp';
+import { DEFAULT_WHATSAPP_TEMPLATE, DEFAULT_WHATSAPP_REVIEW_TEMPLATE } from '../utils/whatsapp';
 import { useTenant } from '../hooks/useTenant';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SettingsViewProps {
   currentUser: {
@@ -19,6 +20,7 @@ interface SettingsViewProps {
 
 export function SettingsView({ currentUser }: SettingsViewProps) {
   const { tenantSettings } = useTenant();
+  const { t } = useLanguage();
   const isFeatureEnabled = (key: string) => {
     if (!tenantSettings || !tenantSettings.features) return true;
     return !!(tenantSettings.features as Record<string, boolean>)[key];
@@ -34,6 +36,7 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
   const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [currentDbPath, setCurrentDbPath] = useState<string>('');
   const [whatsappTemplate, setWhatsappTemplate] = useState('');
+  const [whatsappReviewTemplate, setWhatsappReviewTemplate] = useState('');
 
   console.log('Settings viewed by:', currentUser.username);
 
@@ -42,6 +45,7 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
       window.api.getDbPath().then(path => setCurrentDbPath(path));
     }
     setWhatsappTemplate(localStorage.getItem('whatsapp_template') || DEFAULT_WHATSAPP_TEMPLATE);
+    setWhatsappReviewTemplate(localStorage.getItem('whatsapp_review_template') || DEFAULT_WHATSAPP_REVIEW_TEMPLATE);
   }, []);
 
   const handleBackup = async () => {
@@ -71,15 +75,16 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
 
   const handleSaveTemplate = () => {
     localStorage.setItem('whatsapp_template', whatsappTemplate);
-    alert('WhatsApp template saved successfully!');
+    localStorage.setItem('whatsapp_review_template', whatsappReviewTemplate);
+    alert(t('templates_saved_success', 'Templates saved successfully!'));
   };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground font-heading tracking-tight">System Settings</h1>
-          <p className="text-muted-foreground text-sm font-medium mt-1">Configure clinical protocols, user accounts, and system logistics.</p>
+          <h1 className="text-3xl font-bold text-foreground font-heading tracking-tight">{t('system_settings')}</h1>
+          <p className="text-muted-foreground text-sm font-medium mt-1">{t('settings_subtitle')}</p>
         </div>
       </div>
 
@@ -87,47 +92,47 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
         <div className="flex flex-wrap border-b border-border bg-muted/30 p-1">
           <button 
             onClick={() => setActiveSubTab('backup')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'backup' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <Database size={16} /> Database & Backup
+            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'backup' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+            <Database size={16} /> {t('db_backup')}
+          </button>
+          <button 
+            onClick={() => setActiveSubTab('whatsapp')}
+            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'whatsapp' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+            <MessageSquare size={16} /> {t('whatsapp_templates')}
           </button>
           {showAssessment && (
             <button 
               onClick={() => setActiveSubTab('assessment')}
-              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'assessment' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-              <FileSpreadsheet size={16} /> Clinical Assessment
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'assessment' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+              <FileSpreadsheet size={16} /> {t('clinic_assessment')}
             </button>
           )}
           {showExercises && (
             <button 
               onClick={() => setActiveSubTab('exercises')}
-              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'exercises' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-              <Dumbbell size={16} /> Exercise Library
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'exercises' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+              <Dumbbell size={16} /> {t('exercise_library')}
             </button>
           )}
           {showInvestigations && (
             <button 
               onClick={() => setActiveSubTab('investigations')}
-              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'investigations' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-              <FlaskConical size={16} /> Investigation Library
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'investigations' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+              <FlaskConical size={16} /> {t('investigation_library')}
             </button>
           )}
-          <button 
-            onClick={() => setActiveSubTab('whatsapp')}
-            className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'whatsapp' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-            <MessageSquare size={16} /> WhatsApp Templates
-          </button>
           {showUsers && (
             <button 
               onClick={() => setActiveSubTab('users')}
-              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'users' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-              <ShieldCheck size={16} /> Team Management
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'users' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+              <Plus size={16} /> {t('team_management')}
             </button>
           )}
           {showBranches && (
             <button 
               onClick={() => setActiveSubTab('branches')}
-              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'branches' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
-              <Building2 size={16} /> Branches
+              className={`flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all ${activeSubTab === 'branches' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'} cursor-pointer`}>
+              <Building2 size={16} /> {t('branches')}
             </button>
           )}
         </div>
@@ -202,25 +207,47 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
                     <MessageSquare size={24} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-foreground font-heading">WhatsApp Reminder Template</h3>
-                    <p className="text-xs text-muted-foreground">Customize the default message sent to patients for confirmations</p>
+                    <h3 className="text-lg font-bold text-foreground font-heading">{t('whatsapp_reminder')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('whatsapp_reminder_desc')}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Template Message Text</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('template_text')}</label>
                     <textarea
                       value={whatsappTemplate}
                       onChange={(e) => setWhatsappTemplate(e.target.value)}
-                      rows={5}
+                      rows={4}
+                      className="w-full p-4 text-xs font-semibold rounded-2xl bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary text-foreground leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t border-border/50 pt-6 flex items-center gap-3">
+                  <div className="p-2.5 bg-emerald-500/10 text-emerald-600 rounded-xl">
+                    <MessageSquare size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground font-heading">{t('whatsapp_review')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('whatsapp_review_desc')}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('template_text')}</label>
+                    <textarea
+                      value={whatsappReviewTemplate}
+                      onChange={(e) => setWhatsappReviewTemplate(e.target.value)}
+                      rows={4}
                       className="w-full p-4 text-xs font-semibold rounded-2xl bg-background border border-border focus:outline-none focus:ring-1 focus:ring-primary text-foreground leading-relaxed"
                     />
                   </div>
 
                   <div className="p-4 bg-background/50 rounded-2xl border border-border/50 text-[11px] font-semibold text-muted-foreground space-y-2">
-                    <p className="font-bold uppercase text-foreground tracking-wider text-[9px] text-primary">Dynamic Placeholder Tokens:</p>
-                    <p>Use these tags to automatically fill in details from the appointment:</p>
+                    <p className="font-bold uppercase text-foreground tracking-wider text-[9px] text-primary">{t('dynamic_tokens')}</p>
+                    <p>{t('dynamic_tokens_desc')}</p>
                     <ul className="list-disc pl-4 space-y-1 text-foreground/80">
                       <li><code className="text-primary font-mono font-bold bg-muted px-1.5 py-0.5 rounded">[PatientName]</code> &mdash; Full name of the patient</li>
                       <li><code className="text-primary font-mono font-bold bg-muted px-1.5 py-0.5 rounded">[Date]</code> &mdash; Date of the appointment (DD/MM/YYYY)</li>
@@ -234,7 +261,7 @@ export function SettingsView({ currentUser }: SettingsViewProps) {
                     onClick={handleSaveTemplate}
                     className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-3 cursor-pointer"
                   >
-                    Save Template
+                    {t('save_templates')}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Trash2, Loader2, FlaskConical, CheckCircle2, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface InvestigationLibraryItem {
   id: number;
@@ -7,6 +8,7 @@ interface InvestigationLibraryItem {
 }
 
 export function InvestigationAdmin() {
+  const { t, isAr } = useLanguage();
   const [library, setLibrary] = useState<InvestigationLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -27,7 +29,7 @@ export function InvestigationAdmin() {
         setLibrary(data || []);
       }
     } catch {
-      showFeedback('Failed to load investigation library', 'error');
+      showFeedback(t('toast_failed_load_investigations', 'Failed to load investigation library'), 'error');
     } finally {
       setLoading(false);
     }
@@ -45,33 +47,33 @@ export function InvestigationAdmin() {
         const res = await window.api.addToInvestigationLibrary(newTestName.trim());
         if (res.success) {
           setNewTestName('');
-          showFeedback('Test registered to diagnostic library successfully', 'success');
+          showFeedback(t('toast_test_registered_success', 'Test registered to diagnostic library successfully'), 'success');
           await loadLibrary();
         } else {
-          showFeedback(res.error || 'Failed to add test', 'error');
+          showFeedback(res.error || t('toast_test_add_failed', 'Failed to add test'), 'error');
         }
       }
     } catch (err: any) {
-      showFeedback(err.message || 'System error occurred', 'error');
+      showFeedback(err.message || t('toast_sys_error_occurred', 'System error occurred'), 'error');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteTest = async (id: number, name: string) => {
-    if (confirm(`Are you sure you want to permanently delete "${name}" from the Investigation Library? This will also remove any assigned records of this test from all patients.`)) {
+    if (confirm(t('confirm_delete_test_library', 'Are you sure you want to permanently delete "{name}" from the Investigation Library?').replace('{name}', name))) {
       try {
         if (window.api && window.api.deleteFromInvestigationLibrary) {
           const res = await window.api.deleteFromInvestigationLibrary(id);
           if (res.success) {
-            showFeedback('Test removed from library', 'success');
+            showFeedback(t('toast_test_removed_success', 'Test removed from library'), 'success');
             await loadLibrary();
           } else {
-            showFeedback(res.error || 'Failed to delete test', 'error');
+            showFeedback(res.error || t('toast_test_delete_failed', 'Failed to delete test'), 'error');
           }
         }
       } catch (err: any) {
-        showFeedback(err.message || 'System error occurred', 'error');
+        showFeedback(err.message || t('toast_sys_error_occurred', 'System error occurred'), 'error');
       }
     }
   };
@@ -84,7 +86,7 @@ export function InvestigationAdmin() {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
         <Loader2 size={24} className="animate-spin text-primary" />
-        <span className="text-sm font-semibold tracking-wide uppercase">Syncing Diagnostic Library...</span>
+        <span className="text-sm font-semibold tracking-wide uppercase">{t('syncing_diagnostic_library', 'Syncing Diagnostic Library...')}</span>
       </div>
     );
   }
@@ -112,15 +114,15 @@ export function InvestigationAdmin() {
             <FlaskConical size={20} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-foreground font-heading">Register New Diagnostic Test</h3>
-            <p className="text-xs text-muted-foreground font-medium">Add a standardized investigation type for nutrition protocols.</p>
+            <h3 className="text-base font-bold text-foreground font-heading">{t('register_new_diagnostic_test', 'Register New Diagnostic Test')}</h3>
+            <p className="text-xs text-muted-foreground font-medium">{t('add_standardized_investigation_desc', 'Add a standardized investigation type for nutrition protocols.')}</p>
           </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="e.g. Complete Blood Count (CBC), Fasting Blood Sugar, Vitamin D3..."
+            placeholder={t('investigation_name_placeholder', 'e.g. Complete Blood Count (CBC)...')}
             className="flex-1 px-4 py-3 bg-muted/30 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-semibold text-xs text-foreground placeholder:text-muted-foreground"
             value={newTestName}
             onChange={(e) => setNewTestName(e.target.value)}
@@ -129,10 +131,10 @@ export function InvestigationAdmin() {
           <button
             onClick={handleAddTest}
             disabled={saving || !newTestName.trim()}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-            Register Test
+            {t('register_test_btn', 'Register Test')}
           </button>
         </div>
       </div>
@@ -141,17 +143,17 @@ export function InvestigationAdmin() {
       <div className="bg-card border border-border rounded-3xl shadow-sm overflow-hidden space-y-4 p-6 md:p-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h4 className="font-bold text-foreground font-heading text-sm">Diagnostic Test Repository</h4>
-            <p className="text-xs text-muted-foreground font-medium">Total: {library.length} Registered Tests</p>
+            <h4 className="font-bold text-foreground font-heading text-sm">{t('diagnostic_test_repository', 'Diagnostic Test Repository')}</h4>
+            <p className="text-xs text-muted-foreground font-medium">{t('total_registered_tests', 'Total: {count} Registered Tests').replace('{count}', library.length.toString())}</p>
           </div>
           <div className="relative w-full sm:w-72">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search size={14} className={`absolute ${isAr ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-muted-foreground`} />
             <input
               type="text"
-              placeholder="Search registered tests..."
+              placeholder={t('search_registered_tests_placeholder', 'Search registered tests...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs bg-muted/30 border border-border rounded-xl text-foreground font-medium outline-none focus:ring-1 focus:ring-primary transition-all"
+              className={`w-full ${isAr ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2 text-xs bg-muted/30 border border-border rounded-xl text-foreground font-medium outline-none focus:ring-1 focus:ring-primary transition-all`}
             />
           </div>
         </div>
@@ -160,7 +162,7 @@ export function InvestigationAdmin() {
           <div className="max-h-[350px] overflow-y-auto divide-y divide-border pr-1 custom-scrollbar bg-card">
             {filteredLibrary.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                No matching diagnostic tests in repository
+                {t('no_matching_tests_in_repo', 'No matching diagnostic tests in repository')}
               </div>
             ) : (
               filteredLibrary.map((item) => (
@@ -171,8 +173,8 @@ export function InvestigationAdmin() {
                   </div>
                   <button
                     onClick={() => handleDeleteTest(item.id, item.name)}
-                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
-                    title="Remove from Library"
+                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all cursor-pointer"
+                    title={t('remove_from_library_tooltip', 'Remove from Library')}
                   >
                     <Trash2 size={14} />
                   </button>

@@ -5,16 +5,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle,
-  Ruler, Activity, TrendingUp, TrendingDown, Minus, BarChart2
+  Ruler, Activity, TrendingUp, TrendingDown, Minus, BarChart2, X
 } from 'lucide-react';
-
-function formatDate(dateStr: string | null | undefined) {
-  if (!dateStr) return '';
-  const isoStr = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-  const d = new Date(isoStr);
-  if (isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString();
-}
+import { useLanguage } from '../hooks/useLanguage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,8 +18,6 @@ interface LymphaticMeasurement {
   unit: string;
   session_date: string;
 }
-
-
 
 interface LymphaticProfileProps {
   profileId: number;
@@ -145,6 +136,7 @@ interface MeasurementRowProps {
 function MeasurementRow({
   name, defaultUnit, history, readOnly, onSave, onDelete, saving
 }: MeasurementRowProps) {
+  const { t, isAr } = useLanguage();
   const sorted = [...history].sort((a, b) => b.session_date.localeCompare(a.session_date));
   const latest = sorted[0];
   const trend = getTrend(history);
@@ -165,6 +157,9 @@ function MeasurementRow({
     setLocalSaving(false);
   };
 
+  // Translate standard measurement names dynamically
+  const translatedName = t(name.toLowerCase(), name);
+
   return (
     <div className="bg-card border border-border rounded-2xl p-4 space-y-3 hover:border-primary/30 transition-all shadow-sm">
       {/* Row header */}
@@ -174,15 +169,15 @@ function MeasurementRow({
             <Ruler size={15} className="text-primary" />
           </div>
           <div>
-            <p className="text-sm font-bold text-foreground leading-none">{name}</p>
+            <p className="text-sm font-bold text-foreground leading-none">{translatedName}</p>
             {latest ? (
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-xs text-primary font-semibold">{latest.value} {latest.unit}</span>
                 <TrendIcon trend={trend} />
-                <span className="text-[10px] text-muted-foreground">{formatDate(latest.session_date)}</span>
+                <span className="text-[10px] text-muted-foreground">{latest.session_date}</span>
               </div>
             ) : (
-              <span className="text-[10px] text-muted-foreground">No data yet</span>
+              <span className="text-[10px] text-muted-foreground">{t('no_data_yet', 'No data yet')}</span>
             )}
           </div>
         </div>
@@ -193,10 +188,10 @@ function MeasurementRow({
           )}
           <button
             onClick={() => setShowHistory(v => !v)}
-            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-all flex items-center gap-1"
+            className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-all flex items-center gap-1 cursor-pointer"
           >
             <BarChart2 size={12} />
-            {showHistory ? 'Hide' : `History (${history.length})`}
+            {showHistory ? t('hide', 'Hide') : t('history_count', `History (${history.length})`).replace('{count}', history.length.toString())}
           </button>
         </div>
       </div>
@@ -208,7 +203,7 @@ function MeasurementRow({
             type="number"
             min="0"
             step="0.1"
-            placeholder="Value"
+            placeholder={t('value', 'Value')}
             value={value}
             onChange={e => setValue(e.target.value)}
             className="w-24 bg-background border border-border rounded-xl px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -216,7 +211,7 @@ function MeasurementRow({
           <select
             value={unit}
             onChange={e => setUnit(e.target.value as UnitType)}
-            className="bg-background border border-border rounded-xl px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="bg-background border border-border rounded-xl px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
           >
             <option value="cm">cm</option>
             <option value="kg">kg</option>
@@ -226,15 +221,15 @@ function MeasurementRow({
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="bg-background border border-border rounded-xl px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            className="bg-background border border-border rounded-xl px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
           />
           <button
             onClick={handleSave}
             disabled={saving || localSaving || !value.trim()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50 shrink-0"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50 shrink-0 cursor-pointer"
           >
             {localSaving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
-            Save
+            {t('save')}
           </button>
         </div>
       )}
@@ -242,22 +237,22 @@ function MeasurementRow({
       {/* History */}
       {showHistory && history.length > 0 && (
         <div className="border-t border-border pt-3 space-y-1.5">
-          <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2">Last entries</p>
+          <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2">{t('last_entries', 'Last entries')}</p>
           {sorted.slice(0, 5).map(h => (
             <div key={h.id} className="flex items-center justify-between group px-2 py-1 rounded-lg hover:bg-muted/40">
               <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-24 shrink-0">{formatDate(h.session_date)}</span>
+                <span className="text-xs text-muted-foreground w-24 shrink-0">{h.session_date}</span>
                 <span className="text-sm font-semibold text-foreground">{h.value} <span className="text-xs text-muted-foreground">{h.unit}</span></span>
                 {(h as any).doctor_name && (
                   <span className="text-[10px] text-muted-foreground italic bg-muted px-2 py-0.5 rounded-full shrink-0">
-                    Signed by: {(h as any).doctor_name}
+                    {t('signed_by', 'Signed by:')} {(h as any).doctor_name}
                   </span>
                 )}
               </div>
               {!readOnly && (
                 <button
                   onClick={() => onDelete(h.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all cursor-pointer"
                 >
                   <Trash2 size={12} />
                 </button>
@@ -273,6 +268,7 @@ function MeasurementRow({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function LymphaticProfile({ profileId, currentUser, readOnly = false }: LymphaticProfileProps) {
+  const { t, isAr } = useLanguage();
   const [allMeasurements, setAllMeasurements] = useState<LymphaticMeasurement[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -304,11 +300,11 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
         setSelectedDoctorId(currentUser.doctor_id.toString());
       }
     } catch {
-      showFeedback('Failed to load measurements', 'error');
+      showFeedback(t('toast_failed_load_attendance', 'Failed to load measurements'), 'error');
     } finally {
       setLoading(false);
     }
-  }, [profileId, currentUser]);
+  }, [profileId, currentUser, t]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -317,7 +313,7 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
 
   const handleSave = async (name: string, value: number, unit: UnitType, date: string) => {
     if (!selectedDoctorId) {
-      showFeedback('Doctor signature is required before saving.', 'error');
+      showFeedback(t('doctor_signature_req_error', 'Doctor signature is required before saving.'), 'error');
       return;
     }
     setSaving(true);
@@ -329,10 +325,10 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
         session_date: date,
         doctor_id: parseInt(selectedDoctorId)
       });
-      showFeedback(`${name} saved`, 'success');
+      showFeedback(`${t(name.toLowerCase(), name)} ${t('salary_saved', 'saved')}`, 'success');
       await load();
     } catch {
-      showFeedback('Failed to save measurement', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to save measurement'), 'error');
     } finally {
       setSaving(false);
     }
@@ -341,10 +337,10 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
   const handleDelete = async (id: number) => {
     try {
       await (window.api as any).deleteLymphaticMeasurement(id);
-      showFeedback('Entry deleted', 'success');
+      showFeedback(t('toast_request_denied', 'Entry deleted'), 'success');
       await load();
     } catch {
-      showFeedback('Failed to delete entry', 'error');
+      showFeedback(t('toast_patient_error', 'Failed to delete entry'), 'error');
     }
   };
 
@@ -352,13 +348,13 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
     const trimmed = newCustomName.trim();
     if (!trimmed) return;
     // Validate: no special chars that could cause issues
-    if (!/^[a-zA-Z0-9\s\-_()]{1,64}$/.test(trimmed)) {
-      showFeedback('Measurement name: letters, numbers, spaces, hyphens only (max 64 chars)', 'error');
+    if (!/^[a-zA-Z0-9\s\-_()أ-ي]{1,64}$/.test(trimmed)) {
+      showFeedback(t('invalid_name_error', 'Measurement name: letters, numbers, spaces, hyphens only (max 64 chars)'), 'error');
       return;
     }
     const allNames = [...STANDARD_MEASUREMENTS.map(m => m.name), ...customNames];
     if (allNames.includes(trimmed)) {
-      showFeedback('Measurement already exists', 'error');
+      showFeedback(t('measurement_exists_error', 'Measurement already exists'), 'error');
       return;
     }
     setCustomNames(prev => [...prev, trimmed]);
@@ -377,7 +373,7 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
   if (loading) return (
     <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
       <Loader2 size={20} className="animate-spin text-primary" />
-      <span className="text-sm">Loading measurements…</span>
+      <span className="text-sm">{t('loading_measurements', 'Loading measurements…')}</span>
     </div>
   );
 
@@ -386,10 +382,10 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
       {/* Header stats strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Total Entries', value: totalEntries, icon: <Activity size={16} className="text-primary" /> },
-          { label: 'Measurements', value: uniqueMeasurements, icon: <Ruler size={16} className="text-primary" /> },
-          { label: 'Standard', value: STANDARD_MEASUREMENTS.length, icon: <BarChart2 size={16} className="text-primary" /> },
-          { label: 'Custom', value: customNames.length, icon: <Plus size={16} className="text-primary" /> },
+          { label: t('total_entries', 'Total Entries'), value: totalEntries, icon: <Activity size={16} className="text-primary" /> },
+          { label: t('measurements', 'Measurements'), value: uniqueMeasurements, icon: <Ruler size={16} className="text-primary" /> },
+          { label: t('standard', 'Standard'), value: STANDARD_MEASUREMENTS.length, icon: <BarChart2 size={16} className="text-primary" /> },
+          { label: t('custom', 'Custom'), value: customNames.length, icon: <Plus size={16} className="text-primary" /> },
         ].map(stat => (
           <div key={stat.label} className="bg-card border border-border rounded-2xl px-4 py-3 flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
@@ -407,14 +403,14 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
 
       <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-3">
         <div className="space-y-1">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Doctor Signature (Required)</label>
+          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{t('doctor_signature_req', 'Doctor Signature (Required)')}</label>
           <select 
             disabled={readOnly || currentUser?.role === 'doctor'}
             value={selectedDoctorId} 
             onChange={e => setSelectedDoctorId(e.target.value)} 
-            className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+            className="w-full px-3 py-2.5 text-xs bg-background border border-border rounded-xl text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           >
-            <option value="">Select Doctor...</option>
+            <option value="">{t('select_doctor', 'Select Doctor...')}</option>
             {doctors.map(d => (
               <option key={d.id} value={d.id.toString()}>{d.name} ({d.specialty})</option>
             ))}
@@ -425,7 +421,7 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
       {/* Standard Measurements */}
       <div className="space-y-3">
         <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-          <Ruler size={14} /> Standard Measurements
+          <Ruler size={14} /> {t('standard_measurements_lbl', 'Standard Measurements')}
         </h3>
         <div className="grid gap-3 md:grid-cols-2">
           {STANDARD_MEASUREMENTS.map(m => (
@@ -447,14 +443,14 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-            <Plus size={14} /> Custom Measurements
+            <Plus size={14} /> {t('custom_measurements_lbl', 'Custom Measurements')}
           </h3>
           {!readOnly && (
             <button
               onClick={() => setShowAddCustom(v => !v)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md"
+              className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold hover:opacity-90 transition-all shadow-md cursor-pointer"
             >
-              <Plus size={12} /> Add Measurement
+              <Plus size={12} /> {t('add_measurement_btn', 'Add Measurement')}
             </button>
           )}
         </div>
@@ -464,7 +460,7 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
           <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-2 shadow-sm">
             <input
               type="text"
-              placeholder="Measurement name (e.g. Calf, Waist…)"
+              placeholder={t('measurement_name_placeholder', 'Measurement name (e.g. Calf, Waist…)')}
               value={newCustomName}
               onChange={e => setNewCustomName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAddCustom()}
@@ -474,23 +470,23 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
             <button
               onClick={handleAddCustom}
               disabled={!newCustomName.trim()}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
-              <Plus size={13} /> Add
+              <Plus size={13} /> {t('add', 'Add')}
             </button>
             <button
               onClick={() => { setShowAddCustom(false); setNewCustomName(''); }}
-              className="px-3 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all"
+              className="px-3 py-2 rounded-xl text-xs font-bold bg-muted text-muted-foreground hover:opacity-80 transition-all cursor-pointer"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         )}
 
         {customNames.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground text-sm">
+          <div className="text-center py-10 text-muted-foreground text-sm bg-card border border-border rounded-2xl shadow-sm">
             <BarChart2 size={30} className="mx-auto mb-2 opacity-30" />
-            No custom measurements yet. Click "Add Measurement" to create one.
+            {t('no_custom_measurements_desc', 'No custom measurements yet. Click "Add Measurement" to create one.')}
           </div>
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
@@ -509,8 +505,8 @@ export function LymphaticProfile({ profileId, currentUser, readOnly = false }: L
                 {!readOnly && (
                   <button
                     onClick={() => handleRemoveCustom(name)}
-                    title="Remove custom measurement"
-                    className="absolute top-3 right-3 p-1 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
+                    title={t('remove_custom_measurement_tooltip', 'Remove custom measurement')}
+                    className="absolute top-3 right-3 p-1 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all cursor-pointer"
                   >
                     <Trash2 size={12} />
                   </button>

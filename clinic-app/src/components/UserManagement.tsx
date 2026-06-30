@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Users, Key, Trash2, UserPlus, ShieldCheck, X, AlertCircle, Shield, Stethoscope, Snowflake, Flame, Building2, Search, Edit2, CheckCircle, XCircle } from 'lucide-react';
 import { Doctor } from '../types';
+import { useLanguage } from '../hooks/useLanguage';
 
-export function UserManagement() {
+interface UserManagementProps {
+  currentUser?: any;
+}
+
+export function UserManagement({ currentUser }: UserManagementProps) {
+  const { t, isAr } = useLanguage();
   const [users, setUsers] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [branches, setBranches] = useState<{ id: number; name: string }[]>([]);
@@ -18,6 +24,9 @@ export function UserManagement() {
     doctor_id: '',
     branch_id: '1'
   });
+  const [selectedFormBranches, setSelectedFormBranches] = useState<number[]>([]);
+  const [assigningUser, setAssigningUser] = useState<any | null>(null);
+  const [assignedBranches, setAssignedBranches] = useState<number[]>([]);
   const [error, setError] = useState('');
   
   const [resettingUser, setResettingUser] = useState<any | null>(null);
@@ -34,16 +43,16 @@ export function UserManagement() {
   const loadData = async () => {
     setLoading(true);
     if (window.api) {
-        const userData = await window.api.getAllUsers();
-        setUsers(userData || []);
+        const userData = await window.api.getAllUsers(currentUser?.isRoot);
+        setUsers(Array.isArray(userData) ? userData : []);
         
         if (window.api.getDoctors) {
           const docData = await window.api.getDoctors();
-          setDoctors(docData || []);
+          setDoctors(Array.isArray(docData) ? docData : []);
         }
         if ((window.api as any).getAllBranches) {
           const branchData = await (window.api as any).getAllBranches();
-          setBranches((branchData || []).filter((b: any) => b.is_active));
+          setBranches(Array.isArray(branchData) ? branchData.filter((b: any) => b.is_active) : []);
         }
         if ((window.api as any).getCurrentBranch) {
           const activeBranch = await (window.api as any).getCurrentBranch();
@@ -67,7 +76,7 @@ export function UserManagement() {
     if (res.success) {
       loadData();
     } else {
-      alert('Failed to update account status.');
+      alert(t('toast_failed_load_requests', 'Failed to update account status.'));
     }
   };
 
@@ -76,17 +85,22 @@ export function UserManagement() {
     setError('');
     
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
+      setError(t('pwd_mismatch_error', 'Passwords do not match.'));
       return;
     }
     
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('pwd_length_error', 'Password must be at least 6 characters.'));
       return;
     }
 
     if (formData.role === 'doctor' && !formData.doctor_id) {
-      setError('Please select a doctor profile to link with this account.');
+      setError(t('select_doctor_profile_prompt', 'Please select a doctor profile to link with this account.'));
+      return;
+    }
+
+    if (currentUser?.isRoot && (formData.role === 'admin' || formData.role === 'cfo') && selectedFormBranches.length === 0) {
+      setError(t('select_branches_lbl', 'Please select at least one branch.'));
       return;
     }
 
@@ -97,31 +111,36 @@ export function UserManagement() {
             password: formData.password,
             role: formData.role,
             doctor_id: formData.role === 'doctor' ? parseInt(formData.doctor_id) : null,
-            // Admins are not branch-scoped; staff/doctors get their branch assignment
-            branch_id: formData.role === 'admin' ? null : parseInt(formData.branch_id) || 1
+            branch_id: (formData.role === 'admin' || formData.role === 'cfo')
+              ? (selectedFormBranches[0] || null)
+              : currentUser?.isRoot ? (parseInt(formData.branch_id) || 1) : (currentBranch?.id || 1),
+            branch_ids: (formData.role === 'admin' || formData.role === 'cfo')
+              ? selectedFormBranches.join(',')
+              : (currentUser?.isRoot ? formData.branch_id : String(currentBranch?.id || 1))
         };
         const res = await window.api.setupAdmin(payload);
         if (res.success) {
-          setFormData({ username: '', password: '', confirmPassword: '', role: 'staff', doctor_id: '', branch_id: '1' });
+          setFormData({ username: '', password: '', confirmPassword: '', role: 'staff', doctor_id: '', branch_id: currentBranch?.id ? currentBranch.id.toString() : '1' });
+          setSelectedFormBranches([]);
           setShowAddForm(false);
           loadData();
         } else {
-          setError(res.error || 'Failed to create user account.');
+          setError(res.error || t('setup_failed_error', 'Failed to create user account.'));
         }
       }
     } catch (err) {
-      setError('A system error occurred while creating the account.');
+      setError(t('critical_setup_error', 'A system error occurred while creating the account.'));
     }
   };
 
   const handleResetPassword = async () => {
     if (!newPassword || newPassword.length < 6) {
-        alert('Password must be at least 6 characters.');
+        alert(t('pwd_length_error', 'Password must be at least 6 characters.'));
         return;
     }
     const res = await window.api.resetUserPassword({ userId: resettingUser.id, newPassword });
     if (res.success) {
-      alert(`Password for ${resettingUser.username} has been updated.`);
+      alert(t('toast_request_approved', 'Password updated successfully!'));
       setResettingUser(null);
       setNewPassword('');
     }
@@ -129,10 +148,10 @@ export function UserManagement() {
 
   const handleDeleteUser = async (id: number, username: string) => {
     if (username === 'root') {
-        alert('The root account cannot be deleted.');
+        alert(t('root_no_delete', 'The root account cannot be deleted.'));
         return;
     }
-    if (confirm(`CRITICAL: Are you sure you want to PERMANENTLY delete user "${username}"? This will revoke all system access.`)) {
+    if (confirm(t('confirm_delete_user_desc', `CRITICAL: Are you sure you want to PERMANENTLY delete user "${username}"? This will revoke all system access.`))) {
       const res = await window.api.deleteUserAccount(id);
       if (res.success) loadData();
     }
@@ -141,7 +160,7 @@ export function UserManagement() {
   const handleSaveDoctor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!doctorFormData.name.trim() || !doctorFormData.specialty.trim()) {
-      alert('Name and specialty are required.');
+      alert(t('name_specialty_req', 'Name and specialty are required.'));
       return;
     }
     try {
@@ -166,17 +185,17 @@ export function UserManagement() {
   };
 
   const handleDeleteDoctor = async (doctor: any) => {
-    if (confirm(`Are you sure you want to delete Dr. ${doctor.name}? This will remove their user account, but preserve their logs and name in reports.`)) {
+    if (confirm(t('confirm_delete_doctor_desc', `Are you sure you want to delete Dr. ${doctor.name}? This will remove their user account, but preserve their logs and name in reports.`))) {
       try {
         const res = await (window.api as any).deleteDoctor(doctor.id);
         if (res.success) {
           loadData();
         } else {
-          alert(res.error || 'Failed to delete doctor profile.');
+          alert(res.error || t('toast_sys_error', 'Failed to delete doctor profile.'));
         }
       } catch (err: any) {
         console.error(err);
-        alert(err.message || 'An error occurred.');
+        alert(err.message || t('toast_sys_error_occurred', 'An error occurred.'));
       }
     }
   };
@@ -204,6 +223,38 @@ export function UserManagement() {
     return branches.find(b => b.id === branchId)?.name || `Branch #${branchId}`;
   };
 
+  const renderBranches = (user: any) => {
+    if (user.isRoot || user.username === 'root') {
+      return <span className="text-[10px] text-primary font-black italic uppercase tracking-wider">All Branches (Owner)</span>;
+    }
+    if (user.role === 'admin' || user.role === 'cfo') {
+      if (user.branch_ids) {
+        const ids = user.branch_ids.split(',').map((id: string) => parseInt(id.trim())).filter((id: number) => !isNaN(id));
+        return (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {ids.map((id: number) => {
+              const name = getBranchName(id);
+              return name ? (
+                <span key={id} className="inline-flex items-center gap-1 text-[9px] font-bold text-primary bg-primary/5 px-2.5 py-0.5 rounded-full border border-primary/10">
+                  <Building2 size={8} className="shrink-0" /> {name}
+                </span>
+              ) : null;
+            })}
+          </div>
+        );
+      }
+      return <span className="text-[10px] text-muted-foreground font-medium italic">No branches assigned</span>;
+    }
+    const name = getBranchName(user.branch_id);
+    return name ? (
+      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
+        <Building2 size={10} className="shrink-0" /> {name}
+      </span>
+    ) : (
+      <span className="text-[10px] text-muted-foreground/50">—</span>
+    );
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Section Switcher Tabs */}
@@ -216,7 +267,7 @@ export function UserManagement() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          Users
+          {t('users_tab_lbl', 'Users')}
         </button>
         <button
           onClick={() => setActiveSection('doctors')}
@@ -226,7 +277,7 @@ export function UserManagement() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          Doctors
+          {t('doctors_tab_lbl', 'Doctors')}
         </button>
       </div>
 
@@ -238,33 +289,33 @@ export function UserManagement() {
                 <Users size={32} />
               </div>
               <div className="flex-1 text-center md:text-left space-y-1">
-                <h3 className="text-foreground font-bold text-lg font-heading">Clinic Team Management</h3>
+                <h3 className="text-foreground font-bold text-lg font-heading">{t('clinic_team_mgmt_title', 'Clinic Team Management')}</h3>
                 <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-                  Manage your staff accounts and access controls. You can add new team members or update security credentials for existing ones.
+                  {t('clinic_team_mgmt_desc', 'Manage your staff accounts and access controls. You can add new team members or update security credentials for existing ones.')}
                 </p>
               </div>
               <button 
                 onClick={() => setShowAddForm(!showAddForm)}
                 className="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2 shrink-0">
-                {showAddForm ? <><X size={18} /> Cancel</> : <><UserPlus size={18} /> Add Team Member</>}
+                {showAddForm ? <><X size={18} /> {t('cancel', 'Cancel')}</> : <><UserPlus size={18} /> {t('add_team_member_btn', 'Add Team Member')}</>}
               </button>
             </div>
             {/* Search + Active Branch row */}
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <div className="relative flex-1">
-                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <Search size={15} className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none`} />
                 <input
                   type="text"
-                  placeholder="Search by username..."
+                  placeholder={t('search_by_username_placeholder', 'Search by username...')}
                   value={userSearch}
                   onChange={e => setUserSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-background/80 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                  className={`w-full ${isAr ? 'pr-9 pl-4' : 'pl-9 pr-4'} py-2.5 rounded-xl border border-border bg-background/80 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all`}
                 />
               </div>
               {currentBranch && (
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-4 py-2.5 rounded-xl border border-border">
                   <Building2 size={12} className="text-primary" />
-                  <span>Active Branch: {currentBranch.name}</span>
+                  <span>{t('active_branch_lbl', 'Active Branch:')} {currentBranch.name}</span>
                 </div>
               )}
             </div>
@@ -274,7 +325,7 @@ export function UserManagement() {
             <div className="bg-muted/10 border border-border rounded-3xl p-8 space-y-6 animate-in slide-in-from-top-4 duration-300 shadow-sm">
               <div className="flex justify-between items-center pb-4 border-b border-border">
                 <h4 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-primary animate-pulse" /> Register Security Credentials
+                  <ShieldCheck size={16} className="text-primary animate-pulse" /> {t('register_security_creds', 'Register Security Credentials')}
                 </h4>
                 <button onClick={() => setShowAddForm(false)} className="text-muted-foreground hover:text-foreground">
                   <X size={18} />
@@ -291,7 +342,7 @@ export function UserManagement() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Account Username</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('acc_username', 'Account Username')}</label>
                     <input 
                       type="text" 
                       placeholder="e.g. clinician.smith"
@@ -301,29 +352,30 @@ export function UserManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Access Privilege Role</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('access_privilege_role', 'Access Privilege Role')}</label>
                     <select 
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl font-semibold text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-xs"
                       value={formData.role}
                       onChange={(e) => setFormData({...formData, role: e.target.value})}
                     >
-                      <option value="admin">Administrator (Full Access)</option>
-                      <option value="staff">Clinical Staff (Daily Operations)</option>
-                      <option value="doctor">Medical Specialist / Doctor</option>
-                      <option value="cfo">Chief Financial Officer (CFO)</option>
+                      {currentUser?.isRoot && <option value="owner">{t('role_owner', 'Owner (Super Admin)')}</option>}
+                      {currentUser?.isRoot && <option value="admin">{t('role_admin', 'Administrator (Full Access)')}</option>}
+                      {currentUser?.isRoot && <option value="cfo">{t('role_cfo', 'Chief Financial Officer (CFO)')}</option>}
+                      <option value="staff">{t('role_staff', 'Clinical Staff (Daily Operations)')}</option>
+                      <option value="doctor">{t('role_doctor', 'Medical Specialist / Doctor')}</option>
                     </select>
                   </div>
                 </div>
 
                 {formData.role === 'doctor' && (
                   <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Assign Doctor Profile</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('assign_doctor_profile', 'Assign Doctor Profile')}</label>
                     <select 
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl font-semibold text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-xs"
                       value={formData.doctor_id}
                       onChange={(e) => setFormData({...formData, doctor_id: e.target.value})}
                     >
-                      <option value="">Select Doctor Profile...</option>
+                      <option value="">{t('select_doctor_profile_prompt', 'Select Doctor Profile...')}</option>
                       {doctors.filter(d => (d.status || 'active') === 'active').map(doc => (
                         <option key={doc.id} value={doc.id.toString()}>{doc.name} ({doc.specialty})</option>
                       ))}
@@ -331,37 +383,68 @@ export function UserManagement() {
                   </div>
                 )}
 
-                {formData.role !== 'admin' && branches.length > 0 && (
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Default Operating Branch</label>
-                    <select 
-                      className="w-full px-4 py-3 bg-background border border-border rounded-xl font-semibold text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-xs"
-                      value={formData.branch_id}
-                      onChange={(e) => setFormData({...formData, branch_id: e.target.value})}
-                    >
+                {(formData.role === 'admin' || formData.role === 'cfo') && branches.length > 0 && (
+                  <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('assigned_branches_ctrl', 'Assigned Branches (Control Privileges)')}</label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                       {branches.map(b => (
-                        <option key={b.id} value={b.id.toString()}>{b.name}</option>
+                        <label key={b.id} className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-background hover:bg-muted/30 transition-all cursor-pointer">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedFormBranches.includes(b.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedFormBranches([...selectedFormBranches, b.id]);
+                              } else {
+                                setSelectedFormBranches(selectedFormBranches.filter(id => id !== b.id));
+                              }
+                            }}
+                            className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                          />
+                          <span className="text-xs font-bold text-foreground">{b.name}</span>
+                        </label>
                       ))}
-                    </select>
+                    </div>
+                  </div>
+                )}
+
+                {formData.role !== 'admin' && formData.role !== 'cfo' && branches.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('default_operating_branch', 'Default Operating Branch')}</label>
+                    {currentUser?.isRoot ? (
+                      <select 
+                        className="w-full px-4 py-3 bg-background border border-border rounded-xl font-semibold text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-xs"
+                        value={formData.branch_id}
+                        onChange={(e) => setFormData({...formData, branch_id: e.target.value})}
+                      >
+                        {branches.map(b => (
+                          <option key={b.id} value={b.id.toString()}>{b.name}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="w-full px-4 py-3.5 bg-muted border border-border rounded-xl font-bold text-muted-foreground text-xs">
+                        {currentBranch?.name || t('loading_path', 'Loading branch...')}
+                      </div>
+                    )}
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Security Password</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('security_pwd', 'Security Password')}</label>
                     <input 
                       type="password" 
-                      placeholder="Min. 6 characters"
+                      placeholder={t('pwd_length_error', 'Min. 6 characters')}
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Confirm Security Password</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('confirm_pwd', 'Confirm Security Password')}</label>
                     <input 
                       type="password" 
-                      placeholder="Retype password"
+                      placeholder={t('confirm_pwd', 'Retype password')}
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-sm"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
@@ -373,7 +456,7 @@ export function UserManagement() {
                   <button 
                     type="submit" 
                     className="w-full bg-accent text-accent-foreground py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-accent/20 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-3">
-                    <ShieldCheck size={20} /> Authenticate & Register Account
+                    <ShieldCheck size={20} /> {t('auth_register_account', 'Authenticate & Register Account')}
                   </button>
                 </div>
               </form>
@@ -382,33 +465,33 @@ export function UserManagement() {
 
           {/* ── Active Accounts Section ── */}
           <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-            <div className="bg-emerald-500/5 border-b border-emerald-500/20 px-8 py-4 flex items-center gap-3">
+            <div className={`bg-emerald-500/5 border-b border-emerald-500/20 px-8 py-4 flex items-center gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
               <Flame size={16} className="text-emerald-500" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active Accounts</span>
-              <span className="ml-auto text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{activeUsers.length}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{t('active_accounts_section', 'Active Accounts')}</span>
+              <span className={`${isAr ? 'mr-auto' : 'ml-auto'} text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full`}>{activeUsers.length}</span>
             </div>
             <div className="overflow-x-auto w-full">
-              <table className="w-full text-left min-w-[700px]">
+              <table className="w-full text-left min-w-[750px]">
                 <thead>
                   <tr className="bg-muted/30 border-b border-border">
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Staff Member / Username</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Access Role</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Branch</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('staff_member_username_hdr', 'Staff Member / Username')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('access_role_hdr', 'Access Role')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('branch_header', 'Branch')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('status_header', 'Status')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-left' : 'text-right'}`}>{t('actions_header', 'Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {activeUsers.length === 0 ? (
-                    <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No active accounts match your filter.</td></tr>
+                    <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">{t('search_results_empty', 'No active accounts match your filter.')}</td></tr>
                   ) : activeUsers.map(user => (
                     <tr key={user.id} className="hover:bg-primary/5 transition-colors group">
                       <td className="px-8 py-5">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
+                        <div className={`flex items-center gap-4 ${isAr ? 'flex-row-reverse' : ''}`}>
+                          <div className="w-10 h-10 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center font-bold text-xs uppercase shrink-0">
                             {user.username[0]}
                           </div>
-                          <div>
+                          <div className={isAr ? 'text-right' : 'text-left'}>
                             <div className="font-bold text-foreground group-hover:text-primary transition-colors">{user.username}</div>
                             {user.username === 'root' && <span className="text-[9px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase mt-1 inline-block">System Root</span>}
                           </div>
@@ -416,25 +499,19 @@ export function UserManagement() {
                       </td>
                       <td className="px-8 py-5">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          user.role === 'owner' ? 'bg-primary text-primary-foreground border border-primary/30 shadow-sm' :
                           user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
                           user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
+                          user.role === 'cfo' ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' :
                           'bg-muted text-muted-foreground border border-border'
                         }`}>
-                          {user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
-                          {user.role}
+                          {user.role === 'owner' || user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
+                          {user.role === 'cfo' ? 'CFO' : t(`role_${user.role}`, user.role)}
                           {user.doctor_id && <span className="ml-1 opacity-60">#{user.doctor_id}</span>}
                         </span>
                       </td>
                       <td className="px-8 py-5">
-                        {user.role === 'admin' ? (
-                          <span className="text-[10px] text-muted-foreground font-medium italic">All branches</span>
-                        ) : getBranchName(user.branch_id) ? (
-                          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
-                            <Building2 size={10} /> {getBranchName(user.branch_id)}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] text-muted-foreground/50">—</span>
-                        )}
+                        {renderBranches(user)}
                       </td>
                       <td className="px-8 py-5">
                         <button
@@ -444,16 +521,31 @@ export function UserManagement() {
                             'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
                           }`}>
                           <Flame size={10} />
-                          active
+                          {t('status_active', 'active')}
                         </button>
                       </td>
-                      <td className="px-8 py-5 text-right">
-                        <div className="flex justify-end gap-3">
-                          <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Reset Credentials">
+                      <td className="px-8 py-5">
+                        <div className={`flex gap-3 ${isAr ? 'justify-start' : 'justify-end'}`}>
+                          {currentUser?.isRoot && (user.role === 'admin' || user.role === 'cfo') && user.username !== 'root' && (
+                            <button 
+                              onClick={() => {
+                                setAssigningUser(user);
+                                const ids = user.branch_ids
+                                  ? user.branch_ids.split(',').map((id: string) => parseInt(id.trim())).filter((id: number) => !isNaN(id))
+                                  : [];
+                                setAssignedBranches(ids);
+                              }} 
+                              className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all font-sans cursor-pointer" 
+                              title={t('assign_branches_tooltip', 'Assign Branches')}
+                            >
+                              <Building2 size={18} />
+                            </button>
+                          )}
+                          <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer" title={t('reset_creds_tooltip', 'Reset Credentials')}>
                             <Key size={18} />
                           </button>
                           {user.username !== 'root' && (
-                            <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
+                            <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer" title={t('revoke_access_tooltip', 'Revoke Access')}>
                               <Trash2 size={18} />
                             </button>
                           )}
@@ -469,82 +561,91 @@ export function UserManagement() {
           {/* ── Frozen Accounts Section ── */}
           {(frozenUsers.length > 0 || selectedBranchFilter !== 'all' || userSearch) && (
             <div className="bg-card rounded-3xl border border-rose-500/20 shadow-sm overflow-hidden">
-              <div className="bg-rose-500/5 border-b border-rose-500/20 px-8 py-4 flex items-center gap-3">
+              <div className={`bg-rose-500/5 border-b border-rose-500/20 px-8 py-4 flex items-center gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
                 <Snowflake size={16} className="text-rose-400" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500">Frozen Accounts</span>
-                <span className="ml-auto text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{frozenUsers.length}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-rose-500">{t('frozen_accounts_section', 'Frozen Accounts')}</span>
+                <span className={`${isAr ? 'mr-auto' : 'ml-auto'} text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full`}>{frozenUsers.length}</span>
               </div>
               <div className="overflow-x-auto w-full">
-                <table className="w-full text-left min-w-[700px]">
-                  <thead>
-                    <tr className="bg-muted/30 border-b border-border">
-                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Staff Member / Username</th>
-                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Access Role</th>
-                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Branch</th>
-                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
-                      <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {frozenUsers.length === 0 ? (
-                      <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">No frozen accounts match your filter.</td></tr>
-                    ) : frozenUsers.map(user => (
-                      <tr key={user.id} className="hover:bg-rose-500/5 transition-colors group opacity-80">
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-xs uppercase">
-                              {user.username[0]}
-                            </div>
-                            <div>
-                              <div className="font-bold text-foreground/70 group-hover:text-foreground transition-colors">{user.username}</div>
-                            </div>
+                <table className="w-full text-left min-w-[750px]">
+                <thead>
+                  <tr className="bg-muted/30 border-b border-border">
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('staff_member_username_hdr', 'Staff Member / Username')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('access_role_hdr', 'Access Role')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('branch_header', 'Branch')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('status_header', 'Status')}</th>
+                    <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-left' : 'text-right'}`}>{t('actions_header', 'Actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {frozenUsers.length === 0 ? (
+                    <tr><td colSpan={5} className="px-8 py-8 text-center text-sm text-muted-foreground">{t('search_results_empty', 'No frozen accounts match your filter.')}</td></tr>
+                  ) : frozenUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-rose-500/5 transition-colors group opacity-80">
+                      <td className="px-8 py-5">
+                        <div className={`flex items-center gap-4 ${isAr ? 'flex-row-reverse' : ''}`}>
+                          <div className="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-xl flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                            {user.username[0]}
                           </div>
-                        </td>
-                        <td className="px-8 py-5">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider opacity-70 ${
-                            user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
-                            user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
-                            'bg-muted text-muted-foreground border border-border'
-                          }`}>
-                            {user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-8 py-5">
-                          {user.role === 'admin' ? (
-                            <span className="text-[10px] text-muted-foreground font-medium italic">All branches</span>
-                          ) : getBranchName(user.branch_id) ? (
-                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground bg-muted px-2.5 py-1 rounded-full border border-border">
-                              <Building2 size={10} /> {getBranchName(user.branch_id)}
-                            </span>
-                          ) : (
-                            <span className="text-[10px] text-muted-foreground/50">—</span>
+                          <div className={isAr ? 'text-right' : 'text-left'}>
+                            <div className="font-bold text-foreground/70 group-hover:text-foreground transition-colors">{user.username}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider opacity-70 ${
+                          user.role === 'owner' ? 'bg-primary text-primary-foreground border border-primary/30 shadow-sm' :
+                          user.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' :
+                          user.role === 'doctor' ? 'bg-accent/10 text-accent border border-accent/20' :
+                          user.role === 'cfo' ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' :
+                          'bg-muted text-muted-foreground border border-border'
+                        }`}>
+                          {user.role === 'owner' || user.role === 'admin' ? <Shield size={12} /> : user.role === 'doctor' ? <Stethoscope size={12} /> : <Users size={12} />}
+                          {user.role === 'cfo' ? 'CFO' : t(`role_${user.role}`, user.role)}
+                        </span>
+                      </td>
+                      <td className="px-8 py-5">
+                        {renderBranches(user)}
+                      </td>
+                      <td className="px-8 py-5">
+                        <button
+                          onClick={() => handleStatusToggle(user.id, 'frozen')}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20">
+                          <Snowflake size={10} />
+                          {t('status_frozen', 'frozen')}
+                        </button>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className={`flex gap-3 ${isAr ? 'justify-start' : 'justify-end'}`}>
+                          {currentUser?.isRoot && (user.role === 'admin' || user.role === 'cfo') && user.username !== 'root' && (
+                            <button 
+                              onClick={() => {
+                                setAssigningUser(user);
+                                const ids = user.branch_ids
+                                  ? user.branch_ids.split(',').map((id: string) => parseInt(id.trim())).filter((id: number) => !isNaN(id))
+                                  : [];
+                                setAssignedBranches(ids);
+                              }} 
+                              className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer" 
+                              title={t('assign_branches_tooltip', 'Assign Branches')}
+                            >
+                              <Building2 size={18} />
+                            </button>
                           )}
-                        </td>
-                        <td className="px-8 py-5">
-                          <button
-                            onClick={() => handleStatusToggle(user.id, 'frozen')}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20">
-                            <Snowflake size={10} />
-                            frozen
+                          <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer" title={t('reset_creds_tooltip', 'Reset Credentials')}>
+                            <Key size={18} />
                           </button>
-                        </td>
-                        <td className="px-8 py-5 text-right">
-                          <div className="flex justify-end gap-3">
-                            <button onClick={() => setResettingUser(user)} className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all" title="Reset Credentials">
-                              <Key size={18} />
-                            </button>
-                            <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all" title="Revoke Access">
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          <button onClick={() => handleDeleteUser(user.id, user.username)} className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer" title={t('revoke_access_tooltip', 'Revoke Access')}>
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
           )}
         </>
       ) : (
@@ -555,9 +656,9 @@ export function UserManagement() {
                 <Stethoscope size={32} />
               </div>
               <div className="flex-1 text-center md:text-left space-y-1">
-                <h3 className="text-foreground font-bold text-lg font-heading">Doctor Management</h3>
+                <h3 className="text-foreground font-bold text-lg font-heading">{t('doctor_mgmt_title', 'Doctor Management')}</h3>
                 <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-                  Configure active practitioners and specialists. Frozen doctors will be excluded from signature options.
+                  {t('doctor_mgmt_desc', 'Configure active practitioners and specialists. Frozen doctors will be excluded from signature options.')}
                 </p>
               </div>
               <button 
@@ -567,19 +668,19 @@ export function UserManagement() {
                   setIsAddingDoctor(!isAddingDoctor);
                 }}
                 className="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center gap-2 shrink-0">
-                {isAddingDoctor ? <><X size={18} /> Cancel</> : <><UserPlus size={18} /> Add Doctor</>}
+                {isAddingDoctor ? <><X size={18} /> {t('cancel', 'Cancel')}</> : <><UserPlus size={18} /> {t('add_doctor_btn', 'Add Doctor')}</>}
               </button>
             </div>
 
             {/* Doctor Search Bar */}
             <div className="relative w-full max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+              <Search className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-muted-foreground`} size={16} />
               <input
                 type="text"
-                placeholder="Search doctors by name or specialty..."
+                placeholder={t('search_doctors_placeholder', 'Search doctors by name or specialty...')}
                 value={doctorSearch}
                 onChange={e => setDoctorSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-xl text-xs font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 bg-background border border-border rounded-xl text-xs font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all`}
               />
             </div>
           </div>
@@ -590,7 +691,7 @@ export function UserManagement() {
               <div className="flex justify-between items-center pb-4 border-b border-border">
                 <h4 className="text-xs font-black uppercase tracking-widest text-foreground flex items-center gap-2">
                   <Stethoscope size={16} className="text-primary animate-pulse" />
-                  {editingDoctor ? `Modify Doctor Profile: ${editingDoctor.name}` : 'Add New Doctor Profile'}
+                  {editingDoctor ? `${t('modify_doctor_profile', 'Modify Doctor Profile:')} ${editingDoctor.name}` : t('add_new_doctor_profile', 'Add New Doctor Profile')}
                 </h4>
                 <button onClick={() => { setIsAddingDoctor(false); setEditingDoctor(null); }} className="text-muted-foreground hover:text-foreground">
                   <X size={18} />
@@ -600,7 +701,7 @@ export function UserManagement() {
               <form onSubmit={handleSaveDoctor} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Doctor Name</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('doctor_name_lbl', 'Doctor Name')}</label>
                     <input
                       type="text"
                       required
@@ -611,7 +712,7 @@ export function UserManagement() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Specialty</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('specialty_lbl', 'Specialty')}</label>
                     <input
                       type="text"
                       required
@@ -625,14 +726,14 @@ export function UserManagement() {
 
                 {editingDoctor && (
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Profile Status</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('profile_status_lbl', 'Profile Status')}</label>
                     <select
                       value={doctorFormData.status}
                       onChange={e => setDoctorFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
                       className="w-full px-4 py-3 bg-background border border-border rounded-xl font-semibold text-foreground focus:ring-2 focus:ring-primary outline-none transition-all text-xs"
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
+                      <option value="active">{t('status_active', 'active')}</option>
+                      <option value="inactive">inactive</option>
                     </select>
                   </div>
                 )}
@@ -643,7 +744,7 @@ export function UserManagement() {
                     className="w-full bg-accent text-accent-foreground py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-accent/20 hover:-translate-y-0.5 active:scale-95 transition-all flex items-center justify-center gap-3"
                   >
                     <ShieldCheck size={20} />
-                    {editingDoctor ? 'Update Doctor Profile' : 'Register Doctor Profile'}
+                    {editingDoctor ? t('update_doctor_profile', 'Update Doctor Profile') : t('register_doctor_profile', 'Register Doctor Profile')}
                   </button>
                 </div>
               </form>
@@ -653,74 +754,74 @@ export function UserManagement() {
           {/* Doctors List */}
           <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
             <div className="overflow-x-auto w-full">
-              <table className="w-full text-left min-w-[700px]">
-                <thead>
-                  <tr className="bg-muted/30 border-b border-border">
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Doctor Name</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Specialty</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
-                    <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {doctors
-                    .filter(d => d.name.toLowerCase().includes(doctorSearch.toLowerCase()) || d.specialty.toLowerCase().includes(doctorSearch.toLowerCase()))
-                    .map(doc => (
-                      <tr key={doc.id} className="hover:bg-primary/5 transition-colors group">
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center font-bold text-xs uppercase">
-                              {doc.name[0] || 'D'}
-                            </div>
-                            <div className="font-bold text-foreground group-hover:text-primary transition-colors">{doc.name}</div>
+              <table className="w-full text-left min-w-[750px]">
+              <thead>
+                <tr className="bg-muted/30 border-b border-border">
+                  <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('doctor_name_lbl', 'Doctor Name')}</th>
+                  <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('specialty_lbl', 'Specialty')}</th>
+                  <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{t('status_header', 'Status')}</th>
+                  <th className={`px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground ${isAr ? 'text-left' : 'text-right'}`}>{t('actions_header', 'Actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {doctors
+                  .filter(d => d.name.toLowerCase().includes(doctorSearch.toLowerCase()) || d.specialty.toLowerCase().includes(doctorSearch.toLowerCase()))
+                  .map(doc => (
+                    <tr key={doc.id} className="hover:bg-primary/5 transition-colors group">
+                      <td className="px-8 py-5">
+                        <div className={`flex items-center gap-4 ${isAr ? 'flex-row-reverse' : ''}`}>
+                          <div className="w-10 h-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                            {doc.name[0] || 'D'}
                           </div>
-                        </td>
-                        <td className="px-8 py-5">
-                          <span className="text-sm font-semibold text-muted-foreground">{doc.specialty}</span>
-                        </td>
-                        <td className="px-8 py-5">
+                          <div className={`font-bold text-foreground group-hover:text-primary transition-colors ${isAr ? 'text-right' : 'text-left'}`}>{doc.name}</div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className="text-sm font-semibold text-muted-foreground">{doc.specialty}</span>
+                      </td>
+                      <td className="px-8 py-5">
+                        <button
+                          onClick={() => toggleDoctorStatus(doc)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                            doc.status === 'active'
+                              ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
+                              : 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20'
+                          }`}
+                        >
+                          {doc.status === 'active' ? (
+                            <><Flame size={10} /> {t('status_active', 'active')}</>
+                          ) : (
+                            <><Snowflake size={10} /> {t('status_frozen', 'frozen')}</>
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-8 py-5">
+                        <div className={`flex gap-3 ${isAr ? 'justify-start' : 'justify-end'}`}>
                           <button
-                            onClick={() => toggleDoctorStatus(doc)}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                              doc.status === 'active'
-                                ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20'
-                                : 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-emerald-500/10 hover:text-emerald-500 hover:border-emerald-500/20'
-                            }`}
+                            onClick={() => {
+                              setEditingDoctor(doc);
+                              setDoctorFormData({ name: doc.name, specialty: doc.specialty, status: doc.status });
+                              setIsAddingDoctor(false);
+                            }}
+                            className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer"
+                            title={t('edit', 'Edit')}
                           >
-                            {doc.status === 'active' ? (
-                              <><Flame size={10} /> active</>
-                            ) : (
-                              <><Snowflake size={10} /> frozen</>
-                            )}
+                            <Edit2 size={18} className="w-4.5 h-4.5" />
                           </button>
-                        </td>
-                        <td className="px-8 py-5 text-right">
-                          <div className="flex justify-end gap-3">
-                            <button
-                              onClick={() => {
-                                setEditingDoctor(doc);
-                                setDoctorFormData({ name: doc.name, specialty: doc.specialty, status: doc.status });
-                                setIsAddingDoctor(false);
-                              }}
-                              className="p-2.5 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
-                              title="Edit Profile"
-                            >
-                              <Edit2 size={18} className="w-4.5 h-4.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteDoctor(doc)}
-                              className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all"
-                              title="Delete Profile"
-                            >
-                              <Trash2 size={18} className="w-4.5 h-4.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                          <button
+                            onClick={() => handleDeleteDoctor(doc)}
+                            className="p-2.5 bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all cursor-pointer"
+                            title={t('delete', 'Delete')}
+                          >
+                            <Trash2 size={18} className="w-4.5 h-4.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
           </div>
         </div>
       )}
@@ -732,31 +833,102 @@ export function UserManagement() {
                <div className="inline-flex items-center justify-center p-3 bg-primary/10 text-primary rounded-2xl mb-2">
                   <Key size={32} />
                </div>
-               <h3 className="text-2xl font-bold text-foreground font-heading italic">Credential Reset</h3>
-               <p className="text-sm text-muted-foreground font-medium">Re-issuing access for <strong>{resettingUser.username}</strong>.</p>
+               <h3 className="text-2xl font-bold text-foreground font-heading italic">{t('credential_reset_title', 'Credential Reset')}</h3>
+               <p className="text-sm text-muted-foreground font-medium">{t('reissuing_access_for', 'Re-issuing access for')} <strong>{resettingUser.username}</strong>.</p>
             </div>
             
             <div className="space-y-2">
-               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">New Secure Password</label>
+               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('new_secure_pwd', 'New Secure Password')}</label>
                <input 
                  type="password" 
-                 placeholder="Min. 6 characters"
+                 placeholder={t('pwd_length_error', 'Min. 6 characters')}
                  className="w-full px-4 py-4 bg-muted/30 border border-border rounded-2xl font-bold text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                  value={newPassword}
                  onChange={(e) => setNewPassword(e.target.value)}
                />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <div className={`flex gap-3 pt-2 ${isAr ? 'flex-row-reverse' : ''}`}>
               <button 
                 onClick={() => { setResettingUser(null); setNewPassword(''); }}
-                className="flex-1 py-3 text-muted-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted rounded-2xl transition-all">
-                Cancel
+                className="flex-1 py-3 text-muted-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted rounded-2xl transition-all cursor-pointer">
+                {t('cancel', 'Cancel')}
               </button>
               <button 
                 onClick={handleResetPassword}
-                className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all">
-                Update Credentials
+                className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer">
+                {t('update_creds_btn', 'Update Credentials')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {assigningUser && (
+        <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="bg-card w-full max-w-md rounded-3xl border border-border shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-200">
+            <div className="text-center space-y-2">
+               <div className="inline-flex items-center justify-center p-3 bg-primary/10 text-primary rounded-2xl mb-2">
+                  <Building2 size={32} />
+               </div>
+               <h3 className="text-2xl font-bold text-foreground font-heading italic">{t('assign_branches_tooltip', 'Assign Branches')}</h3>
+               <p className="text-sm text-muted-foreground font-medium">{t('config_branch_access_for', 'Configure branch access for')} <strong>{assigningUser.username}</strong> ({assigningUser.role}).</p>
+            </div>
+            
+            <div className="space-y-3">
+               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">{t('select_branches_lbl', 'Select Branches')}</label>
+               <div className="grid grid-cols-1 gap-2.5 max-h-60 overflow-y-auto pr-1">
+                 {branches.map(b => (
+                   <label key={b.id} className={`flex items-center gap-3 p-3.5 rounded-2xl border border-border bg-muted/20 hover:bg-muted/50 transition-all cursor-pointer ${isAr ? 'flex-row-reverse' : ''}`}>
+                     <input 
+                       type="checkbox" 
+                       checked={assignedBranches.includes(b.id)}
+                       onChange={(e) => {
+                         if (e.target.checked) {
+                           setAssignedBranches([...assignedBranches, b.id]);
+                         } else {
+                           setAssignedBranches(assignedBranches.filter(id => id !== b.id));
+                         }
+                       }}
+                       className="rounded border-border text-primary focus:ring-primary h-4.5 w-4.5"
+                     />
+                     <span className="text-sm font-bold text-foreground">{b.name}</span>
+                   </label>
+                 ))}
+               </div>
+            </div>
+
+            <div className={`flex gap-3 pt-2 ${isAr ? 'flex-row-reverse' : ''}`}>
+              <button 
+                onClick={() => { setAssigningUser(null); setAssignedBranches([]); }}
+                className="flex-1 py-3 text-muted-foreground font-bold text-xs uppercase tracking-widest hover:bg-muted rounded-2xl transition-all cursor-pointer"
+              >
+                {t('cancel', 'Cancel')}
+              </button>
+              <button 
+                onClick={async () => {
+                  if (assignedBranches.length === 0) {
+                    alert(t('select_branches_lbl', 'Please assign at least one branch.'));
+                    return;
+                  }
+                  if (window.api && (window.api as any).updateUserBranches) {
+                    const res = await (window.api as any).updateUserBranches({
+                      userId: assigningUser.id,
+                      branchIds: assignedBranches.join(',')
+                    });
+                    if (res && res.success) {
+                      alert(t('toast_request_approved', 'Branch assignments updated successfully!'));
+                      setAssigningUser(null);
+                      setAssignedBranches([]);
+                      loadData();
+                    } else {
+                      alert(res?.error || t('toast_sys_error', 'Failed to update branches.'));
+                    }
+                  }
+                }}
+                className="flex-1 py-4 bg-primary text-primary-foreground font-bold text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer"
+              >
+                {t('save_changes_btn', 'Save Changes')}
               </button>
             </div>
           </div>

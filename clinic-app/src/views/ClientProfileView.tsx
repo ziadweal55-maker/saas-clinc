@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bot, FileText, RefreshCw, ExternalLink, Folder, ChevronLeft, User, Phone, Clipboard, ShieldAlert, CreditCard, Thermometer, Dumbbell, Activity, Plus, X, Sparkles, CheckCircle, ShieldCheck, QrCode, Edit, Trash2, Layers, MapPin } from 'lucide-react';
+import { Bot, FileText, RefreshCw, ExternalLink, Folder, ChevronLeft, User, Phone, Clipboard, ShieldAlert, CreditCard, Thermometer, Dumbbell, Activity, Plus, X, Sparkles, CheckCircle, ShieldCheck, QrCode, Edit, Trash2, Layers, MapPin, ClipboardList } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import { useLanguage } from '../hooks/useLanguage';
 import { Client, User as UserType } from '../types';
 import { ExercisesTab } from '../components/Exercises';
 import { ProgressTab } from '../components/Progress';
@@ -26,6 +27,7 @@ interface ClientProfileViewProps {
 }
 
 export function ClientProfileView({ client, onBack, onNavigate, currentUser, onClientUpdated }: ClientProfileViewProps) {
+  const { t, isAr } = useLanguage();
   const [localClient, setLocalClient] = useState<any>(client);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileFormData, setProfileFormData] = useState({
@@ -54,6 +56,10 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
 
   const [profiles, setProfiles] = useState<any[]>([]);
   const [activeProfileId, setActiveProfileId] = useState<number | null>(null);
+
+  const [feedbacks, setFeedbacks] = useState<{ paintests: any[]; patientlogs: any[] }>({ paintests: [], patientlogs: [] });
+  const [isLoadingFeedbacks, setIsLoadingFeedbacks] = useState(false);
+  const [feedbacksError, setFeedbacksError] = useState<string | null>(null);
 
   const [sessionTypes, setSessionTypes] = useState<any[]>([]);
 
@@ -213,12 +219,36 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
     }
   }, [localClient, loadPayments, loadDocuments, loadPackageStatus, loadProfiles]);
 
+  const loadRecoveryFeedbacks = useCallback(async () => {
+    if (!localClient || !localClient.sync_token) return;
+    setIsLoadingFeedbacks(true);
+    setFeedbacksError(null);
+    try {
+      if (window.api.getPatientFeedbacks) {
+        const res = await window.api.getPatientFeedbacks(localClient.sync_token);
+        if (res.success) {
+          setFeedbacks({
+            paintests: res.paintests || [],
+            patientlogs: res.patientlogs || []
+          });
+        } else {
+          setFeedbacksError(res.error || 'Failed to load feedbacks');
+        }
+      }
+    } catch (err: any) {
+      setFeedbacksError(err.message || 'An error occurred while loading feedbacks');
+    } finally {
+      setIsLoadingFeedbacks(false);
+    }
+  }, [localClient]);
+
   // Reload data when switching tabs to ensure freshness
   useEffect(() => {
     if (!localClient) return;
     if (activeTab === 'documents') loadDocuments();
     if (activeTab === 'financials') loadPayments();
-  }, [activeTab, localClient, loadDocuments, loadPayments]);
+    if (activeTab === 'recovery-monitoring') loadRecoveryFeedbacks();
+  }, [activeTab, localClient, loadDocuments, loadPayments, loadRecoveryFeedbacks]);
 
 
 
@@ -416,20 +446,21 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
   const tabs = [
     // Profile-specific tabs show directly if they exist for this client
     ...(profiles.some(p => p.profile_type === 'physical_therapy') ? [
-      { id: 'pt-profile', label: 'PT Profile', icon: Activity },
+      { id: 'pt-profile', label: 'pt_profile_tab', icon: Activity },
     ] : []),
     ...(profiles.some(p => p.profile_type === 'nutrition') ? [
-      { id: 'nutrition-profile', label: 'Nutrition', icon: Clipboard },
+      { id: 'nutrition-profile', label: 'nutrition_profile_tab', icon: Clipboard },
     ] : []),
     ...(profiles.some(p => p.profile_type === 'lymphatic') ? [
-      { id: 'lymphatic-profile', label: 'Lymphatic', icon: Thermometer },
+      { id: 'lymphatic-profile', label: 'lymphatic_profile_tab', icon: Thermometer },
     ] : []),
     // These tabs show for all profiles or when no profile:
-    { id: 'documents', label: 'Medical Records', icon: FileText },
-    { id: 'exercises', label: 'Home Exercises', icon: Dumbbell },
-    { id: 'home-exercises', label: 'Clinical Exercises', icon: Sparkles },
-    { id: 'financials', label: 'Session Finance', icon: CreditCard },
-    { id: 'progress', label: 'Recovery Insights', icon: Activity },
+    { id: 'documents', label: 'medical_records_tab', icon: FileText },
+    { id: 'exercises', label: 'home_exercises_tab', icon: Dumbbell },
+    { id: 'home-exercises', label: 'clinical_exercises_tab', icon: Sparkles },
+    { id: 'financials', label: 'session_finance_tab', icon: CreditCard },
+    { id: 'progress', label: 'recovery_insights_tab', icon: Activity },
+    { id: 'recovery-monitoring', label: 'recovery_monitoring', icon: ClipboardList },
   ].filter(tab => {
     if (isStaff) {
       // Staff should only see the 'financials' (Session Finance) tab
@@ -447,19 +478,19 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
           <button 
             onClick={onBack} 
             className="p-2 md:p-2.5 bg-background border border-border text-muted-foreground rounded-xl hover:bg-muted transition-all"
-            title="Back to Clients"
+            title={t('back')}
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={20} className={isAr ? "rotate-180" : ""} />
           </button>
           <button 
             onClick={handleRefreshData} 
             disabled={isSyncingLocal}
             className={`p-2 md:p-2.5 bg-background border border-border rounded-xl transition-all flex items-center gap-2 group ${isSyncingLocal ? 'text-accent' : 'text-primary hover:bg-muted'}`}
-            title="Refresh from Network Database"
+            title={t('sync_local_database')}
           >
             <RefreshCw size={20} className={isSyncingLocal ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'} />
             <span className="text-[10px] font-bold uppercase tracking-wider hidden sm:inline">
-              {isSyncingLocal ? 'Syncing Local...' : 'Sync Local DB'}
+              {isSyncingLocal ? t('syncing_local') : t('sync_local_database')}
             </span>
           </button>
         </div>
@@ -469,13 +500,13 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
             onClick={() => window.print()} 
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-background border border-border text-foreground rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-muted transition-all"
           >
-            <FileText size={16} /> <span className="hidden xs:inline">Print Report</span><span className="xs:hidden">Print</span>
+            <FileText size={16} /> <span className="hidden xs:inline">{t('print_patient_report')}</span><span className="xs:hidden">{t('print_sheet')}</span>
           </button>
           <button 
             onClick={() => onNavigate('ai-assistant')} 
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95"
           >
-            <Bot size={16} /> AI Assist
+            <Bot size={16} /> {t('ai_assist')}
           </button>
         </div>
       </div>
@@ -484,7 +515,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
         {/* Left Sidebar Profile */}
         <div className="lg:col-span-4 space-y-6">
           <div className="bg-card rounded-2xl md:rounded-3xl border border-border shadow-xl p-6 md:p-8 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
+            <div className={`absolute top-0 ${isAr ? 'left-0' : 'right-0'} p-4 opacity-5`}>
                <User size={120} />
             </div>
             
@@ -502,8 +533,8 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                   });
                   setIsEditingProfile(true);
                 }} 
-                className="absolute top-6 right-6 p-2 bg-muted hover:bg-muted/80 border border-border rounded-xl text-muted-foreground hover:text-foreground transition-all z-20"
-                title="Edit Patient Info"
+                className={`absolute top-6 ${isAr ? 'left-6' : 'right-6'} p-2 bg-muted hover:bg-muted/80 border border-border rounded-xl text-muted-foreground hover:text-foreground transition-all z-20`}
+                title={t('edit_patient_profile')}
               >
                 <Edit size={16} />
               </button>
@@ -544,11 +575,11 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                   }
                 }
               }} className="relative z-10 space-y-4">
-                <h3 className="text-sm font-black text-primary uppercase tracking-widest leading-none italic mb-4">Edit Patient Profile</h3>
+                <h3 className="text-sm font-black text-primary uppercase tracking-widest leading-none italic mb-4">{t('edit_patient_profile')}</h3>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">First Name</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('first_name')}</label>
                     <input 
                       required 
                       type="text" 
@@ -558,7 +589,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Last Name</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('last_name')}</label>
                     <input 
                       required 
                       type="text" 
@@ -571,7 +602,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Phone Number</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('phone_number')}</label>
                     <input 
                       type="text" 
                       value={profileFormData.phone} 
@@ -580,7 +611,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Age</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('age')}</label>
                     <input 
                       type="number" 
                       min="0"
@@ -593,7 +624,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Address</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('address')}</label>
                     <input 
                       type="text" 
                       value={profileFormData.address} 
@@ -602,7 +633,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">How did you know us?</label>
+                    <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('how_did_you_know_us')}</label>
                     <input 
                       type="text" 
                       value={profileFormData.referral_source} 
@@ -613,7 +644,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest ml-1">Medical History</label>
+                  <label className={`text-[9px] font-black text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('primary_clinical_notes')}</label>
                   <textarea 
                     rows={4} 
                     value={profileFormData.medical_history} 
@@ -627,14 +658,14 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     type="submit" 
                     className="flex-1 py-2 px-4 bg-accent text-accent-foreground rounded-xl text-[10px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
                   >
-                    Save Changes
+                    {t('save_changes_btn')}
                   </button>
                   <button 
                     type="button" 
                     onClick={() => setIsEditingProfile(false)}
                     className="py-2 px-4 bg-muted text-foreground border border-border rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-muted/80 transition-all"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                 </div>
               </form>
@@ -659,19 +690,19 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     )}
                     {localClient.referral_source && (
                       <div className="flex items-center gap-1.5 justify-center text-[10px] bg-primary/5 text-primary px-2.5 py-0.5 rounded-full border border-primary/10">
-                         <span className="font-bold">Source:</span>
+                         <span className="font-bold">{t('how_did_you_know_us')}:</span>
                          <span>{localClient.referral_source}</span>
                       </div>
                     )}
                     {localClient.age !== undefined && localClient.age !== null && (
                       <div className="text-[11px] font-bold bg-primary/5 text-primary px-2.5 py-0.5 rounded-full border border-primary/10">
-                        {localClient.age} Years Old
+                        {localClient.age} {t('years_old', 'Years Old')}
                       </div>
                     )}
                   </div>
                   {localClient.is_active === 0 && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-destructive/10 text-destructive text-[9px] md:text-[10px] font-bold rounded-full border border-destructive/10 uppercase tracking-wider">
-                      <ShieldAlert size={12} /> Archived Account
+                      <ShieldAlert size={12} /> {t('archived')}
                     </span>
                   )}
                 </div>
@@ -679,21 +710,26 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                 <div className="space-y-4 md:space-y-6">
                   <div className="space-y-2 md:space-y-3">
                     <h3 className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                      <Clipboard size={12} className="text-primary" /> Diagnosis & History
+                      <Clipboard size={12} className="text-primary" /> {t('diagnosis_history_section')}
                     </h3>
                     <div className="bg-muted/30 rounded-xl md:rounded-2xl p-4 md:p-5 border border-border">
                       <p className="text-foreground text-xs md:text-sm leading-relaxed italic font-medium">
-                        "{localClient.medical_history || 'No prior medical history recorded for this patient.'}"
+                        "{localClient.medical_history || t('no_prior_medical_history')}"
                       </p>
                     </div>
                   </div>
 
                   {(isAdmin || isDoctor) && (
                     <div className="bg-muted/20 p-4 md:p-5 rounded-xl md:rounded-2xl border border-border space-y-3 md:space-y-4">
-                      <div className="flex items-center gap-2 text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          <ShieldCheck size={14} className="text-accent" /> Patient Access PIN
-                      </div>
+                      <label 
+                        htmlFor="patient-portal-pin"
+                        className="flex items-center gap-2 text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase tracking-widest cursor-pointer"
+                      >
+                           <ShieldCheck size={14} className="text-accent" /> {t('patient_access_pin_lbl')}
+                      </label>
                       <input 
+                        id="patient-portal-pin"
+                        name="patient_portal_pin"
                         type="text" 
                         maxLength={4}
                         value={patientPin}
@@ -706,9 +742,9 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                         disabled={isSyncing}
                         className={`w-full py-3 md:py-3.5 px-4 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border shadow-sm ${isSyncing ? 'bg-muted text-muted-foreground border-border cursor-not-allowed' : 'bg-accent text-accent-foreground border-accent/10 hover:shadow-lg hover:shadow-accent/20 hover:-translate-y-0.5 active:scale-95'}`}>
                         {isSyncing ? (
-                          <><RefreshCw size={16} className="animate-spin text-accent" /> Synchronizing...</>
+                          <><RefreshCw size={16} className="animate-spin text-accent" /> {t('synchronizing')}</>
                         ) : (
-                          <><RefreshCw size={16} /> Sync Portal</>
+                          <><RefreshCw size={16} /> {t('sync_portal_btn')}</>
                         )}
                       </button>
                     </div>
@@ -717,13 +753,13 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                   {/* Profiles Panel */}
                   <div className="space-y-3 pt-4 border-t border-border">
                     <h3 className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-2">
-                      <Layers size={12} className="text-primary" /> Patient Clinical Profiles
+                      <Layers size={12} className="text-primary" /> {t('patient_clinical_profiles')}
                     </h3>
                     <div className="grid grid-cols-1 gap-2.5">
                       {([
-                        { type: 'physical_therapy', label: 'Physical Therapy', tabId: 'pt-profile', activeColor: 'bg-blue-500/10 text-blue-500 border-blue-500/20 hover:bg-blue-500/15', inactiveColor: 'border-dashed border-border hover:border-blue-500/40 hover:bg-blue-500/5 text-muted-foreground hover:text-blue-500' },
-                        { type: 'nutrition', label: 'Nutrition', tabId: 'nutrition-profile', activeColor: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/15', inactiveColor: 'border-dashed border-border hover:border-emerald-500/40 hover:bg-emerald-500/5 text-muted-foreground hover:text-emerald-500' },
-                        { type: 'lymphatic', label: 'Lymphatic', tabId: 'lymphatic-profile', activeColor: 'bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/15', inactiveColor: 'border-dashed border-border hover:border-purple-500/40 hover:bg-purple-500/5 text-muted-foreground hover:text-purple-500' }
+                        { type: 'physical_therapy', label: 'physical_therapy', tabId: 'pt-profile', activeColor: 'bg-blue-500/10 text-blue-500 border-blue-500/20 hover:bg-blue-500/15', inactiveColor: 'border-dashed border-border hover:border-blue-500/40 hover:bg-blue-500/5 text-muted-foreground hover:text-blue-500' },
+                        { type: 'nutrition', label: 'nutrition', tabId: 'nutrition-profile', activeColor: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/15', inactiveColor: 'border-dashed border-border hover:border-emerald-500/40 hover:bg-emerald-500/5 text-muted-foreground hover:text-emerald-500' },
+                        { type: 'lymphatic', label: 'lymphatic', tabId: 'lymphatic-profile', activeColor: 'bg-purple-500/10 text-purple-500 border-purple-500/20 hover:bg-purple-500/15', inactiveColor: 'border-dashed border-border hover:border-purple-500/40 hover:bg-purple-500/5 text-muted-foreground hover:text-purple-500' }
                       ] as const).map(pConfig => {
                         const profile = profiles.find(p => p.profile_type === pConfig.type);
                         const isActive = activeProfileId && profile && activeProfileId === profile.id;
@@ -742,20 +778,20 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             >
                               <div className="flex items-center gap-2">
                                 <CheckCircle size={14} className="text-current shrink-0" />
-                                <span className="text-xs font-bold">{pConfig.label}</span>
+                                <span className="text-xs font-bold">{t(pConfig.label)}</span>
                               </div>
                               {!isStaff && (
                                 <button
                                   onClick={async (e) => {
                                     e.stopPropagation();
-                                    if (confirm(`Are you sure you want to permanently delete the ${pConfig.label.substring(2)} Profile? This will delete all Red Flags, Subjective, Objective, and measurements data related to this profile.`)) {
+                                    if (confirm(t('active_profile_confirm_delete').replace('{type}', t(pConfig.label)))) {
                                       await (window.api as any).deleteClientProfile(profile.id);
                                       loadProfiles();
                                       if (activeProfileId === profile.id) setActiveProfileId(null);
                                     }
                                   }}
                                   className="p-1 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-all"
-                                  title="Delete Profile"
+                                  title={t('delete')}
                                 >
                                   <Trash2 size={12} />
                                 </button>
@@ -763,6 +799,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             </div>
                           );
                         } else {
+                          const addLabel = pConfig.type === 'physical_therapy' ? t('add_pt_profile') : pConfig.type === 'nutrition' ? t('add_nutrition_profile') : t('add_lymphatic_profile');
                           return (
                             <div
                               key={pConfig.type}
@@ -785,7 +822,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                 }
                               }}
                             >
-                              <Plus size={14} /> Add {pConfig.label.split(' ')[1]} Profile
+                              <Plus size={14} /> {addLabel}
                             </div>
                           );
                         }
@@ -798,12 +835,12 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                       <button 
                         onClick={handleToggleStatus}
                         className={`w-full py-3 md:py-3.5 px-4 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 border shadow-sm ${localClient.is_active === 0 ? 'bg-primary text-primary-foreground border-primary/10 shadow-primary/20 hover:-translate-y-0.5' : 'bg-background text-foreground border-border hover:bg-muted/50'}`}>
-                        {localClient.is_active === 0 ? <><CheckCircle size={16} /> Activate</> : <><ShieldAlert size={16} /> Archive</>}
+                        {localClient.is_active === 0 ? <><CheckCircle size={16} /> {t('activate_account')}</> : <><ShieldAlert size={16} /> {t('archive_account')}</>}
                       </button>
 
                       <button 
                         onClick={async () => {
-                          if (confirm(`CRITICAL WARNING: Permanently delete ${localClient.first_name} ${localClient.last_name}? This action is irreversible.`)) {
+                          if (confirm(t('purge_client_confirm').replace('{name}', localClient.first_name + ' ' + localClient.last_name))) {
                             if (window.api && window.api.deleteClient) {
                               const res = await window.api.deleteClient(localClient.id);
                               if (res.success) onBack();
@@ -811,7 +848,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                           }
                         }}
                         className="w-full py-3 md:py-3.5 px-4 bg-destructive/5 text-destructive/60 border border-destructive/10 rounded-xl md:rounded-2xl text-[10px] md:text-xs font-bold uppercase tracking-widest hover:bg-destructive hover:text-white transition-all flex items-center justify-center gap-2">
-                        Purge Record
+                        {t('purge_record_btn')}
                       </button>
                     </div>
                   )}
@@ -844,7 +881,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     }} 
                     className={`flex items-center gap-2 px-4 md:px-6 py-3 md:py-4 text-[9px] md:text-[10px] font-bold uppercase tracking-widest rounded-xl md:rounded-2xl transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:bg-background/50'}`}>
                     <tab.icon size={14} />
-                    {tab.label}
+                    {t(tab.label)}
                   </button>
                 ))}
               </div>
@@ -878,14 +915,14 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-primary/5 p-6 rounded-2xl border border-primary/10 no-print">
                         <div className="space-y-1">
                            <h4 className="text-primary font-bold text-sm flex items-center gap-2 font-heading">
-                              <Bot size={18} /> AI CLINICAL RECOVERY GENERATOR
+                              <Bot size={18} /> {t('ai_clinical_recovery_generator', 'AI CLINICAL RECOVERY GENERATOR')}
                            </h4>
-                           <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Synthesize personalized protocol based on clinical findings</p>
+                           <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{t('synthesize_personalized_protocol', 'Synthesize personalized protocol based on clinical findings')}</p>
                         </div>
                         <button 
                           onClick={() => { onNavigate('ai-assistant'); }}
                           className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2">
-                          <Sparkles size={14} /> Generate Program
+                          <Sparkles size={14} /> {t('generate_program', 'Generate Program')}
                         </button>
                      </div>
                    )}
@@ -899,14 +936,14 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                 <div className="space-y-8 animate-in fade-in duration-300">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h3 className="text-xl font-bold text-foreground font-heading">Medical Documents</h3>
-                      <p className="text-xs text-muted-foreground mt-1 font-medium tracking-tight">Diagnostic imagery, reports, and digital records.</p>
+                      <h3 className="text-xl font-bold text-foreground font-heading">{t('medical_documents_header')}</h3>
+                      <p className="text-xs text-muted-foreground mt-1 font-medium tracking-tight">{t('diagnostic_imagery_desc')}</p>
                     </div>
                     <div className="flex gap-3">
                       <button 
                         onClick={loadDocuments}
                         className="p-2.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all border border-border"
-                        title="Refresh Registry"
+                        title={t('refresh_registry', 'Refresh Registry')}
                       >
                         <RefreshCw size={18} />
                       </button>
@@ -928,7 +965,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             ) : (
                               <FileText size={16} />
                             )}
-                            {isUploadingMobile ? 'Uploading...' : 'Import Record'}
+                            {isUploadingMobile ? t('uploading', 'Uploading...') : t('import_record_btn')}
                           </button>
                         </>
                       )}
@@ -938,8 +975,8 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                   {documents.length === 0 ? (
                     <div className="text-center py-20 bg-muted/10 rounded-3xl border border-dashed border-border">
                       <FileText size={48} className="mx-auto mb-4 text-muted-foreground/30" />
-                      <p className="font-bold text-foreground mb-1 font-heading">No digital records found</p>
-                      <p className="text-xs text-muted-foreground font-medium">Securely store PDFs, diagnostic results, or clinical scans.</p>
+                      <p className="font-bold text-foreground mb-1 font-heading">{t('no_digital_records_found')}</p>
+                      <p className="text-xs text-muted-foreground font-medium">{t('securely_store_pdfs')}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -951,21 +988,21 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             </div>
                             <div className="overflow-hidden">
                               <p className="font-bold text-foreground text-sm truncate" title={doc.file_name}>{doc.file_name}</p>
-                              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{doc.upload_date ? formatPTDate(doc.upload_date) : 'Unknown Date'}</p>
+                              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{doc.upload_date ? formatPTDate(doc.upload_date) : t('unknown_date', 'Unknown Date')}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <button 
                               onClick={async () => {
-                                if (window.api && window.api.openDocument) {
-                                  const res = await window.api.openDocument(doc.local_file_path);
-                                  if (res && !res.success) {
-                                    alert(`Error: ${res.error}`);
+                                  if (window.api && window.api.openDocument) {
+                                    const res = await window.api.openDocument(doc.local_file_path);
+                                    if (res && !res.success) {
+                                      alert(`Error: ${res.error}`);
+                                    }
                                   }
-                                }
                               }}
                               className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all"
-                              title="Open Document"
+                              title={t('open_document_tooltip')}
                             >
                               <ExternalLink size={18} />
                             </button>
@@ -976,7 +1013,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                 }
                               }}
                               className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all" 
-                              title="Reveal in System"
+                              title={t('reveal_in_system_tooltip')}
                             >
                               <Folder size={18} />
                             </button>
@@ -995,7 +1032,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                        <div className="p-2 bg-primary/10 text-primary rounded-lg">
                           <CreditCard size={20} />
                        </div>
-                       <h3 className="text-xl font-bold text-foreground font-heading">Session Finance</h3>
+                       <h3 className="text-xl font-bold text-foreground font-heading">{t('session_finance_tab')}</h3>
                     </div>
                     {(isAdmin || isStaff) && (
                       <button 
@@ -1006,7 +1043,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                           setShowAddPayment(!showAddPayment);
                         }} 
                         className={`${showAddPayment ? 'bg-muted text-foreground' : 'bg-primary text-primary-foreground shadow-lg shadow-primary/10'} px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 transition-all`}>
-                        {showAddPayment ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Record Payment</>}
+                        {showAddPayment ? <><X size={16} /> {t('cancel')}</> : <><Plus size={16} /> {t('record_payment_btn')}</>}
                       </button>
                     )}
                   </div>
@@ -1016,20 +1053,20 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/5 border border-primary/20 rounded-3xl p-6 md:p-8 space-y-4 md:space-y-6 shadow-sm animate-in fade-in duration-300">
                       <div className="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                          <h4 className="text-sm font-black text-primary uppercase tracking-wider italic font-heading">Active Session Package Status</h4>
-                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mt-1">Real-Time Sync with Treatment Timeline</p>
+                          <h4 className="text-sm font-black text-primary uppercase tracking-wider italic font-heading">{t('active_package_status')}</h4>
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mt-1">{t('realtime_sync_timeline')}</p>
                         </div>
                         <div className="flex gap-4">
                           <div className="text-center bg-card border border-border px-4 py-2 rounded-2xl shadow-sm">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">Total Purchased</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">{t('total_purchased')}</p>
                             <p className="text-xl md:text-2xl font-black text-primary font-heading leading-tight mt-1">{packageStatus.total}</p>
                           </div>
                           <div className="text-center bg-card border border-border px-4 py-2 rounded-2xl shadow-sm">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">Sessions Used</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">{t('sessions_used')}</p>
                             <p className="text-xl md:text-2xl font-black text-accent font-heading leading-tight mt-1">{packageStatus.used}</p>
                           </div>
                           <div className="text-center bg-card border border-border px-4 py-2 rounded-2xl shadow-sm">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">Sessions Left</p>
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-wider">{t('sessions_left')}</p>
                             <p className="text-xl md:text-2xl font-black text-emerald-600 font-heading leading-tight mt-1">{Math.max(0, packageStatus.total - packageStatus.used)}</p>
                           </div>
                         </div>
@@ -1037,8 +1074,8 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
 
                       <div className="space-y-2">
                         <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                          <span>Progress</span>
-                          <span>{Math.round((packageStatus.used / packageStatus.total) * 100)}% Used</span>
+                          <span>{t('progress_tab', 'Progress')}</span>
+                          <span>{Math.round((packageStatus.used / packageStatus.total) * 100)}% {t('used')}</span>
                         </div>
                         <div className="h-3 w-full bg-muted border border-border rounded-full overflow-hidden shadow-inner">
                           <div 
@@ -1065,7 +1102,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     }} className="bg-muted/20 border border-border rounded-3xl p-8 space-y-6 animate-in slide-in-from-top-4 duration-300 shadow-sm">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Service Classification</label>
+                          <label className={`text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('service_classification')}</label>
                           <select 
                             value={paymentData.session_type} 
                             onChange={e => {
@@ -1079,14 +1116,14 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             }} 
                             className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground font-medium focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
                           >
-                            <option value="">Select Service Type...</option>
-                            {sessionTypes.map(t => (
-                              <option key={t.id} value={t.id.toString()}>{t.name} — {t.cost} EGP{t.num_sessions ? ` (${t.num_sessions} sessions)` : ''}</option>
-                            ))}
+                            <option value="">{t('select_service_type')}</option>
+                             {sessionTypes.map(st => (
+                               <option key={st.id} value={st.id.toString()}>{st.name} — {st.cost} EGP{st.num_sessions ? ` (${st.num_sessions} ${t('sessions_unit')})` : ''}</option>
+                             ))}
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Session Count</label>
+                          <label className={`text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('session_count_label')}</label>
                           <input 
                             disabled 
                             type="number" 
@@ -1096,20 +1133,20 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Total Transaction Value ($)</label>
+                        <label className={`text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'mr-1' : 'ml-1'}`}>{t('total_transaction_value')}</label>
                         <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">$</span>
+                          <span className={`absolute ${isAr ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-muted-foreground font-bold`}>$</span>
                           <input 
                             disabled 
                             type="number" 
                             value={paymentData.amount} 
-                            className="w-full pl-8 pr-4 py-4 bg-muted/50 border border-border rounded-2xl text-muted-foreground font-bold text-2xl outline-none cursor-not-allowed tabular-nums" 
+                            className={`w-full ${isAr ? 'pr-8 pl-4' : 'pl-8 pr-4'} py-4 bg-muted/50 border border-border rounded-2xl text-muted-foreground font-bold text-2xl outline-none cursor-not-allowed tabular-nums`} 
                           />
                         </div>
-                        <p className="text-[9px] text-muted-foreground mt-1 uppercase font-bold tracking-wider">* Fixed rate synchronized with Session Type Library.</p>
+                        <p className="text-[9px] text-muted-foreground mt-1 uppercase font-bold tracking-wider">{t('fixed_rate_sync_notice')}</p>
                       </div>
                       <div className="flex justify-end pt-2">
-                        <button type="submit" className="bg-accent text-accent-foreground px-10 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-accent/10 hover:-translate-y-0.5 transition-all">Authenticate & Record Transaction</button>
+                        <button type="submit" className="bg-accent text-accent-foreground px-10 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-accent/10 hover:-translate-y-0.5 transition-all">{t('authenticate_record')}</button>
                       </div>
                     </form>
                   )}
@@ -1118,25 +1155,26 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                     {payments.length === 0 ? (
                       <div className="text-center py-20">
                         <CreditCard size={48} className="mx-auto mb-4 text-muted-foreground/30" />
-                        <p className="text-muted-foreground font-medium">No financial records detected.</p>
+                        <p className="text-muted-foreground font-medium">{t('no_financial_records')}</p>
                       </div>
                     ) : (
                       <>
                         {/* Desktop View Table */}
-                        <table className="w-full text-left hidden md:table">
+                        <div className="hidden md:block overflow-x-auto w-full">
+                          <table className={`w-full ${isAr ? 'text-right' : 'text-left'} min-w-[850px]`}>
                           <thead>
                             <tr className="bg-muted/50 border-b border-border">
-                              <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Transaction Date</th>
-                              <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Service Details</th>
-                              <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Volume / Notes</th>
-                              <th className="px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-right">Net Amount</th>
+                              <th className={`px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'text-right' : 'text-left'}`}>{t('transaction_date')}</th>
+                              <th className={`px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'text-right' : 'text-left'}`}>{t('service_details')}</th>
+                              <th className={`px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'text-right' : 'text-left'}`}>{t('volume_notes')}</th>
+                              <th className={`px-8 py-5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest ${isAr ? 'text-left' : 'text-right'}`}>{t('net_amount')}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border">
                             {payments.map((p, i) => (
                               editingPaymentId === p.id ? (
                                 <tr key={p.id || i} className="bg-primary/5">
-                                  <td className="px-8 py-5 text-sm font-medium text-muted-foreground">{formatPTDate(p.payment_date)}</td>
+                                  <td className={`px-8 py-5 text-sm font-medium text-muted-foreground ${isAr ? 'text-right' : 'text-left'}`}>{formatPTDate(p.payment_date)}</td>
                                   <td className="px-8 py-5">
                                     <input 
                                       type="text" 
@@ -1149,30 +1187,30 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                     <div className="flex items-center gap-2 mb-2">
                                       <input 
                                         type="number"
-                                        placeholder="Sessions"
+                                        placeholder={t('sessions_unit')}
                                         value={editPaymentData.package_sessions_total}
                                         onChange={e => setEditPaymentData({ ...editPaymentData, package_sessions_total: parseInt(e.target.value) || 0 })}
                                         className="w-20 px-2 py-1 bg-background border border-border rounded-xl text-xs font-bold text-foreground focus:ring-2 focus:ring-primary outline-none"
                                         min="1"
                                       />
-                                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Sessions</span>
+                                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sessions_unit')}</span>
                                     </div>
                                     <input 
                                       type="text" 
-                                      placeholder="Payment Notes..."
+                                      placeholder={t('payment_notes_placeholder')}
                                       value={editPaymentData.notes}
                                       onChange={e => setEditPaymentData({ ...editPaymentData, notes: e.target.value })}
                                       className="w-full px-3 py-1.5 bg-background border border-border rounded-xl text-xs text-foreground font-medium outline-none focus:ring-2 focus:ring-primary"
                                     />
                                   </td>
-                                  <td className="px-8 py-5 text-right font-bold">
-                                    <div className="flex items-center justify-end gap-2.5">
+                                  <td className={`px-8 py-5 font-bold ${isAr ? 'text-left' : 'text-right'}`}>
+                                    <div className={`flex items-center ${isAr ? 'justify-start' : 'justify-end'} gap-2.5`}>
                                       <span className="text-sm text-muted-foreground font-bold">$</span>
                                       <input 
                                         type="number" 
                                         value={editPaymentData.amount}
                                         onChange={e => setEditPaymentData({ ...editPaymentData, amount: parseFloat(e.target.value) || 0 })}
-                                        className="w-24 px-3 py-1.5 bg-background border border-border rounded-xl text-xs text-foreground font-bold outline-none text-right focus:ring-2 focus:ring-primary"
+                                        className={`w-24 px-3 py-1.5 bg-background border border-border rounded-xl text-xs text-foreground font-bold outline-none focus:ring-2 focus:ring-primary ${isAr ? 'text-left' : 'text-right'}`}
                                       />
                                       <button 
                                         onClick={async () => {
@@ -1192,13 +1230,13 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                         }}
                                         className="px-3 py-1.5 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider rounded-xl hover:scale-105 active:scale-95 transition-all"
                                       >
-                                        Save
+                                        {t('confirm')}
                                       </button>
                                       <button 
                                         onClick={() => setEditingPaymentId(null)}
                                         className="px-3 py-1.5 bg-muted text-muted-foreground text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-muted/80 transition-all"
                                       >
-                                        Cancel
+                                        {t('cancel')}
                                       </button>
                                     </div>
                                   </td>
@@ -1209,21 +1247,21 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                                   <td className="px-8 py-5 font-bold text-foreground">{p.payment_type}</td>
                                   <td className="px-8 py-5">
                                     <div className="flex flex-col gap-1.5">
-                                      <span className="text-xs font-bold px-2.5 py-1 bg-muted rounded-lg text-foreground w-fit">{p.package_sessions_total} Sessions</span>
+                                      <span className="text-xs font-bold px-2.5 py-1 bg-muted rounded-lg text-foreground w-fit">{p.package_sessions_total} {t('sessions_unit')}</span>
                                       {p.notes && <span className="text-[10px] text-muted-foreground font-semibold italic mt-0.5">{p.notes}</span>}
                                     </div>
                                   </td>
-                                  <td className="px-8 py-5 text-right font-bold text-primary tabular-nums text-lg">
-                                    <div className="flex items-center justify-end gap-3.5">
-                                      <span>${(p.amount ?? 0).toLocaleString()}</span>
+                                  <td className={`px-8 py-5 font-bold text-primary tabular-nums text-lg ${isAr ? 'text-left' : 'text-right'}`}>
+                                    <div className={`flex items-center ${isAr ? 'justify-start' : 'justify-end'} gap-3.5`}>
+                                      <span>${p.amount.toLocaleString()}</span>
                                       {isAdmin && (
                                         <button 
                                           onClick={() => {
                                             setEditingPaymentId(p.id);
                                             setEditPaymentData({ amount: p.amount, payment_type: p.payment_type, notes: p.notes || '', package_sessions_total: p.package_sessions_total || 0 });
                                           }}
-                                          className="p-2 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-                                          title="Edit Entry"
+                                          className="p-2 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer opacity-70 hover:opacity-100"
+                                          title={t('edit')}
                                         >
                                           <Edit size={14} />
                                         </button>
@@ -1235,21 +1273,109 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                             ))}
                           </tbody>
                         </table>
+                      </div>
 
                         {/* Mobile View Cards */}
                         <div className="md:hidden divide-y divide-border">
                           {payments.map((p, i) => (
-                            <div key={i} className="p-4 space-y-3 hover:bg-primary/5 transition-colors">
-                              <div className="flex justify-between items-center">
-                                <div className="font-bold text-sm text-foreground">{p.payment_type}</div>
-                                <div className="font-black text-primary tabular-nums text-base">${(p.amount ?? 0).toLocaleString()}</div>
+                            editingPaymentId === p.id ? (
+                              <div key={p.id || i} className="p-4 space-y-4 bg-primary/5">
+                                <div className="space-y-2">
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('service_details')}</label>
+                                  <input 
+                                    type="text" 
+                                    value={editPaymentData.payment_type}
+                                    onChange={e => setEditPaymentData({ ...editPaymentData, payment_type: e.target.value })}
+                                    className="w-full px-3 py-2 bg-background border border-border rounded-xl text-xs text-foreground font-semibold outline-none focus:ring-2 focus:ring-primary"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sessions_unit')}</label>
+                                    <input 
+                                      type="number"
+                                      value={editPaymentData.package_sessions_total}
+                                      onChange={e => setEditPaymentData({ ...editPaymentData, package_sessions_total: parseInt(e.target.value) || 0 })}
+                                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-xs font-bold text-foreground focus:ring-2 focus:ring-primary outline-none"
+                                      min="1"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('net_amount')}</label>
+                                    <input 
+                                      type="number" 
+                                      value={editPaymentData.amount}
+                                      onChange={e => setEditPaymentData({ ...editPaymentData, amount: parseFloat(e.target.value) || 0 })}
+                                      className="w-full px-3 py-2 bg-background border border-border rounded-xl text-xs text-foreground font-bold outline-none focus:ring-2 focus:ring-primary"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('volume_notes')}</label>
+                                  <input 
+                                    type="text" 
+                                    placeholder={t('payment_notes_placeholder')}
+                                    value={editPaymentData.notes}
+                                    onChange={e => setEditPaymentData({ ...editPaymentData, notes: e.target.value })}
+                                    className="w-full px-3 py-2 bg-background border border-border rounded-xl text-xs text-foreground font-medium outline-none focus:ring-2 focus:ring-primary"
+                                  />
+                                </div>
+                                <div className="flex gap-2 justify-end pt-2">
+                                  <button 
+                                    onClick={async () => {
+                                      if (window.api && (window.api as any).updatePayment) {
+                                        const res = await (window.api as any).updatePayment({
+                                          paymentId: p.id,
+                                          data: editPaymentData
+                                        });
+                                        if (res.success) {
+                                          setEditingPaymentId(null);
+                                          loadPayments();
+                                          loadPackageStatus();
+                                        } else {
+                                          alert(`Update failed: ${res.error}`);
+                                        }
+                                      }
+                                    }}
+                                    className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-xl hover:scale-105 active:scale-95 transition-all"
+                                  >
+                                    {t('confirm')}
+                                  </button>
+                                  <button 
+                                    onClick={() => setEditingPaymentId(null)}
+                                    className="px-4 py-2 bg-muted text-muted-foreground text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-muted/80 transition-all"
+                                  >
+                                    {t('cancel')}
+                                  </button>
+                                </div>
                               </div>
-                              {p.notes && <div className="text-xs text-muted-foreground font-medium italic mt-0.5">{p.notes}</div>}
-                              <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
-                                <span className="bg-muted text-foreground px-2 py-0.5 rounded-lg border border-border/10">{p.package_sessions_total} Sessions</span>
-                                <span className="tabular-nums opacity-80">{formatPTDate(p.payment_date)}</span>
+                            ) : (
+                              <div key={i} className="p-4 space-y-3 hover:bg-primary/5 transition-colors relative group">
+                                <div className="flex justify-between items-center">
+                                  <div className="font-bold text-sm text-foreground">{p.payment_type}</div>
+                                  <div className="flex items-center gap-3">
+                                    <div className="font-black text-primary tabular-nums text-base">${p.amount.toLocaleString()}</div>
+                                    {isAdmin && (
+                                      <button 
+                                        onClick={() => {
+                                          setEditingPaymentId(p.id);
+                                          setEditPaymentData({ amount: p.amount, payment_type: p.payment_type, notes: p.notes || '', package_sessions_total: p.package_sessions_total || 0 });
+                                        }}
+                                        className="p-2 bg-muted text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all cursor-pointer opacity-80 hover:opacity-100"
+                                        title={t('edit')}
+                                      >
+                                        <Edit size={14} />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                                {p.notes && <div className="text-xs text-muted-foreground font-medium italic mt-0.5">{p.notes}</div>}
+                                <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider">
+                                  <span className="bg-muted text-foreground px-2 py-0.5 rounded-lg border border-border/10">{p.package_sessions_total} {t('sessions_unit')}</span>
+                                  <span className="tabular-nums opacity-80">{formatPTDate(p.payment_date)}</span>
+                                </div>
                               </div>
-                            </div>
+                            )
                           ))}
                         </div>
                       </>
@@ -1257,6 +1383,155 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                   </div>
                 </div>
               )}
+
+              {activeTab === 'recovery-monitoring' && (() => {
+                const unifiedFeedbacks = [
+                  ...(feedbacks.paintests || []).map(t => ({
+                    id: t.id,
+                    date: t.created_at,
+                    score: t.pain_score ?? t.pain_level ?? 0,
+                    type: t.test_type || 'Pain Test',
+                    notes: t.notes || t.comments || t.observations || '',
+                    isPainTest: true
+                  })),
+                  ...(feedbacks.patientlogs || []).map(l => ({
+                    id: l.id,
+                    date: l.created_at,
+                    score: l.pain_level ?? 0,
+                    type: 'Daily Check-in',
+                    notes: l.notes || l.comments || l.observations || '',
+                    isPainTest: false
+                  }))
+                ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                return (
+                  <div className="space-y-8 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-border/10 pb-6">
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground font-heading">{t('recovery_monitoring')}</h3>
+                        <p className="text-xs text-muted-foreground mt-1 font-medium tracking-tight">{t('recovery_monitoring_subtitle')}</p>
+                      </div>
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        {localClient.sync_token && (
+                          <button 
+                            onClick={loadRecoveryFeedbacks}
+                            disabled={isLoadingFeedbacks}
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 p-2.5 bg-background border border-border text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all disabled:opacity-50"
+                            title={t('refresh_registry', 'Refresh')}
+                          >
+                            <RefreshCw size={18} className={isLoadingFeedbacks ? 'animate-spin' : ''} />
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => {
+                            const portalUrl = `https://revive-patiant-portal.vercel.app/?token=${localClient.sync_token || ''}`;
+                            setSyncUrl(portalUrl);
+                            setShowQr(true);
+                          }}
+                          className="flex-1 sm:flex-none bg-primary text-primary-foreground px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95"
+                        >
+                          <QrCode size={16} />
+                          {t('view_qr_code', 'View QR Code')}
+                        </button>
+                      </div>
+                    </div>
+
+                    {!localClient.sync_token ? (
+                      <div className="text-center py-20 bg-muted/10 rounded-3xl border border-dashed border-border p-6">
+                        <QrCode size={48} className="mx-auto mb-4 text-muted-foreground/30 animate-pulse" />
+                        <p className="font-bold text-foreground mb-1 font-heading">Sync Portal Not Configured</p>
+                        <p className="text-xs text-muted-foreground font-medium max-w-md mx-auto mb-6">
+                          To monitor patient recovery, please click the sync button to generate a QR code and link this patient with the client portal.
+                        </p>
+                      </div>
+                    ) : isLoadingFeedbacks ? (
+                      <div className="flex flex-col items-center justify-center py-20">
+                        <RefreshCw size={36} className="text-primary animate-spin mb-4" />
+                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">{t('syncing')}</p>
+                      </div>
+                    ) : feedbacksError ? (
+                      <div className="text-center py-16 bg-destructive/5 rounded-3xl border border-dashed border-destructive/20 p-6">
+                        <ShieldAlert size={48} className="mx-auto mb-4 text-destructive/40" />
+                        <p className="font-bold text-destructive mb-1 font-heading">Failed to Load Feedbacks</p>
+                        <p className="text-xs text-muted-foreground font-medium max-w-md mx-auto mb-4">
+                          {feedbacksError}
+                        </p>
+                        <button 
+                          onClick={loadRecoveryFeedbacks}
+                          className="px-4 py-2 bg-background border border-border text-foreground hover:bg-muted font-bold text-xs rounded-xl transition-all"
+                        >
+                          Try Again
+                        </button>
+                      </div>
+                    ) : unifiedFeedbacks.length === 0 ? (
+                      <div className="text-center py-20 bg-muted/10 rounded-3xl border border-dashed border-border p-6">
+                        <ClipboardList size={48} className="mx-auto mb-4 text-muted-foreground/30" />
+                        <p className="font-bold text-foreground mb-1 font-heading">No Feedbacks Logged Yet</p>
+                        <p className="text-xs text-muted-foreground font-medium max-w-sm mx-auto">
+                          Once the patient scans their portal QR code and logs their check-ins or pain scores, they will appear here in real-time.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6 relative before:absolute before:inset-0 before:left-5 before:md:left-7 before:w-0.5 before:bg-border/60 overflow-hidden py-2 animate-in fade-in duration-300">
+                        {unifiedFeedbacks.map((item, idx) => {
+                          const dateObj = new Date(item.date);
+                          const dateStr = dateObj.toLocaleDateString(isAr ? 'ar-EG' : undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                          const timeStr = dateObj.toLocaleTimeString(isAr ? 'ar-EG' : [], { hour: '2-digit', minute: '2-digit' });
+                          const isHighPain = item.score >= 7;
+                          const isMediumPain = item.score >= 4 && item.score < 7;
+
+                          return (
+                            <div key={item.id || idx} className="relative pl-12 md:pl-16 group">
+                              {/* Timeline dot */}
+                              <div className={`absolute left-3.5 md:left-5.5 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-background z-10 transition-transform group-hover:scale-125 ${
+                                isHighPain ? 'bg-destructive shadow-lg shadow-destructive/30' : 
+                                isMediumPain ? 'bg-orange-500 shadow-lg shadow-orange-500/30' : 
+                                'bg-emerald-600 shadow-lg shadow-emerald-600/30'
+                              }`} />
+
+                              {/* Card Content */}
+                              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 border border-border rounded-2xl bg-card shadow-sm hover:border-primary/20 hover:shadow-md transition-all">
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                  {/* Pain Score Badge */}
+                                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-black text-white shadow-md transition-transform group-hover:scale-105 shrink-0 ${
+                                    isHighPain ? 'bg-destructive shadow-destructive/20' : 
+                                    isMediumPain ? 'bg-orange-500 shadow-orange-500/20' : 
+                                    'bg-emerald-600 shadow-emerald-600/20'
+                                  }`}>
+                                    {item.score}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="font-black text-sm md:text-base text-foreground group-hover:text-primary transition-colors truncate uppercase italic tracking-tight">
+                                      {item.type}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">
+                                        {dateStr}
+                                      </span>
+                                      <span className="text-[9px] text-muted-foreground/60 font-semibold">•</span>
+                                      <span className="text-[9px] text-muted-foreground font-bold tabular-nums">
+                                        {timeStr}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex-1 max-w-full md:max-w-md">
+                                  <div className="bg-muted/30 p-3 rounded-xl border border-border/50 group-hover:border-primary/20 transition-all">
+                                    <p className="text-xs text-muted-foreground font-medium italic leading-relaxed">
+                                      {item.notes || 'No comments left by patient'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -1267,7 +1542,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
           <div className="w-full max-w-sm bg-card border border-border rounded-[2.5rem] shadow-2xl p-8 space-y-6 text-center relative">
             <button 
               onClick={() => setShowQr(false)}
-              className="absolute top-6 right-6 p-2 text-muted-foreground hover:bg-muted rounded-xl transition-all"
+              className={`absolute top-6 ${isAr ? 'left-6' : 'right-6'} p-2 text-muted-foreground hover:bg-muted rounded-xl transition-all`}
             >
               <X size={20} />
             </button>
@@ -1276,8 +1551,8 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
               <div className="inline-flex items-center justify-center p-4 bg-primary/10 text-primary rounded-2xl mb-2">
                 <QrCode size={32} />
               </div>
-              <h3 className="text-xl font-bold text-foreground font-heading uppercase italic">Patient Access</h3>
-              <p className="text-xs text-muted-foreground font-medium">Scan this code with the patient's phone to open their recovery portal.</p>
+              <h3 className="text-xl font-bold text-foreground font-heading uppercase italic">{t('patient_access_portal')}</h3>
+              <p className="text-xs text-muted-foreground font-medium">{t('scan_code_portal')}</p>
             </div>
 
             <div className="bg-white p-6 rounded-3xl inline-block shadow-inner border border-border">
@@ -1285,7 +1560,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
             </div>
 
             <div className="bg-muted/50 p-4 rounded-2xl space-y-1">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Access PIN</p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('patient_access_pin_lbl')}</p>
               <p className="text-2xl font-mono font-bold text-primary tracking-[0.5em] ml-2">{patientPin}</p>
             </div>
 
@@ -1293,7 +1568,7 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
               onClick={() => setShowQr(false)}
               className="w-full py-4 bg-foreground text-background rounded-2xl font-bold text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all"
             >
-              Done
+              {t('done_btn')}
             </button>
           </div>
         </div>

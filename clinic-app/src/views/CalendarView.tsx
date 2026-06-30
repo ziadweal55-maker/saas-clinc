@@ -15,45 +15,21 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { Client, User, Doctor } from '../types';
-import { generateWhatsAppLink, DEFAULT_WHATSAPP_TEMPLATE } from '../utils/whatsapp';
+import { generateWhatsAppLink, DEFAULT_WHATSAPP_TEMPLATE, DEFAULT_WHATSAPP_REVIEW_TEMPLATE } from '../utils/whatsapp';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface CalendarViewProps {
   clients: Client[];
   currentUser: User | null;
 }
 
-// Helper to get Cairo YYYY-MM-DD date string
-const getCairoDateString = (dateInput: string) => {
-  if (!dateInput) return '';
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('sv-SE', { timeZone: 'Africa/Cairo' });
-};
-
-// Helper to get Cairo hour (0-23)
-const getCairoHour = (dateInput: string) => {
-  if (!dateInput) return -1;
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return -1;
-  const hourStr = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', timeZone: 'Africa/Cairo' });
-  return parseInt(hourStr);
-};
-
-// Helper to convert Date/string to Cairo local datetime-local input string
-const toCairoDateTimeLocal = (dateInput: string) => {
-  if (!dateInput) return '';
-  const d = new Date(dateInput);
-  if (isNaN(d.getTime())) return '';
-  const localStr = d.toLocaleString('sv-SE', { timeZone: 'Africa/Cairo' });
-  return localStr.replace(' ', 'T').substring(0, 16);
-};
-
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 10); // 10 AM to 10 PM (22:00)
 
 export function CalendarView({ clients, currentUser }: CalendarViewProps) {
+  const { t, isAr } = useLanguage();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [selectedDate, setSelectedDate] = useState(() => getCairoDateString(new Date().toISOString()));
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showAdd, setShowAdd] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<any | null>(null);
   const [formData, setFormData] = useState({ 
@@ -92,9 +68,9 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
 
     if (!formData.client_id) {
       if ((window as any).showToast) {
-        (window as any).showToast('Please select a patient.', 'error');
+        (window as any).showToast(t('toast_select_patient'), 'error');
       } else {
-        alert('Please select a patient.');
+        alert(t('toast_select_patient'));
       }
       return;
     }
@@ -102,32 +78,33 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
     const finalDoctorId = currentUser?.role === 'doctor' ? currentUser.doctor_id : parseInt(formData.doctor_id);
     if (!finalDoctorId) {
       if ((window as any).showToast) {
-        (window as any).showToast('Please select a doctor.', 'error');
+        (window as any).showToast(t('toast_select_doctor'), 'error');
       } else {
-        alert('Please select a doctor.');
+        alert(t('toast_select_doctor'));
       }
       return;
     }
     
-    // Use Cairo timezone helper parsing for hour and date comparison
-    const selectedHour = getCairoHour(formData.appointment_date);
-    const selectedDateStr = getCairoDateString(formData.appointment_date);
+    // Use local time parsing for hour comparison
+    const selectedDateObj = new Date(formData.appointment_date);
+    const selectedHour = selectedDateObj.getHours();
     
     // Conflict Checks
     const sameHourAppointments = appointments.filter(apt => {
-      return getCairoDateString(apt.appointment_date) === selectedDateStr && 
-             getCairoHour(apt.appointment_date) === selectedHour;
+      const aptDate = new Date(apt.appointment_date);
+      return aptDate.toLocaleDateString() === selectedDateObj.toLocaleDateString() && 
+             aptDate.getHours() === selectedHour;
     });
 
     const sameDoctorInHour = sameHourAppointments.find(apt => apt.doctor_id === finalDoctorId && apt.id !== editingAppointment?.id);
     const capacityReached = sameHourAppointments.length >= 3;
 
     if (sameDoctorInHour) {
-      if (!window.confirm(`Notice: Dr. ${doctors.find(d => d.id === finalDoctorId)?.name} already has a session at this hour. Assign anyway?`)) {
+      if (!window.confirm(t('conflict_doctor_assign').replace('{name}', doctors.find(d => d.id === finalDoctorId)?.name || ''))) {
         return;
       }
     } else if (capacityReached) {
-      if (!window.confirm(`Notice: There are already ${sameHourAppointments.length} sessions scheduled at this hour. Assign anyway?`)) {
+      if (!window.confirm(t('conflict_capacity_reached').replace('{count}', sameHourAppointments.length.toString()))) {
         return;
       }
     }
@@ -166,15 +143,15 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
 
       if (res && res.success === false) {
         if ((window as any).showToast) {
-          (window as any).showToast(`Error: ${res.error || 'Failed to save appointment'}`, 'error');
+          (window as any).showToast(`${t('toast_sys_error')}${res.error || ''}`, 'error');
         } else {
-          alert(`Error: ${res.error || 'Failed to save appointment'}`);
+          alert(`${t('toast_sys_error')}${res.error || ''}`);
         }
         return;
       }
 
       if ((window as any).showToast) {
-        (window as any).showToast('Appointment successfully saved!', 'success');
+        (window as any).showToast(t('toast_apt_saved'), 'success');
       }
 
       setShowAdd(false);
@@ -187,35 +164,55 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
       loadData();
     } catch (err: any) {
       if ((window as any).showToast) {
-        (window as any).showToast(`System Error: ${err.message}`, 'error');
+        (window as any).showToast(`${t('toast_sys_error')}${err.message}`, 'error');
       } else {
-        alert(`System Error: ${err.message}`);
+        alert(`${t('toast_sys_error')}${err.message}`);
       }
     }
   };
 
-  const handleWhatsApp = (apt: any) => {
-    const savedTemplate = localStorage.getItem('whatsapp_template') || DEFAULT_WHATSAPP_TEMPLATE;
+  const handleWhatsApp = (apt: any, type: 'reminder' | 'review' = 'reminder') => {
+    const savedTemplate = type === 'review'
+      ? (localStorage.getItem('whatsapp_review_template') || DEFAULT_WHATSAPP_REVIEW_TEMPLATE)
+      : (localStorage.getItem('whatsapp_template') || DEFAULT_WHATSAPP_TEMPLATE);
     
-    // Format date for Egyptian standard (DD/MM/YYYY) in Cairo timezone
+    // Format date for Egyptian standard (DD/MM/YYYY)
     let formattedDate = '';
-    let formattedTime = '';
     try {
       const d = new Date(apt.appointment_date);
       if (!isNaN(d.getTime())) {
-        formattedDate = d.toLocaleDateString('en-GB', { timeZone: 'Africa/Cairo' });
-        formattedTime = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo' });
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        formattedDate = `${day}/${month}/${year}`;
       }
     } catch (e) {
       formattedDate = apt.appointment_date.split(' ')[0] || '';
     }
+
+    // Format time: extract HH:MM
+    let formattedTime = '';
+    try {
+      const parts = apt.appointment_date.split(' ');
+      if (parts.length >= 2) {
+        formattedTime = parts[1].substring(0, 5);
+      } else {
+        const d = new Date(apt.appointment_date);
+        formattedTime = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      }
+    } catch (e) {
+      // fallback
+    }
+
+    const doctorObj = doctors.find(d => d.id === apt.doctor_id);
+    const doctorName = doctorObj ? doctorObj.name : (apt.doctor_name || 'العيادة');
 
     const link = generateWhatsAppLink(savedTemplate, {
       patientName: `${apt.client_first_name || ''} ${apt.client_last_name || ''}`,
       phone: apt.client_phone || '',
       date: formattedDate || apt.appointment_date,
       time: formattedTime || 'الموعد المحدد',
-      doctorName: apt.doctor_name || 'العيادة',
+      doctorName: doctorName,
       branchName: apt.branch_id === 2 ? 'El Monofaya Branch' : 'Banha Branch',
     });
     window.open(link, '_blank');
@@ -227,7 +224,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
     setFormData({ 
       client_id: apt.client_id.toString(), 
       doctor_id: apt.doctor_id ? apt.doctor_id.toString() : '',
-      appointment_date: toCairoDateTimeLocal(apt.appointment_date), 
+      appointment_date: apt.appointment_date.substring(0, 16), 
       status: apt.status,
       session_type: apt.session_type || ''
     });
@@ -236,7 +233,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
 
   const handleDelete = async (id: number) => {
     if (currentUser?.role === 'doctor') return;
-    if (confirm('Delete this appointment permanently?')) {
+    if (confirm(t('delete_apt_confirm'))) {
       await (window.api as any).deleteAppointment(id);
       loadData();
     }
@@ -244,9 +241,9 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
 
   const getAppointmentsForHour = (hour: number) => {
     return appointments.filter(apt => {
-      const isSameDate = getCairoDateString(apt.appointment_date) === selectedDate;
-      const aptHour = getCairoHour(apt.appointment_date);
-      if (!isSameDate || aptHour !== hour) return false;
+      const aptDate = new Date(apt.appointment_date);
+      const isSameDate = apt.appointment_date.startsWith(selectedDate);
+      if (!isSameDate || aptDate.getHours() !== hour) return false;
 
       const clientName = `${apt.client_first_name || ''} ${apt.client_last_name || ''}`;
       const doctorName = apt.doctor_name || '';
@@ -263,13 +260,9 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
   };
 
   const changeDate = (days: number) => {
-    const parts = selectedDate.split('-');
-    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const d = new Date(selectedDate);
     d.setDate(d.getDate() + days);
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    setSelectedDate(`${y}-${m}-${day}`);
+    setSelectedDate(d.toISOString().split('T')[0]);
   };
 
   const canModify = currentUser?.role !== 'doctor' && currentUser?.role !== 'cfo';
@@ -282,20 +275,20 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
             <div className="p-1.5 md:p-2 bg-primary/10 rounded-lg md:rounded-xl text-primary shrink-0">
               <CalendarDays size={24} />
             </div>
-            Clinical Schedule
+            {t('clinical_schedule')}
           </h1>
-          <p className="text-muted-foreground text-xs md:text-sm mt-1 font-medium italic">Manage appointments and availability</p>
+          <p className="text-muted-foreground text-xs md:text-sm mt-1 font-medium italic">{t('manage_appointments')}</p>
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            <Search className={`absolute ${isAr ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 text-muted-foreground`} size={16} />
             <input 
               type="text" 
-              placeholder="Search schedule..." 
+              placeholder={t('search_schedule')} 
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-xs placeholder:text-muted-foreground/50"
+              className={`w-full ${isAr ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-xs placeholder:text-muted-foreground/50`}
             />
           </div>
 
@@ -303,7 +296,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
             <button 
               onClick={() => changeDate(-1)}
               className="p-2 hover:bg-secondary rounded-lg md:rounded-xl transition-all">
-              <ChevronLeft size={18} />
+              {isAr ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
             <input 
               type="date" 
@@ -314,7 +307,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
             <button 
               onClick={() => changeDate(1)}
               className="p-2 hover:bg-secondary rounded-lg md:rounded-xl transition-all">
-              <ChevronRight size={18} />
+              {isAr ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </button>
           </div>
 
@@ -332,7 +325,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                 setShowAdd(true);
               }}
               className="bg-primary text-primary-foreground px-5 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-black text-xs md:text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
-              <Plus size={18} /> New Session
+              <Plus size={18} /> {t('new_session')}
             </button>
           )}
         </div>
@@ -341,13 +334,15 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
       {/* Hour Block Grid */}
       <div className="bg-card rounded-2xl md:rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col">
         <div className="p-3 md:p-4 bg-muted/30 border-b border-border text-center font-black text-xs md:text-sm tracking-widest uppercase">
-          {new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+          {new Date(selectedDate).toLocaleDateString(isAr ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
         
         <div className="divide-y divide-border">
           {HOURS.map(hour => {
             const apts = getAppointmentsForHour(hour);
-            const timeLabel = hour === 12 ? '12 PM' : hour > 12 ? `${hour - 12} PM` : `${hour} AM`;
+            const timeLabel = isAr 
+              ? (hour === 12 ? '12 مساءً' : hour > 12 ? `${hour - 12} مساءً` : `${hour} صباحاً`)
+              : (hour === 12 ? '12 PM' : hour > 12 ? `${hour - 12} PM` : `${hour} AM`);
             
             return (
               <div 
@@ -369,7 +364,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                   canModify ? 'cursor-pointer hover:bg-primary/[0.03]' : 'hover:bg-muted/10'
                 }`}
               >
-                <div className="w-16 md:w-24 p-2 md:p-4 border-r border-border flex flex-col items-center justify-start text-muted-foreground font-black text-[10px] md:text-xs pt-4 md:pt-6 shrink-0">
+                <div className={`w-16 md:w-24 p-2 md:p-4 ${isAr ? 'border-l' : 'border-r'} border-border flex flex-col items-center justify-start text-muted-foreground font-black text-[10px] md:text-xs pt-4 md:pt-6 shrink-0`}>
                   <Clock size={12} className="mb-1" />
                   {timeLabel}
                 </div>
@@ -382,7 +377,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         handleEdit(apt);
                       }}
                       className="bg-background border border-border p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group/card relative overflow-hidden">
-                      <div className={`absolute top-0 left-0 w-1 h-full ${apt.status === 'Completed' ? 'bg-emerald-500' : apt.status === 'Cancelled' ? 'bg-rose-500' : 'bg-primary'}`} />
+                      <div className={`absolute top-0 ${isAr ? 'right-0' : 'left-0'} w-1 h-full ${apt.status === 'Completed' ? 'bg-emerald-500' : apt.status === 'Cancelled' ? 'bg-rose-500' : 'bg-primary'}`} />
                       
                       <div className="flex justify-between items-start mb-2">
                         <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-tighter px-1.5 md:px-2 py-0.5 rounded-md md:rounded-lg ${apt.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-500' : apt.status === 'Cancelled' ? 'bg-rose-500/10 text-rose-500' : 'bg-primary/10 text-primary'}`}>
@@ -390,16 +385,29 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         </span>
                         <div className="flex items-center gap-1.5">
                           {apt.client_phone && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleWhatsApp(apt);
-                              }}
-                              className="p-1 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-all"
-                              title="Send WhatsApp Reminder"
-                            >
-                              <MessageSquare size={14} />
-                            </button>
+                            apt.status === 'Completed' ? (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWhatsApp(apt, 'review');
+                                }}
+                                className="p-1 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 rounded-lg transition-all"
+                                title="Send WhatsApp Review"
+                              >
+                                <MessageSquare size={14} />
+                              </button>
+                            ) : (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWhatsApp(apt, 'reminder');
+                                }}
+                                className="p-1 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-all"
+                                title="Send WhatsApp Reminder"
+                              >
+                                <MessageSquare size={14} />
+                              </button>
+                            )
                           )}
                           {canModify && (
                             <button 
@@ -418,14 +426,14 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         </p>
                         <p className="text-[10px] md:text-xs font-bold text-muted-foreground flex items-center gap-2 truncate">
                           <Stethoscope size={12} className="text-primary shrink-0" />
-                          Dr. {apt.doctor_name || 'Unassigned'}
+                          {t('doctor_label')} {apt.doctor_name || t('unassigned')}
                         </p>
                       </div>
                     </div>
                   ))}
                   {apts.length === 0 && (
                     <div className="md:col-span-3 flex items-center justify-center text-muted-foreground/20 group-hover:text-primary/60 transition-colors font-black text-[10px] md:text-xs uppercase tracking-[0.2em] italic py-4 md:py-0">
-                      {canModify ? `＋ Click to schedule at ${timeLabel}` : 'No sessions'}
+                      {canModify ? t('click_to_schedule').replace('{time}', timeLabel) : t('no_sessions')}
                     </div>
                   )}
                 </div>
@@ -443,7 +451,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
               <div>
                 <h3 className="text-lg md:text-xl font-bold flex items-center gap-2">
                   <Clock className="text-primary" size={20} />
-                  {editingAppointment ? 'Edit Session' : 'New Session'}
+                  {editingAppointment ? t('edit_session') : t('new_session')}
                 </h3>
               </div>
               <button 
@@ -462,7 +470,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
             <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-4 md:space-y-6 overflow-y-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-2 relative">
-                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">Patient</label>
+                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('patients')}</label>
                   <div className="relative">
                     <button
                       type="button"
@@ -470,17 +478,17 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         setShowClientDropdown(!showClientDropdown);
                         setShowDoctorDropdown(false);
                       }}
-                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-left flex justify-between items-center transition-all font-bold text-sm"
+                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-start flex justify-between items-center transition-all font-bold text-sm"
                     >
                       <span className="truncate">
                         {formData.client_id
                           ? (() => {
                               const selectedClient = clients.find(c => c.id.toString() === formData.client_id.toString());
-                              return selectedClient ? `${selectedClient.first_name} ${selectedClient.last_name}` : 'Select Patient...';
+                              return selectedClient ? `${selectedClient.first_name} ${selectedClient.last_name}` : t('select_patient_prompt');
                             })()
-                          : 'Select Patient...'}
+                          : t('select_patient_prompt')}
                       </span>
-                      <span className="text-muted-foreground text-[10px] ml-2 shrink-0">▼</span>
+                      <span className="text-muted-foreground text-[10px] ms-2 shrink-0">▼</span>
                     </button>
 
                     {showClientDropdown && (
@@ -488,13 +496,13 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         <div className="fixed inset-0 z-40" onClick={() => setShowClientDropdown(false)} />
                         <div className="absolute left-0 right-0 z-50 mt-1 bg-card border border-border rounded-xl shadow-xl p-2 space-y-2 max-h-60 flex flex-col">
                           <div className="relative shrink-0">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                            <Search className={`absolute ${isAr ? 'right-2.5' : 'left-2.5'} top-1/2 -translate-y-1/2 text-muted-foreground`} size={14} />
                             <input
                               type="text"
-                              placeholder="Search patient..."
+                              placeholder={t('search_patient')}
                               value={clientSearch}
                               onChange={(e) => setClientSearch(e.target.value)}
-                              className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary outline-none"
+                              className={`w-full ${isAr ? 'pr-8 pl-3' : 'pl-8 pr-3'} py-1.5 bg-background border border-border rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary outline-none`}
                               onClick={(e) => e.stopPropagation()}
                               autoFocus
                             />
@@ -505,7 +513,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                                 `${c.first_name || ''} ${c.last_name || ''}`.toLowerCase().includes(clientSearch.toLowerCase())
                               );
                               if (filtered.length === 0) {
-                                return <div className="p-2 text-center text-xs text-muted-foreground font-medium">No patients found</div>;
+                                return <div className="p-2 text-center text-xs text-muted-foreground font-medium">{t('no_patients_found')}</div>;
                               }
                               return filtered.map(c => (
                                 <button
@@ -516,7 +524,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                                     setShowClientDropdown(false);
                                     setClientSearch('');
                                   }}
-                                  className="w-full text-left px-3 py-2 text-xs font-bold text-foreground hover:bg-primary/10 rounded-lg transition-colors truncate"
+                                  className="w-full text-start px-3 py-2 text-xs font-bold text-foreground hover:bg-primary/10 rounded-lg transition-colors truncate"
                                 >
                                   {c.first_name} {c.last_name}
                                 </button>
@@ -530,7 +538,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                 </div>
 
                 <div className="space-y-2 relative">
-                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">Doctor</label>
+                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('doctor_label').replace(':', '')}</label>
                   <div className="relative">
                     <button
                       type="button"
@@ -539,16 +547,16 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         setShowDoctorDropdown(!showDoctorDropdown);
                         setShowClientDropdown(false);
                       }}
-                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-left flex justify-between items-center transition-all font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-start flex justify-between items-center transition-all font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="truncate">
                         {currentUser?.role === 'doctor'
                           ? `Dr. ${doctors.find(d => d.id === currentUser.doctor_id)?.name || currentUser.username}`
                           : formData.doctor_id
-                          ? `Dr. ${doctors.find(d => d.id.toString() === formData.doctor_id.toString())?.name || 'Select Doctor...'}`
-                          : 'Select Doctor...'}
+                          ? `Dr. ${doctors.find(d => d.id.toString() === formData.doctor_id.toString())?.name || t('select_doctor_prompt')}`
+                          : t('select_doctor_prompt')}
                       </span>
-                      {currentUser?.role !== 'doctor' && <span className="text-muted-foreground text-[10px] ml-2 shrink-0">▼</span>}
+                      {currentUser?.role !== 'doctor' && <span className="text-muted-foreground text-[10px] ms-2 shrink-0">▼</span>}
                     </button>
 
                     {showDoctorDropdown && currentUser?.role !== 'doctor' && (
@@ -556,13 +564,13 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                         <div className="fixed inset-0 z-40" onClick={() => setShowDoctorDropdown(false)} />
                         <div className="absolute left-0 right-0 z-50 mt-1 bg-card border border-border rounded-xl shadow-xl p-2 space-y-2 max-h-60 flex flex-col">
                           <div className="relative shrink-0">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                            <Search className={`absolute ${isAr ? 'right-2.5' : 'left-2.5'} top-1/2 -translate-y-1/2 text-muted-foreground`} size={14} />
                             <input
                               type="text"
-                              placeholder="Search doctor..."
+                              placeholder={t('search_doctor')}
                               value={doctorSearch}
                               onChange={(e) => setDoctorSearch(e.target.value)}
-                              className="w-full pl-8 pr-3 py-1.5 bg-background border border-border rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary outline-none"
+                              className={`w-full ${isAr ? 'pr-8 pl-3' : 'pl-8 pr-3'} py-1.5 bg-background border border-border rounded-lg text-xs font-medium focus:ring-1 focus:ring-primary outline-none`}
                               onClick={(e) => e.stopPropagation()}
                               autoFocus
                             />
@@ -574,7 +582,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                                 (d.specialty || '').toLowerCase().includes(doctorSearch.toLowerCase())
                               );
                               if (filtered.length === 0) {
-                                return <div className="p-2 text-center text-xs text-muted-foreground font-medium">No doctors found</div>;
+                                return <div className="p-2 text-center text-xs text-muted-foreground font-medium">{t('no_doctors_found')}</div>;
                               }
                               return filtered.map(d => (
                                 <button
@@ -585,7 +593,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                                     setShowDoctorDropdown(false);
                                     setDoctorSearch('');
                                   }}
-                                  className="w-full text-left px-3 py-2 text-xs font-bold text-foreground hover:bg-primary/10 rounded-lg transition-colors truncate"
+                                  className="w-full text-start px-3 py-2 text-xs font-bold text-foreground hover:bg-primary/10 rounded-lg transition-colors truncate"
                                 >
                                   Dr. {d.name} ({d.specialty})
                                 </button>
@@ -599,7 +607,7 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">Date & Time</label>
+                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('date_time')}</label>
                   <input 
                     type="datetime-local" 
                     required
@@ -610,30 +618,30 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">Status</label>
+                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('status')}</label>
                   <select 
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-sm">
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                    <option value="No Show">No Show</option>
+                    <option value="Scheduled">{t('scheduled')}</option>
+                    <option value="Completed">{isAr ? 'مكتمل' : 'Completed'}</option>
+                    <option value="Cancelled">{isAr ? 'ملغي' : 'Cancelled'}</option>
+                    <option value="No Show">{isAr ? 'لم يحضر' : 'No Show'}</option>
                   </select>
                 </div>
 
                 <div className="space-y-2 col-span-1 sm:col-span-2">
-                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">Session Type</label>
+                  <label className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('session_type', 'Session Type')}</label>
                   <select 
                     required
                     value={formData.session_type}
                     onChange={(e) => setFormData({ ...formData, session_type: e.target.value })}
                     className="w-full px-3 md:px-4 py-2.5 md:py-3 bg-secondary/30 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold text-sm text-foreground">
-                    <option value="">Select Session Type...</option>
-                    <option value="Physical Therapy">Physical Therapy</option>
-                    <option value="Nutrition">Nutrition</option>
-                    <option value="Lymphatic">Lymphatic</option>
-                    <option value="Other">Other</option>
+                    <option value="">{t('select_session_type')}</option>
+                    <option value="Physical Therapy">{t('physical_therapy')}</option>
+                    <option value="Nutrition">{t('nutrition')}</option>
+                    <option value="Lymphatic">{t('lymphatic')}</option>
+                    <option value="Other">{t('other')}</option>
                   </select>
                 </div>
               </div>
@@ -641,14 +649,14 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
               <div className="p-3 md:p-4 bg-primary/5 rounded-xl md:rounded-2xl border border-primary/10 flex items-start gap-2 md:gap-3">
                 <AlertCircle className="text-primary shrink-0" size={16} />
                 <p className="text-[9px] md:text-[10px] font-bold text-primary uppercase tracking-wider leading-relaxed">
-                  System will automatically check for availability. notices will trigger for conflicts.
+                  {t('avail_check_notice')}
                 </p>
               </div>
 
               <button 
                 type="submit"
                 className="w-full bg-primary text-primary-foreground py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-sm md:text-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 md:gap-3 uppercase tracking-[0.2em]">
-                {editingAppointment ? 'Update' : 'Confirm'}
+                {editingAppointment ? t('update') : t('confirm')}
               </button>
             </form>
           </div>
@@ -660,32 +668,32 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-card border border-border rounded-2xl shadow-2xl p-6 w-full max-w-md space-y-4 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-foreground text-lg">Mark Session as Completed</h3>
+              <h3 className="font-bold text-foreground text-lg">{t('mark_session_completed')}</h3>
               <button onClick={() => setCompletingAppointment(null)} className="text-muted-foreground hover:text-foreground p-1 rounded-lg hover:bg-muted transition-all">
                 <X size={18} />
               </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Patient: <span className="font-bold text-foreground">{completingAppointment.client_first_name} {completingAppointment.client_last_name}</span>
+              {isAr ? 'المريض:' : 'Patient:'} <span className="font-bold text-foreground">{completingAppointment.client_first_name} {completingAppointment.client_last_name}</span>
             </p>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Treatment Notes (optional)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('treatment_notes_optional')}</label>
                 <textarea
                   rows={3}
                   value={completionNotes.treatment_notes}
                   onChange={e => setCompletionNotes(prev => ({ ...prev, treatment_notes: e.target.value }))}
-                  placeholder="Describe today's treatment..."
+                  placeholder={t('desc_today_treatment')}
                   className="w-full px-3 py-2 text-sm bg-background border border-border rounded-xl text-foreground font-medium focus:ring-2 focus:ring-primary outline-none resize-none transition-all"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Progress Notes (optional)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('progress_notes_optional')}</label>
                 <textarea
                   rows={2}
                   value={completionNotes.progress_notes}
                   onChange={e => setCompletionNotes(prev => ({ ...prev, progress_notes: e.target.value }))}
-                  placeholder="Patient progress observations..."
+                  placeholder={t('patient_progress_obs')}
                   className="w-full px-3 py-2 text-sm bg-background border border-border rounded-xl text-foreground font-medium focus:ring-2 focus:ring-primary outline-none resize-none transition-all"
                 />
               </div>
@@ -704,6 +712,10 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                       doctor_id: completingAppointment.doctor_id,
                       session_type: completingAppointment.session_type
                     });
+                    // Trigger WhatsApp Review after updating to Completed
+                    if (completingAppointment.client_phone) {
+                      handleWhatsApp(completingAppointment, 'review');
+                    }
                     setCompletingAppointment(null);
                     setEditingAppointment(null);
                     setCompletionNotes({ treatment_notes: '', progress_notes: '' });
@@ -712,13 +724,13 @@ export function CalendarView({ clients, currentUser }: CalendarViewProps) {
                 }}
                 className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-xs uppercase tracking-widest hover:-translate-y-0.5 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
               >
-                <CheckCircle size={16} /> Confirm Complete
+                <CheckCircle size={16} /> {t('confirm_complete')}
               </button>
               <button
                 onClick={() => setCompletingAppointment(null)}
                 className="px-4 py-3 bg-muted text-foreground border border-border rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-muted/80 transition-all"
               >
-                Cancel
+                {t('cancel')}
               </button>
             </div>
           </div>

@@ -65,7 +65,7 @@ export interface AuditLog {
 export interface User {
   id: number;
   username: string;
-  role: 'admin' | 'doctor' | 'staff';
+  role: 'owner' | 'admin' | 'doctor' | 'staff' | 'cfo';
   doctor_id?: number;
   status?: 'active' | 'frozen';
   base_salary?: number;

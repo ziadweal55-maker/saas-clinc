@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { AlertCircle, UserPlus, ShieldCheck, Lock, User } from 'lucide-react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SetupViewProps {
   onComplete: () => void;
 }
 
 export function SetupView({ onComplete }: SetupViewProps) {
+  const { t, isAr } = useLanguage();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,11 +18,11 @@ export function SetupView({ onComplete }: SetupViewProps) {
     e.preventDefault();
     setError('');
     if (password !== confirmPassword) {
-      setError('Passwords do not match. Please verify.');
+      setError(t('pwd_mismatch_error'));
       return;
     }
     if (password.length < 6) {
-      setError('Security requirement: Password must be at least 6 characters.');
+      setError(t('pwd_length_error'));
       return;
     }
 
@@ -30,10 +32,10 @@ export function SetupView({ onComplete }: SetupViewProps) {
       if (result.success) {
         onComplete();
       } else {
-        setError(result.error || 'Setup initialization failed.');
+        setError(result.error || t('setup_failed_error'));
       }
     } catch (err) {
-      setError('A critical system error occurred during initial setup.');
+      setError(t('critical_setup_error'));
     } finally {
       setIsLoading(false);
     }
@@ -52,14 +54,14 @@ export function SetupView({ onComplete }: SetupViewProps) {
             <div className="inline-flex items-center justify-center p-3 bg-primary/10 text-primary rounded-2xl mb-4">
                <ShieldCheck size={32} />
             </div>
-            <h1 className="text-4xl font-bold tracking-tighter text-foreground font-heading italic">INITIAL SETUP</h1>
-            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">Initialize Administrator Account</p>
+            <h1 className="text-4xl font-bold tracking-tighter text-foreground font-heading italic">{t('initial_setup')}</h1>
+            <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground">{t('init_admin_acc')}</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                <User size={12} /> Admin Username
+              <label className={`text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 ${isAr ? 'mr-1' : 'ml-1'}`}>
+                <User size={12} /> {t('username')}
               </label>
               <input
                 type="text"
@@ -71,29 +73,29 @@ export function SetupView({ onComplete }: SetupViewProps) {
             </div>
             
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                <Lock size={12} /> New Password
+              <label className={`text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 ${isAr ? 'mr-1' : 'ml-1'}`}>
+                <Lock size={12} /> {t('new_password')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-4 rounded-2xl bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium text-foreground"
-                placeholder="At least 6 characters"
+                placeholder={t('pwd_length_error')}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                <ShieldCheck size={12} /> Confirm Password
+              <label className={`text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 ${isAr ? 'mr-1' : 'ml-1'}`}>
+                <ShieldCheck size={12} /> {t('confirm_pwd')}
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-4 rounded-2xl bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium text-foreground"
-                placeholder="Re-enter password"
+                placeholder={t('confirm_pwd')}
                 required
               />
             </div>
@@ -112,9 +114,9 @@ export function SetupView({ onComplete }: SetupViewProps) {
                 className="w-full py-4 bg-accent text-accent-foreground rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl shadow-accent/20 hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isLoading ? (
-                  <><div className="animate-spin h-4 w-4 border-2 border-accent-foreground border-t-transparent rounded-full" /> Initializing...</>
+                  <><div className="animate-spin h-4 w-4 border-2 border-accent-foreground border-t-transparent rounded-full" /> {t('initializing')}</>
                 ) : (
-                  <><UserPlus size={18} /> Complete Secure Setup</>
+                  <><UserPlus size={18} /> {t('complete_secure_setup')}</>
                 )}
               </button>
             </div>
@@ -122,13 +124,13 @@ export function SetupView({ onComplete }: SetupViewProps) {
           
           <div className="text-center">
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-              Protected by Enterprise-Grade Encryption
+              {t('protected_encryption')}
             </p>
           </div>
         </div>
         
         <div className="mt-8 text-center">
-           <p className="text-xs text-muted-foreground font-medium">System Configuration Mode | &copy; 2026 Revive Medical</p>
+           <p className="text-xs text-muted-foreground font-medium">{t('sys_config_mode_footer')}</p>
         </div>
       </div>
     </div>

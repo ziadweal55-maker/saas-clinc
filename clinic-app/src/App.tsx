@@ -24,9 +24,11 @@ import { AttendanceView } from './views/AttendanceView';
 import { AccountRequestsView } from './views/AccountRequestsView';
 import { InvestigationAdmin } from './components/InvestigationAdmin';
 import { ChangePasswordView } from './views/ChangePasswordView';
+import { useLanguage } from './hooks/useLanguage';
 
 export default function App() {
   const { tenantSettings, loading: tenantLoading } = useTenant();
+  const { language, setLanguage, t, isAr } = useLanguage();
   const isFeatureEnabled = useCallback((key: string) => {
     if (!tenantSettings || !tenantSettings.features) return true;
     return !!(tenantSettings.features as Record<string, boolean>)[key];
@@ -399,9 +401,9 @@ export default function App() {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 w-64 bg-card text-card-foreground flex flex-col shadow-xl z-40 transition-transform duration-300 border-r border-border overflow-y-auto
+        fixed inset-y-0 ${isAr ? 'right-0 border-l' : 'left-0 border-r'} w-64 bg-card text-card-foreground flex flex-col shadow-xl z-40 transition-transform duration-300 border-border overflow-y-auto
         lg:translate-x-0 lg:static lg:flex
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        ${isSidebarOpen ? 'translate-x-0' : (isAr ? 'translate-x-full lg:translate-x-0' : '-translate-x-full lg:translate-x-0')}
       `}>
         <div className="p-8 pb-6 flex justify-between items-center">
           <div>
@@ -409,18 +411,25 @@ export default function App() {
               {tenantSettings?.name || 'Clinic Management'}
             </h2>
             <p className="text-[10px] uppercase tracking-[0.3em] font-bold mt-1 text-muted-foreground">
-              {tenantSettings?.name ? 'SaaS Workspace' : 'Clinic'}
+              {tenantSettings?.name ? t('system_settings') : t('clinic_assessment')}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <button 
+              onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+              className="p-2 px-2.5 rounded-xl bg-secondary/20 text-primary hover:bg-secondary/40 transition-all active:scale-90 border border-primary/20 text-[10px] font-bold tracking-wider font-sans shrink-0 cursor-pointer"
+              title={language === 'ar' ? 'Switch to English' : 'تحويل للغة العربية'}
+            >
+              {language === 'ar' ? 'EN' : 'عربي'}
+            </button>
             <button 
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-xl bg-secondary/20 text-primary hover:bg-secondary/40 transition-all active:scale-90 border border-primary/20">
+              className="p-2 rounded-xl bg-secondary/20 text-primary hover:bg-secondary/40 transition-all active:scale-90 border border-primary/20 cursor-pointer">
               {darkMode ? <Activity size={18} /> : <Settings size={18} />}
             </button>
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="p-2 rounded-xl bg-destructive/10 text-destructive lg:hidden transition-all active:scale-90 border border-destructive/20">
+              className="p-2 rounded-xl bg-destructive/10 text-destructive lg:hidden transition-all active:scale-90 border border-destructive/20 cursor-pointer">
               <X size={18} />
             </button>
           </div>
@@ -430,24 +439,24 @@ export default function App() {
           {(isAdmin || isDoctor) && (
             <button 
               onClick={() => setCurrentView('dashboard')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'dashboard' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <Home size={20} /> {isAdmin ? 'Dashboard' : 'Recovery Monitoring'}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'dashboard' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <Home size={20} /> {isAdmin ? t('dashboard') : t('recovery_monitoring')}
             </button>
           )}
           
           {isFeatureEnabled('calendar') && (
             <button 
               onClick={() => setCurrentView('calendar')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'calendar' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <Calendar size={20} /> Calendar
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'calendar' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <Calendar size={20} /> {t('calendar')}
             </button>
           )}
           
           {(isAdmin || isDoctor || isStaff) && isFeatureEnabled('patients') && (
             <button 
               onClick={() => setCurrentView('clients')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'clients' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <Users size={20} /> Patients
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'clients' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <Users size={20} /> {t('patients')}
             </button>
           )}
 
@@ -455,55 +464,55 @@ export default function App() {
           {(isAdmin || isCfo) && isFeatureEnabled('reports') && (
             <button 
               onClick={() => setCurrentView('reports')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'reports' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <FileText size={20} /> Reports
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'reports' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <FileText size={20} /> {t('reports')}
             </button>
           )}
 
           {(isAdmin || isCfo) && isFeatureEnabled('finance') && (
             <button 
               onClick={() => setCurrentView('finance')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'finance' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <DollarSign size={20} /> Finance
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'finance' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <DollarSign size={20} /> {t('finance')}
             </button>
           )}
 
           {(isAdmin || isDoctor) && isFeatureEnabled('assessments') && (
             <button 
               onClick={() => setCurrentView('assessment')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'assessment' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <ClipboardList size={20} /> Clinic Assessment
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'assessment' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <ClipboardList size={20} /> {t('clinic_assessment')}
             </button>
           )}
 
           {(isAdmin || isDoctor) && isFeatureEnabled('exercises') && (
             <button 
               onClick={() => setCurrentView('exercises')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'exercises' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <Dumbbell size={20} /> Exercise Library
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'exercises' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <Dumbbell size={20} /> {t('exercise_library')}
             </button>
           )}
 
           {(isAdmin || isDoctor) && isFeatureEnabled('investigations') && (
             <button 
               onClick={() => setCurrentView('investigation-library')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'investigation-library' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <FlaskConical size={20} /> Investigation Library
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'investigation-library' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <FlaskConical size={20} /> {t('investigation_library')}
             </button>
           )}
  
           {isAdmin && isFeatureEnabled('ai_assistant') && (
             <button 
               onClick={() => setCurrentView('ai-assistant')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'ai-assistant' ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20 font-bold' : 'hover:bg-accent/10 text-muted-foreground hover:text-accent'}`}>
-              <Bot size={20} /> Revive AI Assist
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'ai-assistant' ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/20 font-bold' : 'hover:bg-accent/10 text-muted-foreground hover:text-accent'} cursor-pointer`}>
+              <Bot size={20} /> {t('ai_assist')}
             </button>
           )}
           {isAdmin && isFeatureEnabled('users') && (
             <button 
               onClick={() => setCurrentView('approvals')} 
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'approvals' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'}`}>
-              <UserCheck size={20} /> Account Requests
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === 'approvals' ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 font-bold' : 'hover:bg-secondary/10 text-muted-foreground hover:text-primary'} cursor-pointer`}>
+              <UserCheck size={20} /> {t('account_requests')}
             </button>
           )}
         </nav>
@@ -512,26 +521,26 @@ export default function App() {
            {isFeatureEnabled('attendance') && (
              <button 
                onClick={() => setCurrentView('attendance')}
-               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'attendance' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'}`}>
-               <Clock size={20} /> Shift Attendance
+               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'attendance' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'} cursor-pointer`}>
+               <Clock size={20} /> {t('shift_attendance')}
              </button>
            )}
            {isAdmin && (
              <button 
                onClick={() => setCurrentView('settings')}
-               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'settings' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'}`}>
-               <Settings size={20} /> Settings & Backup
+               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${currentView === 'settings' ? 'bg-secondary/20 text-primary' : 'text-muted-foreground hover:bg-secondary/10 hover:text-primary'} cursor-pointer`}>
+               <Settings size={20} /> {t('settings_backup')}
              </button>
            )}
            <button 
              onClick={handleLogout}
-             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors cursor-pointer"
            >
-             <X size={20} /> Log Out
+             <X size={20} /> {t('logout')}
            </button>
            <div className="mt-3 mx-2 p-3 rounded-xl bg-muted/30 border border-border/50 space-y-1.5 mb-2">
               <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                User: {currentUser?.username} ({currentUser?.role})
+                {t('user')}: {currentUser?.username} ({currentUser?.role})
               </div>
               {currentBranch && isFeatureEnabled('branches') && (
                 <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold uppercase tracking-widest mb-1">
@@ -542,14 +551,14 @@ export default function App() {
               {(isAdmin || isCfo) && currentBranch && isFeatureEnabled('branches') && (
                 <button
                   onClick={() => setNeedsBranchSelection(true)}
-                  className="mt-1 w-full py-2 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-1"
+                  className="mt-1 w-full py-2 px-3 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg text-[10px] font-extrabold uppercase tracking-widest transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  Switch Branch
+                  {t('switch_branch')}
                 </button>
               )}
             </div>
             <div className="px-4 pt-1 pb-6 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-              Version 4.0.0-REVIVE
+              {t('version')} 4.0.0-REVIVE
             </div>
         </div>
       </div>
@@ -618,37 +627,37 @@ export default function App() {
           {isAdmin && (
             <button 
               onClick={() => setCurrentView('dashboard')} 
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'dashboard' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'dashboard' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'} cursor-pointer`}>
               <Home size={18} />
-              <span className="text-[9px] uppercase tracking-wider font-black">Home</span>
+              <span className="text-[9px] uppercase tracking-wider font-black">{t('home')}</span>
             </button>
           )}
           {isFeatureEnabled('calendar') && (
             <button 
               onClick={() => setCurrentView('calendar')} 
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'calendar' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'calendar' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'} cursor-pointer`}>
               <Calendar size={18} />
-              <span className="text-[9px] uppercase tracking-wider font-black">Schedule</span>
+              <span className="text-[9px] uppercase tracking-wider font-black">{t('schedule')}</span>
             </button>
           )}
           {(isAdmin || isDoctor || isStaff) && isFeatureEnabled('patients') && (
             <button 
               onClick={() => setCurrentView('clients')} 
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'clients' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'}`}>
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all active:scale-95 ${currentView === 'clients' ? 'text-primary bg-primary/10 font-bold scale-105' : 'text-muted-foreground'} cursor-pointer`}>
               <Users size={18} />
-              <span className="text-[9px] uppercase tracking-wider font-black">Patients</span>
+              <span className="text-[9px] uppercase tracking-wider font-black">{t('patients')}</span>
             </button>
           )}
           <button 
             onClick={() => setIsSidebarOpen(true)} 
-            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-muted-foreground active:scale-95 hover:text-primary transition-all">
+            className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-muted-foreground active:scale-95 hover:text-primary transition-all cursor-pointer">
             <Menu size={18} />
-            <span className="text-[9px] uppercase tracking-wider font-black">Menu</span>
+            <span className="text-[9px] uppercase tracking-wider font-black">{t('menu')}</span>
           </button>
         </div>
 
         {/* Toasts overlay */}
-        <div className="fixed bottom-20 md:bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none no-print">
+        <div className={`fixed bottom-20 md:bottom-6 ${isAr ? 'left-6' : 'right-6'} z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none no-print`}>
           {toasts.map(toast => {
             const colors = {
               success: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400',
