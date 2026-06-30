@@ -461,8 +461,8 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
     ] : []),
     // These tabs show for all profiles or when no profile:
     { id: 'documents', label: 'medical_records_tab', icon: FileText },
-    { id: 'exercises', label: 'home_exercises_tab', icon: Dumbbell },
-    { id: 'home-exercises', label: 'clinical_exercises_tab', icon: Sparkles },
+    { id: 'exercises', label: 'clinical_exercises_tab', icon: Sparkles },
+    { id: 'home-exercises', label: 'home_exercises_tab', icon: Dumbbell },
     { id: 'financials', label: 'session_finance_tab', icon: CreditCard },
     { id: 'progress', label: 'recovery_insights_tab', icon: Activity },
     { id: 'recovery-monitoring', label: 'recovery_monitoring', icon: ClipboardList },
