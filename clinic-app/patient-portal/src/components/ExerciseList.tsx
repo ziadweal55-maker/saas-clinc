@@ -28,12 +28,6 @@ export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) 
 
   useEffect(() => {
     let isMounted = true;
-    const timeout = setTimeout(() => {
-      if (loading && isMounted) {
-        setError('Connection timed out. Please check your internet or server configuration.');
-        setLoading(false);
-      }
-    }, 10000); // 10 second timeout
 
     async function fetchPlan() {
       // Validate UUID
@@ -61,7 +55,6 @@ export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) 
       } finally {
         if (isMounted) {
           setLoading(false);
-          clearTimeout(timeout);
         }
       }
     }
@@ -69,7 +62,6 @@ export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) 
     fetchPlan();
     return () => { 
       isMounted = false;
-      clearTimeout(timeout);
     };
   }, [patientId]);
 
