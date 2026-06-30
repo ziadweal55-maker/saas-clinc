@@ -587,6 +587,10 @@ if (!isElectron) {
     getHighPainAlerts: () => request('GET', '/finance/high-pain-alerts'),
     getPainTestResults: () => request('GET', '/finance/pain-test-results'),
     getPatientFeedbacks: (syncToken: string) => request('GET', `/clients/feedbacks/by-token/${syncToken}`),
+    pushPatientPlan: async (payload: any) => {
+      console.log('[API BRIDGE] pushPatientPlan (No-op in SaaS, client portal reads directly from Neon)', payload);
+      return { success: true };
+    },
     getActiveSessions: () => request('GET', '/finance/active-sessions'),
     getDoctorsList: () => request('GET', '/doctors'),
     getReportStats: (data: any) => request('GET', `/finance/report-stats?startDate=${data.startDate}&endDate=${data.endDate}${data.doctorId ? `&doctorId=${data.doctorId}` : ''}`),

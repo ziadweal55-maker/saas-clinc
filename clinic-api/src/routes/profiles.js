@@ -317,9 +317,11 @@ router.get('/pt/objective-rows/:profileId', authMiddleware, async (req, res) => 
   const { subjectiveId } = req.query;
   try {
     if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
+    const sId = parseInt(subjectiveId);
+    const cleanSubjectiveId = isNaN(sId) ? null : sId;
     const result = await req.db.query(
       'SELECT * FROM PTObjectiveRows WHERE profile_id = $1 AND subjective_id = $2 ORDER BY sort_order ASC',
-      [parseInt(req.params.profileId), subjectiveId ? parseInt(subjectiveId) : null]
+      [parseInt(req.params.profileId), cleanSubjectiveId]
     );
     return res.json(result.rows);
   } catch (error) {
@@ -357,9 +359,11 @@ router.get('/pt/palpation/:profileId', authMiddleware, async (req, res) => {
   const { subjectiveId } = req.query;
   try {
     if (!(await checkBranchAccessByProfileId(req, res, req.params.profileId))) return;
+    const sId = parseInt(subjectiveId);
+    const cleanSubjectiveId = isNaN(sId) ? null : sId;
     const result = await req.db.query(
       'SELECT * FROM PTObjectivePalpation WHERE profile_id = $1 AND subjective_id = $2',
-      [parseInt(req.params.profileId), subjectiveId ? parseInt(subjectiveId) : null]
+      [parseInt(req.params.profileId), cleanSubjectiveId]
     );
     if (result.rowCount === 0) {
       return res.json({ notes: '' });

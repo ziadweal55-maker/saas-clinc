@@ -19,7 +19,7 @@ const getApiBaseUrl = () => {
   }
   
   // Default production API endpoint fallback
-  return 'https://api.clinicmanger-pt.com/api/v1';
+  return 'https://saas-clinc.onrender.com/api/v1';
 };
 
 const API_BASE_URL = getApiBaseUrl();
