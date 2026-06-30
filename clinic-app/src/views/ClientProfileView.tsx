@@ -383,22 +383,24 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
         }
       }
 
-      // 2. Handle sync token persistence
+      // 2. Handle sync token and PIN persistence in database
       let currentToken = client.sync_token;
       if (!currentToken) {
         currentToken = Math.random().toString(36).substring(2, 15);
-        if (window.api.updateClient) {
-          const updatedClient = {
-            ...client,
-            sync_token: currentToken
-          };
-          await window.api.updateClient(client.id, updatedClient);
-          // Update the local client object to prevent re-generation in the same view session
-          client.sync_token = currentToken;
-          setLocalClient(updatedClient);
-          if (onClientUpdated) {
-            onClientUpdated(updatedClient);
-          }
+      }
+      
+      if (window.api.updateClient) {
+        const updatedClient = {
+          ...client,
+          sync_token: currentToken,
+          pin: patientPin
+        };
+        await window.api.updateClient(client.id, updatedClient);
+        client.sync_token = currentToken;
+        client.pin = patientPin;
+        setLocalClient(updatedClient);
+        if (onClientUpdated) {
+          onClientUpdated(updatedClient);
         }
       }
 

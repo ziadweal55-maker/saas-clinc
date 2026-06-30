@@ -1,8 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PinEntry } from './components/PinEntry'
 import { ExerciseList } from './components/ExerciseList'
 import { DailyCheckIn } from './components/DailyCheckIn'
 import { LogOut, Dumbbell, Sparkles, CheckCircle } from 'lucide-react'
+import { request } from './lib/api'
+
+function hexToHslValues(hex: string): string {
+  if (!hex || hex.length !== 7 || !hex.startsWith('#')) {
+    return '160 84% 39%';
+  }
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
 
 function App() {
   const [patientId, setPatientId] = useState<string | null>(() => {
@@ -23,6 +49,26 @@ function App() {
   })
   const [showCheckIn, setShowCheckIn] = useState(false)
   const [sessionCompleted, setSessionCompleted] = useState(false)
+  const [branding, setBranding] = useState<any>(null)
+
+  useEffect(() => {
+    async function loadBranding() {
+      try {
+        const settings = await request('GET', '/global/settings');
+        setBranding(settings);
+        if (settings.primary_color) {
+          const hslString = hexToHslValues(settings.primary_color);
+          document.documentElement.style.setProperty('--primary', hslString);
+        }
+        if (settings.name) {
+          document.title = `${settings.name} Patient Portal`;
+        }
+      } catch (err) {
+        console.error('Failed to load branding:', err);
+      }
+    }
+    loadBranding();
+  }, []);
 
   const handleAuthSuccess = (id: string) => {
     setIsAuthenticated(true)
@@ -51,8 +97,12 @@ function App() {
       <header className="bg-card border-b border-border p-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2 text-primary font-bold">
-            <Dumbbell size={24} />
-            <span className="tracking-tight italic uppercase">Revive Patient Portal</span>
+            {branding?.logo_url ? (
+              <img src={branding.logo_url} alt={branding.name} className="h-6 w-auto object-contain rounded" />
+            ) : (
+              <Dumbbell size={24} />
+            )}
+            <span className="tracking-tight italic uppercase">{branding?.name || 'Revive'} Patient Portal</span>
           </div>
           <button 
             onClick={handleLogout}
