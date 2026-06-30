@@ -17,9 +17,9 @@ export function DailyCheckIn({ patientId, onClose, onSuccess }: DailyCheckInProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate UUID
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId);
-    if (!isUuid) {
+    // Validate patient ID (can be integer or UUID)
+    const isValid = /^\d+$/.test(patientId) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId);
+    if (!isValid) {
       setError('Invalid session. Please log in again.');
       return;
     }

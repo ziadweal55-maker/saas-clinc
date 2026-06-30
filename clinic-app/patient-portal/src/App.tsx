@@ -30,12 +30,17 @@ function hexToHslValues(hex: string): string {
   return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
 }
 
+const isValidPatientId = (id: string | null) => {
+  if (!id) return false;
+  const isInteger = /^\d+$/.test(id);
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  return isInteger || isUuid;
+};
+
 function App() {
   const [patientId, setPatientId] = useState<string | null>(() => {
     const stored = localStorage.getItem('patientId');
-    // More permissive UUID regex check
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(stored || '');
-    if (stored && !isUuid) {
+    if (stored && !isValidPatientId(stored)) {
       localStorage.removeItem('patientId');
       localStorage.removeItem('syncToken');
       return null;
@@ -44,8 +49,7 @@ function App() {
   })
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     const stored = localStorage.getItem('patientId');
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(stored || '');
-    return !!stored && isUuid;
+    return isValidPatientId(stored);
   })
   const [showCheckIn, setShowCheckIn] = useState(false)
   const [sessionCompleted, setSessionCompleted] = useState(false)

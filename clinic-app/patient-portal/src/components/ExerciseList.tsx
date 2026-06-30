@@ -30,9 +30,9 @@ export function ExerciseList({ patientId, onFinishSession }: ExerciseListProps) 
     let isMounted = true;
 
     async function fetchPlan() {
-      // Validate UUID
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId);
-      if (!isUuid) {
+      // Validate patient ID (can be integer or UUID)
+      const isValid = /^\d+$/.test(patientId) || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId);
+      if (!isValid) {
         setError('Invalid session. Please log in again.');
         setLoading(false);
         return;
