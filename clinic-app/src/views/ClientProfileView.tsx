@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Bot, FileText, RefreshCw, ExternalLink, Folder, ChevronLeft, User, Phone, Clipboard, ShieldAlert, CreditCard, Thermometer, Dumbbell, Activity, Plus, X, Sparkles, CheckCircle, ShieldCheck, QrCode, Edit, Trash2, Layers, MapPin, ClipboardList } from 'lucide-react';
 import QRCode from 'react-qr-code';
 import { useLanguage } from '../hooks/useLanguage';
+import { useTenant } from '../hooks/useTenant';
 import { Client, User as UserType } from '../types';
 import { ExercisesTab } from '../components/Exercises';
 import { ProgressTab } from '../components/Progress';
@@ -28,6 +29,7 @@ interface ClientProfileViewProps {
 
 export function ClientProfileView({ client, onBack, onNavigate, currentUser, onClientUpdated }: ClientProfileViewProps) {
   const { t, isAr } = useLanguage();
+  const { tenantSettings } = useTenant();
   const [localClient, setLocalClient] = useState<any>(client);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileFormData, setProfileFormData] = useState({
@@ -425,7 +427,11 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
 
       if (res.success) {
         // Generate the URL for the patient portal
-        const portalUrl = `https://revive-patiant-portal.vercel.app/?token=${currentToken}`;
+        const tenantId = tenantSettings?.id || 'revive';
+        const baseUrl = window.location.hostname.includes('clinicmanger-pt.com') || window.location.hostname.includes('clinicmanager-pt.com')
+          ? 'https://portal.clinicmanger-pt.com'
+          : 'https://saas-clinc-xktx.vercel.app';
+        const portalUrl = `${baseUrl}/?token=${currentToken}&tenant=${tenantId}`;
         setSyncUrl(portalUrl);
         setShowQr(true);
       } else {
@@ -1424,7 +1430,11 @@ export function ClientProfileView({ client, onBack, onNavigate, currentUser, onC
                         )}
                         <button 
                           onClick={() => {
-                            const portalUrl = `https://revive-patiant-portal.vercel.app/?token=${localClient.sync_token || ''}`;
+                            const tenantId = tenantSettings?.id || 'revive';
+                            const baseUrl = window.location.hostname.includes('clinicmanger-pt.com') || window.location.hostname.includes('clinicmanager-pt.com')
+                              ? 'https://portal.clinicmanger-pt.com'
+                              : 'https://saas-clinc-xktx.vercel.app';
+                            const portalUrl = `${baseUrl}/?token=${localClient.sync_token || ''}&tenant=${tenantId}`;
                             setSyncUrl(portalUrl);
                             setShowQr(true);
                           }}
