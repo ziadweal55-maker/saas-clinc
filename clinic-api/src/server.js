@@ -18,17 +18,55 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 // Setup Middlewares
-// Allowed origins: all subdomains of production domain + localhost for dev
-const ALLOWED_ORIGIN_PATTERN = process.env.ALLOWED_ORIGIN || '';
+// Allowed origins: localhost for dev, plus patterns from env (ALLOWED_ORIGIN, CLINIC_BASE_DOMAIN) and default domains
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
+const CLINIC_BASE_DOMAIN = process.env.CLINIC_BASE_DOMAIN || '';
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true); // server-to-server or Postman
-    const isLocalhost = /localhost|127\.0\.0\.1/.test(origin);
-    const isProd = (ALLOWED_ORIGIN_PATTERN && origin.endsWith(ALLOWED_ORIGIN_PATTERN)) ||
-                   origin.endsWith('.vercel.app') ||
-                   origin.endsWith('saasclinic.com') ||
-                   origin.endsWith('.saasclinic.com');
-    if (isLocalhost || isProd) {
+    
+    let hostname;
+    try {
+      hostname = new URL(origin).hostname;
+    } catch (e) {
+      hostname = origin.replace(/^https?:\/\//, '').split(':')[0];
+    }
+    
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    let isAllowed = false;
+    
+    // 1. Check ALLOWED_ORIGIN (supports comma-separated list)
+    if (ALLOWED_ORIGIN) {
+      const patterns = ALLOWED_ORIGIN.split(',').map(p => p.trim().toLowerCase());
+      for (const pattern of patterns) {
+        if (pattern) {
+          const cleanPattern = pattern.replace(/^\*\./, '.'); // convert *.domain.com to .domain.com
+          if (hostname === cleanPattern || hostname.endsWith(cleanPattern.startsWith('.') ? cleanPattern : '.' + cleanPattern)) {
+            isAllowed = true;
+            break;
+          }
+        }
+      }
+    }
+    
+    // 2. Check CLINIC_BASE_DOMAIN (if configured)
+    if (!isAllowed && CLINIC_BASE_DOMAIN) {
+      const cleanBase = CLINIC_BASE_DOMAIN.trim().toLowerCase().replace(/^https?:\/\//, '').split(':')[0];
+      if (hostname === cleanBase || hostname.endsWith('.' + cleanBase)) {
+        isAllowed = true;
+      }
+    }
+    
+    // 3. Defaults (.vercel.app and saasclinic.com)
+    if (!isAllowed) {
+      if (hostname.endsWith('.vercel.app') || hostname === 'vercel.app' ||
+          hostname.endsWith('.saasclinic.com') || hostname === 'saasclinic.com') {
+        isAllowed = true;
+      }
+    }
+    
+    if (isLocalhost || isAllowed) {
       callback(null, true);
     } else {
       callback(new Error(`CORS: Origin not allowed: ${origin}`));
