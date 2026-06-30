@@ -1,4 +1,26 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://127.0.0.1:3000/api/v1' : '/api/v1');
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window === 'undefined') {
+    return '/api/v1';
+  }
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://127.0.0.1:3000/api/v1';
+  }
+  
+  // Dynamically resolve base API domain from hostname
+  // Example: portal.clinicmanger-pt.com -> api.clinicmanger-pt.com
+  const hostParts = window.location.hostname.split('.');
+  if (hostParts.length >= 2) {
+    const baseDomain = hostParts.slice(-2).join('.');
+    return `https://api.${baseDomain}/api/v1`;
+  }
+  
+  return '/api/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const getTenantId = () => {
   if (typeof window !== 'undefined' && window.location) {
