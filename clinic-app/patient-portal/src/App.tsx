@@ -93,7 +93,7 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return <PinEntry onSuccess={handleAuthSuccess} />
+    return <PinEntry onSuccess={handleAuthSuccess} branding={branding} />
   }
 
   return (
