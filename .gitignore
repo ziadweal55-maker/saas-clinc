@@ -4,8 +4,7 @@ node_modules/
 
 # Build outputs
 dist/
-dist-electron/
-build/
+**/dist/
 
 # Environment files (KEEP SECRETS OUT OF GIT)
 .env
@@ -20,14 +19,6 @@ npm-debug.log*
 # OS files
 .DS_Store
 Thumbs.db
-
-# Electron
-*.exe
-*.dmg
-*.AppImage
-
-# Uploads (user data, not code)
-clinic-api/uploads/
 
 # IDE
 .vscode/
