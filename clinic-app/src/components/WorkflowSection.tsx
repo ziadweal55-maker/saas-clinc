@@ -25,8 +25,20 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
   return (
     <section
       id="workflow"
-      className="relative overflow-hidden bg-[#071F18] bg-dark-grid py-20 text-white sm:py-24"
+      className="relative overflow-hidden bg-[#071F18] py-20 text-white sm:py-24"
     >
+      {/* Subtle Clinic Interior Architectural Background */}
+      <img
+        src="/photos/clinic-interior-workflow.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-20"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#071F18]/92 via-[#071F18]/84 to-[#071F18]/95"
+        aria-hidden="true"
+      />
       <div
         className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"
         aria-hidden="true"
@@ -40,7 +52,7 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
           <h2 className="mt-4 text-3xl font-extrabold text-white sm:text-4xl">
             {t.workflow.title}
           </h2>
-          <p className="mt-3 text-base leading-relaxed text-emerald-100/75">
+          <p className="mt-3 text-base leading-relaxed text-emerald-100/80">
             {t.workflow.subtitle}
           </p>
         </div>
@@ -53,7 +65,7 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.35, delay: index * 0.06 }}
-              className="rounded-3xl border border-emerald-500/20 bg-[#0B2F24]/75 p-6"
+              className="rounded-3xl border border-emerald-500/25 bg-[#0B2F24]/80 p-6 backdrop-blur-xs"
             >
               <div className="flex items-center justify-between">
                 <span className="font-mono text-2xl font-extrabold text-[#10B981]">
@@ -73,8 +85,8 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
           ))}
         </div>
 
-        {/* Live Walkthrough / Cloudinary Video Slot */}
-        <div className="mt-12 overflow-hidden rounded-3xl border border-emerald-500/25 bg-[#0B2F24] p-6 sm:p-8">
+        {/* Live Walkthrough Visual Card */}
+        <div className="mt-12 overflow-hidden rounded-3xl border border-emerald-500/25 bg-[#0B2F24]/90 p-6 backdrop-blur-sm sm:p-8">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             <div className="lg:col-span-6">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[#059669]/25 px-3 py-1 text-xs font-bold text-[#A7F3D0]">
@@ -95,7 +107,7 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
                   <span>{t.workflow.videoCard.cta}</span>
                   <ArrowIcon className="h-4 w-4" />
                 </a>
-                <span className="text-xs font-semibold text-emerald-200/75">
+                <span className="text-xs font-semibold text-emerald-200/80">
                   {t.workflow.videoCard.duration}
                 </span>
               </div>
@@ -126,17 +138,23 @@ export const WorkflowSection: React.FC<WorkflowSectionProps> = ({ mediaAssets })
               ) : (
                 <a
                   href="#demo"
-                  className="group relative flex aspect-video w-full flex-col items-center justify-center rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-[#071F18] via-[#0B2F24] to-[#059669]/35 p-6 text-center transition-all hover:border-emerald-400/60"
+                  className="group relative block aspect-video w-full overflow-hidden rounded-2xl border border-emerald-500/30 transition-all hover:border-emerald-400/70"
                 >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#10B981] text-[#071F18] shadow-xl transition-transform group-hover:scale-105">
-                    <Play className="h-7 w-7 fill-current ms-0.5" />
-                  </span>
-                  <span className="mt-4 text-sm font-extrabold text-white">
-                    {t.workflow.videoCard.duration}
-                  </span>
-                  <span className="mt-1 max-w-sm text-xs text-emerald-100/70">
-                    {t.workflow.videoCard.mediaPlaceholderNote}
-                  </span>
+                  <img
+                    src="/photos/doctor-care.jpg"
+                    alt={t.workflow.videoCard.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#071F18]/85 via-[#071F18]/35 to-transparent" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#10B981] text-[#071F18] shadow-xl ring-4 ring-white/20 transition-transform group-hover:scale-110">
+                      <Play className="h-7 w-7 fill-current ms-0.5" />
+                    </span>
+                    <span className="mt-4 rounded-full bg-[#071F18]/80 px-4 py-1.5 text-xs font-extrabold text-white backdrop-blur-xs ring-1 ring-white/15">
+                      {t.workflow.videoCard.previewActionLabel}
+                    </span>
+                  </div>
                 </a>
               )}
             </div>

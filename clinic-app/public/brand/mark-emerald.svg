@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700;800&display=swap');
-      text { font-family: 'Figtree', 'Segoe UI', 'Arial', sans-serif; }
-    </style>
-    
-  </defs>
-  
   <g transform="translate(32, 32) scale(7)">
     <circle cx="41" cy="13" r="4.6" fill="#10B981"/>
     <path d="M 14.44 23.94 A 32.15 32.15 0 0 1 43.56 21.91 A 3.65 3.65 0 0 1 40.71 28.63 A 24.85 24.85 0 0 0 18.2 30.2 A 3.65 3.65 0 0 1 14.44 23.94 Z" fill="#059669"/>
     <path d="M 20.53 36.81 A 34.15 34.15 0 0 1 50.47 36.81 A 3.65 3.65 0 0 1 47.27 43.37 A 26.85 26.85 0 0 0 23.73 43.37 A 3.65 3.65 0 0 1 20.53 36.81 Z" fill="#10B981"/>
     <path d="M 41.64 51.25 A 31.15 31.15 0 0 1 13.36 51.25 A 3.65 3.65 0 0 1 16.67 44.75 A 23.85 23.85 0 0 0 38.33 44.75 A 3.65 3.65 0 0 1 41.64 51.25 Z" fill="#059669"/>
   </g>
-
 </svg>

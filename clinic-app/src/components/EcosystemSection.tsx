@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Monitor, QrCode, Smartphone, Bot, Check } from 'lucide-react';
+import { Monitor, QrCode, Smartphone, Bot, Check, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../context/useLanguage';
 
 const PILLAR_ICONS: Record<string, React.ReactNode> = {
@@ -11,7 +11,7 @@ const PILLAR_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const EcosystemSection: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, isAr } = useLanguage();
 
   return (
     <section id="ecosystem" className="bg-white py-20 sm:py-24">
@@ -28,7 +28,52 @@ export const EcosystemSection: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Editorial Clinic Care Photo Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.45 }}
+          className="relative mt-10 overflow-hidden rounded-3xl border border-[#D1FAE5] bg-[#071F18] shadow-lg shadow-emerald-950/10"
+        >
+          <img
+            src="/photos/doctor-care.jpg"
+            alt={t.ecosystem.banner.headline}
+            loading="lazy"
+            className="h-64 w-full object-cover object-center sm:h-72 lg:h-80"
+          />
+          <div
+            className={`absolute inset-0 ${
+              isAr
+                ? 'bg-gradient-to-l from-[#071F18]/90 via-[#071F18]/65 to-[#071F18]/20'
+                : 'bg-gradient-to-r from-[#071F18]/90 via-[#071F18]/65 to-[#071F18]/20'
+            }`}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 flex flex-col justify-end p-6 sm:justify-center sm:p-10">
+            <div className="max-w-xl">
+              <span className="inline-block rounded-full bg-[#10B981]/20 px-3 py-1 text-[11px] font-bold text-[#A7F3D0] backdrop-blur-xs">
+                {t.ecosystem.banner.eyebrow}
+              </span>
+              <h3 className="mt-3 text-xl font-extrabold leading-snug text-white sm:text-2xl lg:text-3xl">
+                {t.ecosystem.banner.headline}
+              </h3>
+              <div className="mt-5 flex flex-wrap gap-2.5">
+                {t.ecosystem.banner.stats.map((stat) => (
+                  <div
+                    key={stat}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-md ring-1 ring-white/20"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#10B981]" />
+                    <span>{stat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {t.ecosystem.pillars.map((pillar, index) => (
             <motion.div
               key={pillar.id}

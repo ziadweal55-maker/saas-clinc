@@ -115,10 +115,21 @@ export const DemoBookingSection: React.FC<DemoBookingSectionProps> = ({
   );
 
   return (
-    <section id="demo" className="bg-[#F4F7F6] py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="demo" className="relative overflow-hidden bg-[#F4F7F6] py-20 sm:py-24">
+      <img
+        src="/photos/clinic-reception-team.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-[0.07]"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#F4F7F6] via-[#F4F7F6]/92 to-[#F4F7F6]"
+        aria-hidden="true"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-          {/* Left Column: Direct Channels & Demo Agenda */}
+          {/* Left Column: Reception Team Photo, Direct Channels & Demo Agenda */}
           <div className="space-y-6 lg:col-span-5">
             <div>
               <span className="inline-block rounded-full bg-white px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#059669] ring-1 ring-[#D1FAE5]">
@@ -130,6 +141,27 @@ export const DemoBookingSection: React.FC<DemoBookingSectionProps> = ({
               <p className="mt-3 text-base leading-relaxed text-[#0B2F24]/75">
                 {t.demo.subtitle}
               </p>
+            </div>
+
+            <div className="relative overflow-hidden rounded-3xl border border-[#D1FAE5] bg-[#071F18] shadow-sm">
+              <img
+                src="/photos/clinic-reception-team.jpg"
+                alt={t.demo.photoBannerTitle}
+                loading="lazy"
+                className="h-48 w-full object-cover object-center"
+              />
+              <div
+                className="absolute inset-0 bg-gradient-to-t from-[#071F18]/90 via-[#071F18]/35 to-transparent"
+                aria-hidden="true"
+              />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <div className="text-sm font-extrabold text-white">
+                  {t.demo.photoBannerTitle}
+                </div>
+                <div className="mt-0.5 text-xs font-medium text-emerald-200/90">
+                  {t.demo.photoBannerSubtitle}
+                </div>
+              </div>
             </div>
 
             <div className="rounded-3xl border border-[#D1FAE5] bg-white p-6 space-y-4">

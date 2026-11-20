@@ -257,7 +257,7 @@ export const ProductShowcaseMockup: React.FC<ProductShowcaseMockupProps> = ({
                     ))}
                   </div>
 
-                  {/* Gemini AI Co-Pilot Drawer */}
+                  {/* Smart Clinical Assistant Drawer */}
                   <div className="flex flex-col justify-between rounded-2xl bg-[#071F18] p-4 text-white lg:col-span-2">
                     <div>
                       <div className="flex items-center justify-between">
@@ -265,7 +265,7 @@ export const ProductShowcaseMockup: React.FC<ProductShowcaseMockupProps> = ({
                           <Bot className="h-4 w-4" />
                           <span>{t.showcase.clinical.copilotTitle}</span>
                         </div>
-                        <span className="rounded-md bg-white/10 px-2 py-0.5 font-mono text-[10px] text-emerald-200">
+                        <span className="rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-bold text-emerald-200">
                           {t.showcase.clinical.copilotShortcut}
                         </span>
                       </div>
@@ -277,7 +277,7 @@ export const ProductShowcaseMockup: React.FC<ProductShowcaseMockupProps> = ({
                       <div className="mt-3 rounded-xl border border-emerald-500/30 bg-[#059669]/20 p-3 text-xs leading-relaxed text-emerald-100">
                         <div className="mb-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#10B981]">
                           <Sparkles className="h-3 w-3" />
-                          <span>Gemini AI</span>
+                          <span>{t.showcase.clinical.copilotBadge}</span>
                         </div>
                         {t.showcase.clinical.copilotReply}
                       </div>
